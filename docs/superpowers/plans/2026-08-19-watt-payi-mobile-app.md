@@ -450,7 +450,7 @@ git commit -m "feat: add device-breakdown calculation engine"
 - Create: `src/lib/trends.ts`
 - Test: `src/lib/trends.test.ts`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `src/lib/trends.test.ts`:
 ```ts
@@ -494,12 +494,12 @@ describe('detectRisingDevices', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `npx vitest run src/lib/trends.test.ts`
 Expected: FAIL — `Cannot find module './trends'`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 `src/lib/trends.ts`:
 ```ts
@@ -553,12 +553,12 @@ export function detectRisingDevices(bills: BillWithItems[], minConsecutiveMonths
 }
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `npx vitest run src/lib/trends.test.ts`
 Expected: PASS — 2 tests passed
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/trends.ts src/lib/trends.test.ts
