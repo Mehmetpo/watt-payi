@@ -1,0 +1,8 @@
+.home-shell { max-width: 640px; margin: 0 auto; padding: 1.5rem 1.25rem 6rem; }
+.home-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem; }
+.home-delta { font-size: .82rem; font-weight: 700; }
+.home-delta.down { color: var(--good); }
+.home-delta.up { color: var(--coral); }
+.home-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 1.5rem; }
+.home-empty { text-align: center; color: var(--ink-muted); padding: 3rem 1rem; }
+.home-empty a { display: inline-block; margin-top: 1rem; background: var(--accent); color: #fff; padding: .75rem 1.25rem; border-radius: 11px; font-weight: 700; text-decoration: none; }
