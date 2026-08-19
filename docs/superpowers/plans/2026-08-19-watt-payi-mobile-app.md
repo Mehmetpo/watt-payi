@@ -1847,7 +1847,7 @@ git commit -m "feat: add Sonuç step and Supabase save to Add flow"
 **Files:**
 - Create: `supabase/functions/extract-bill/index.ts`
 
-- [ ] **Step 1: Write `supabase/functions/extract-bill/index.ts`**
+- [x] **Step 1: Write `supabase/functions/extract-bill/index.ts`**
 
 ```ts
 import { serve } from 'https://deno.land/std@0.224.0/http/server.ts';
@@ -1934,7 +1934,7 @@ serve(async (req) => {
 });
 ```
 
-- [ ] **Step 2: Deploy and configure secrets**
+- [ ] **Step 2: Deploy and configure secrets** — BLOCKED: same reason as Task 5 Step 2 — no Supabase project exists for this app yet (account's free-project limit of 2 is used by ResumeAI and flort-asistan; re-checked 2026-08-19, still true). Apply once a project is available: `supabase secrets set ANTHROPIC_API_KEY=<key>` then `supabase functions deploy extract-bill`.
 
 Run:
 ```bash
@@ -1943,7 +1943,7 @@ supabase functions deploy extract-bill
 ```
 Expected: deploy succeeds; `supabase functions list` shows `extract-bill` as active.
 
-- [ ] **Step 3: Smoke-test with curl** (replace `<anon-jwt>` with a logged-in user's access token and point at a real bill photo encoded as base64)
+- [ ] **Step 3: Smoke-test with curl** — BLOCKED on Step 2 (no deployed function to test against yet). Replace `<anon-jwt>` with a logged-in user's access token and point at a real bill photo encoded as base64 once deployed:
 
 ```bash
 curl -X POST "https://<project-ref>.functions.supabase.co/extract-bill" \
@@ -1953,7 +1953,7 @@ curl -X POST "https://<project-ref>.functions.supabase.co/extract-bill" \
 ```
 Expected: `200` with a JSON body containing `toplam_tutar` (or `null` if the model wasn't confident).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add supabase/functions/extract-bill/index.ts
@@ -1969,7 +1969,7 @@ git commit -m "feat: add extract-bill Edge Function using Claude Vision"
 - Modify: `src/screens/add/steps/BillStep.tsx`
 - Modify: `src/screens/add/AddFlow.css`
 
-- [ ] **Step 1: Write `src/lib/billExtraction.ts`**
+- [x] **Step 1: Write `src/lib/billExtraction.ts`**
 
 ```ts
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
@@ -2010,7 +2010,7 @@ export async function extractBillFromPhoto(base64: string, mediaType: string): P
 }
 ```
 
-- [ ] **Step 2: Add the capture button + error state to `src/screens/add/steps/BillStep.tsx`**
+- [x] **Step 2: Add the capture button + error state to `src/screens/add/steps/BillStep.tsx`**
 
 ```tsx
 import { useState } from 'react';
@@ -2094,12 +2094,9 @@ export function BillStep({ value, onChange }: BillStepProps) {
 }
 ```
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify** — `npm run build` shows only pre-existing pending-screen errors (`HomeScreen`/`HistoryScreen`/`HistoryDetailScreen`/`ProfileScreen`, expected until Tasks 17–19); no errors reference `BillStep` or `billExtraction`. Manual check happens once the app is running on a device (Task 21) since `Camera.getPhoto` needs a native/browser camera permission prompt.
 
-Run: `npm run build`
-Expected: builds without TypeScript errors. Manual check happens once the app is running on a device (Task 21) since `Camera.getPhoto` needs a native/browser camera permission prompt.
-
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/lib/billExtraction.ts src/screens/add/steps/BillStep.tsx
@@ -2114,7 +2111,7 @@ git commit -m "feat: wire bill-photo capture and Claude Vision extraction into F
 - Create: `src/screens/home/HomeScreen.tsx`
 - Create: `src/screens/home/HomeScreen.css`
 
-- [ ] **Step 1: Write `src/screens/home/HomeScreen.css`**
+- [x] **Step 1: Write `src/screens/home/HomeScreen.css`**
 
 ```css
 .home-shell { max-width: 640px; margin: 0 auto; padding: 1.5rem 1.25rem 6rem; }
@@ -2127,7 +2124,7 @@ git commit -m "feat: wire bill-photo capture and Claude Vision extraction into F
 .home-empty a { display: inline-block; margin-top: 1rem; background: var(--accent); color: #fff; padding: .75rem 1.25rem; border-radius: 11px; font-weight: 700; text-decoration: none; }
 ```
 
-- [ ] **Step 2: Write `src/screens/home/HomeScreen.tsx`**
+- [x] **Step 2: Write `src/screens/home/HomeScreen.tsx`**
 
 ```tsx
 import { useEffect, useState } from 'react';
@@ -2221,12 +2218,9 @@ export function HomeScreen() {
 }
 ```
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify** — `npm run build` shows only pre-existing pending-screen errors (`HistoryScreen`/`HistoryDetailScreen`/`ProfileScreen`, expected until Tasks 18–19); no errors reference `HomeScreen`.
 
-Run: `npm run build`
-Expected: builds without TypeScript errors.
-
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/screens/home/HomeScreen.tsx src/screens/home/HomeScreen.css
@@ -2242,7 +2236,7 @@ git commit -m "feat: add Ana Sayfa dashboard"
 - Create: `src/screens/history/HistoryDetailScreen.tsx`
 - Create: `src/screens/history/HistoryScreen.css`
 
-- [ ] **Step 1: Write `src/screens/history/HistoryScreen.css`**
+- [x] **Step 1: Write `src/screens/history/HistoryScreen.css`**
 
 ```css
 .history-shell { max-width: 640px; margin: 0 auto; padding: 1.5rem 1.25rem 6rem; }
@@ -2261,7 +2255,7 @@ git commit -m "feat: add Ana Sayfa dashboard"
 .history-back { display: inline-block; margin-bottom: 1rem; color: var(--ink-muted); text-decoration: none; font-size: .85rem; }
 ```
 
-- [ ] **Step 2: Write `src/screens/history/HistoryScreen.tsx`** (list + rising-device insight banner)
+- [x] **Step 2: Write `src/screens/history/HistoryScreen.tsx`** (list + rising-device insight banner)
 
 ```tsx
 import { useEffect, useState } from 'react';
@@ -2338,7 +2332,7 @@ export function HistoryScreen() {
 }
 ```
 
-- [ ] **Step 3: Write `src/screens/history/HistoryDetailScreen.tsx`**
+- [x] **Step 3: Write `src/screens/history/HistoryDetailScreen.tsx`**
 
 ```tsx
 import { useEffect, useState } from 'react';
@@ -2394,14 +2388,9 @@ export function HistoryDetailScreen() {
 }
 ```
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify** — `npm run build` shows only the `ProfileScreen` missing-module error (expected until Task 19); no errors reference `HomeScreen`, `AddFlow`, `HistoryScreen`, or `HistoryDetailScreen`.
 
-Run: `npm run build`
-Expected: builds without TypeScript errors. With Tasks 11–18 done, `App.tsx`'s full route tree now compiles — run once more:
-Run: `npm run build`
-Expected: no missing-module errors for `HomeScreen`, `AddFlow`, `HistoryScreen`, `HistoryDetailScreen` (`ProfileScreen` still missing until Task 19).
-
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/screens/history/HistoryScreen.tsx src/screens/history/HistoryDetailScreen.tsx src/screens/history/HistoryScreen.css
@@ -2416,7 +2405,7 @@ git commit -m "feat: add Geçmiş list, detail screen, and rising-device insight
 - Create: `src/screens/profile/ProfileScreen.tsx`
 - Create: `src/screens/profile/ProfileScreen.css`
 
-- [ ] **Step 1: Write `src/screens/profile/ProfileScreen.css`**
+- [x] **Step 1: Write `src/screens/profile/ProfileScreen.css`**
 
 ```css
 .profile-shell { max-width: 640px; margin: 0 auto; padding: 1.5rem 1.25rem 6rem; }
@@ -2430,7 +2419,7 @@ git commit -m "feat: add Geçmiş list, detail screen, and rising-device insight
 .profile-device-row input { width: 4.5rem; text-align: right; border: 1.5px solid var(--line); border-radius: 8px; padding: .35rem .5rem; font-family: 'IBM Plex Mono', monospace; background: var(--surface-sunken); color: var(--ink); }
 ```
 
-- [ ] **Step 2: Write `src/screens/profile/ProfileScreen.tsx`**
+- [x] **Step 2: Write `src/screens/profile/ProfileScreen.tsx`**
 
 ```tsx
 import { useEffect, useState } from 'react';
@@ -2534,12 +2523,9 @@ export function ProfileScreen() {
 }
 ```
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify** — as expected, build failed on missing `src/lib/notifications.ts` until Task 20 landed; confirmed resolved in Task 20's full-project build.
 
-Run: `npm run build`
-Expected: this references `scheduleMonthlyReminder` from `src/lib/notifications.ts`, which is created in Task 20 — the build will fail until that task lands. That's expected; proceed to Task 20 before checking the build.
-
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/screens/profile/ProfileScreen.tsx src/screens/profile/ProfileScreen.css
@@ -2553,7 +2539,7 @@ git commit -m "feat: add Profil screen with reminder-day setting and sign out"
 **Files:**
 - Create: `src/lib/notifications.ts`
 
-- [ ] **Step 1: Write `src/lib/notifications.ts`**
+- [x] **Step 1: Write `src/lib/notifications.ts`**
 
 ```ts
 import { LocalNotifications } from '@capacitor/local-notifications';
@@ -2585,12 +2571,9 @@ export async function scheduleMonthlyReminder(dayOfMonth: number): Promise<void>
 }
 ```
 
-- [ ] **Step 2: Verify**
+- [x] **Step 2: Verify** — `npm run build` succeeds with no TypeScript errors: first clean full-project build. `npm run test` also passes (6/6 tests).
 
-Run: `npm run build`
-Expected: builds without TypeScript errors — `ProfileScreen.tsx` (Task 19) and `App.tsx`'s full route tree (Task 9) now resolve. This is the first clean full-project build.
-
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/lib/notifications.ts
