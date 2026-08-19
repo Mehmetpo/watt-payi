@@ -1,0 +1,15 @@
+.login-shell { max-width: 360px; margin: 0 auto; padding: 4rem 1.5rem; display: flex; flex-direction: column; gap: .5rem; }
+.login-sub { color: var(--ink-muted); margin: 0 0 1.5rem; }
+.login-form { display: flex; flex-direction: column; gap: .5rem; }
+.login-form label { font-size: .8rem; font-weight: 600; color: var(--ink-muted); }
+.login-form input {
+  border: 1.5px solid var(--line); border-radius: 12px; padding: .8rem 1rem;
+  background: var(--surface-sunken); color: var(--ink); font-size: 1rem; outline: 0;
+}
+.login-form input:focus { border-color: var(--accent); }
+.login-form button {
+  margin-top: .5rem; border: 0; border-radius: 12px; padding: .85rem;
+  background: var(--accent); color: #fff; font-weight: 700; cursor: pointer;
+}
+.login-form button:disabled { opacity: .6; cursor: not-allowed; }
+.login-error { color: var(--coral); font-size: .85rem; margin-top: .75rem; }
