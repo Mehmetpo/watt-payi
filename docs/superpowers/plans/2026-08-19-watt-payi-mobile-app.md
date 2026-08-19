@@ -2587,31 +2587,19 @@ git commit -m "feat: schedule monthly local-notification reminder"
 **Files:**
 - No new source files — Capacitor generates the `android/` directory (gitignored).
 
-- [ ] **Step 1: Add the Android platform**
+- [x] **Step 1: Add the Android platform** — done: `npm run build`, `npx cap add android`, `npx cap sync android` all succeeded; `android/` directory created (gitignored, nothing to commit).
 
-Run:
-```bash
-npm run build
-npx cap add android
-npx cap sync android
-```
-Expected: `android/` directory created, sync completes with no errors.
+- [ ] **Step 2: Run on a connected device via adb** — BLOCKED: `adb devices` shows no connected device. Android SDK and adb are installed (`C:\Users\cebem\AppData\Local\Android\Sdk`), so once a device is plugged in with USB debugging enabled, run `npx cap run android`.
 
-- [ ] **Step 2: Run on a connected device via adb** (matches the existing project preference for testing on a real device rather than an emulator)
-
-Run:
-```bash
-npx cap run android
-```
-Expected: app installs and launches on the connected device; `adb devices` shows the target device as the one used.
-
-- [ ] **Step 3: Manual end-to-end check on the device**
+- [ ] **Step 3: Manual end-to-end check on the device** — BLOCKED on Step 2 (needs the app actually running on a device).
 
 - Log in with email OTP
 - Tap **+ Ekle**, capture a real bill photo, confirm the amount prefills (or the fallback message appears if unreadable)
 - Select 2–3 devices, adjust usage sliders, save
 - Confirm the new bill appears on **Ana Sayfa** and in **Geçmiş**
 - In **Profil**, set a reminder day and confirm the OS notification-permission prompt appears
+
+Note: Steps 2–3 also depend on Tasks 5/15 being unblocked (a live Supabase project + deployed Edge Function) since login, saving bills, and photo extraction all call Supabase.
 
 - [ ] **Step 4: Commit** (only if any fixes were needed during manual testing; otherwise this task has no code change to commit)
 
