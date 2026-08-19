@@ -320,7 +320,7 @@ git commit -m "feat: add Enerji Canlı design tokens and global styles"
 - Create: `src/lib/calc.ts`
 - Test: `src/lib/calc.test.ts`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `src/lib/calc.test.ts`:
 ```ts
@@ -370,12 +370,12 @@ describe('calculateBreakdown', () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `npx vitest run src/lib/calc.test.ts`
 Expected: FAIL — `Cannot find module './calc'`
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 `src/lib/calc.ts`:
 ```ts
@@ -430,12 +430,12 @@ export function calculateBreakdown(devices: DeviceUsage[], bill: BillCalibration
 }
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `npx vitest run src/lib/calc.test.ts`
 Expected: PASS — 4 tests passed
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/calc.ts src/lib/calc.test.ts
