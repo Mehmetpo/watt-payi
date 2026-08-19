@@ -305,7 +305,7 @@ import './styles/global.css';
 Run: `npm run dev`
 Expected: dev server starts, page background/font visibly match the new tokens when opened in a browser.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/styles/tokens.css src/styles/global.css src/main.tsx index.html
