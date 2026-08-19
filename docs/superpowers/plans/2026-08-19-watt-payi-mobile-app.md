@@ -1294,7 +1294,7 @@ git commit -m "feat: add shared BillBreakdown donut + list component"
 
 This task creates the wizard container with in-memory state for all 4 steps, and implements the first step (manual bill entry only — photo capture is wired in Task 16 once the Edge Function exists).
 
-- [ ] **Step 1: Write `src/screens/add/AddFlow.css`**
+- [x] **Step 1: Write `src/screens/add/AddFlow.css`**
 
 ```css
 .add-shell { max-width: 640px; margin: 0 auto; padding: 1.5rem 1.25rem 6rem; }
@@ -1315,7 +1315,7 @@ This task creates the wizard container with in-memory state for all 4 steps, and
 .add-photo-btn { width: 100%; border: 1.5px dashed var(--line); border-radius: 12px; padding: .9rem; background: transparent; color: var(--accent); font-weight: 700; cursor: pointer; margin-bottom: 1rem; }
 ```
 
-- [ ] **Step 2: Write `src/screens/add/steps/BillStep.tsx`**
+- [x] **Step 2: Write `src/screens/add/steps/BillStep.tsx`**
 
 ```tsx
 export interface BillStepValue {
@@ -1364,7 +1364,7 @@ export function BillStep({ value, onChange }: BillStepProps) {
 }
 ```
 
-- [ ] **Step 3: Write `src/screens/add/AddFlow.tsx`** (wizard container; steps 2–4 are stubbed with a "sonraki görevde" placeholder body until Tasks 12–14 fill them in — the container itself has no TBD logic, only the not-yet-built child steps are absent)
+- [x] **Step 3: Write `src/screens/add/AddFlow.tsx`** (wizard container; steps 2–4 are stubbed with a "sonraki görevde" placeholder body until Tasks 12–14 fill them in — the container itself has no TBD logic, only the not-yet-built child steps are absent)
 
 ```tsx
 import { useState } from 'react';
@@ -1408,12 +1408,9 @@ export function AddFlow() {
 }
 ```
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify** — `npm run build` shows only the pre-existing Task 9 errors (missing `HomeScreen`/`HistoryScreen`/`HistoryDetailScreen`/`ProfileScreen`, expected until Tasks 13/15/17 add them); `AddFlow` resolves cleanly with no errors referencing it.
 
-Run: `npm run build`
-Expected: builds without TypeScript errors. `App.tsx` (Task 9) can now resolve `AddFlow`.
-
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/screens/add/AddFlow.tsx src/screens/add/AddFlow.css src/screens/add/steps/BillStep.tsx
