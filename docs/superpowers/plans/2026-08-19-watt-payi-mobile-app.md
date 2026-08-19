@@ -572,7 +572,7 @@ git commit -m "feat: add rising-device trend detection"
 **Files:**
 - Create: `supabase/migrations/0001_init_schema.sql`
 
-- [ ] **Step 1: Write the migration**
+- [x] **Step 1: Write the migration**
 
 `supabase/migrations/0001_init_schema.sql`:
 ```sql
@@ -684,12 +684,9 @@ create policy "bill_photos_owner_write" on storage.objects
   for insert with check (bucket_id = 'bill-photos' and (storage.foldername(name))[1] = auth.uid()::text);
 ```
 
-- [ ] **Step 2: Apply the migration**
+- [ ] **Step 2: Apply the migration** — BLOCKED: no Supabase project exists for this app yet. The account's free-project limit (2) is already used by ResumeAI and flort-asistan (both active/live), and the third project ("Mehmetpo's Project") can't be reactivated without pausing one of those — declined per user instruction 2026-08-19. Apply this manually once a project is available: create/reactivate a project, `supabase link`, then `supabase db push`.
 
-Run (via Supabase CLI, from the project root, after `supabase link` to the project): `supabase db push`
-Expected: `0001_init_schema.sql` applied with no errors; `select * from devices_catalog;` returns 13 rows.
-
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add supabase/migrations/0001_init_schema.sql
