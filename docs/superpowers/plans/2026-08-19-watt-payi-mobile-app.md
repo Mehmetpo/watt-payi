@@ -1161,7 +1161,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
 Note: this task references `HomeScreen`, `AddFlow`, `HistoryScreen`, `HistoryDetailScreen`, `ProfileScreen`, which don't exist yet — the build will fail until Tasks 11–18 add them. Skip the build check here and run it at the end of Task 14 (once `AddFlow` exists) and again at the end of Task 19.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/App.tsx src/main.tsx src/components/BottomNav.tsx src/components/BottomNav.css
