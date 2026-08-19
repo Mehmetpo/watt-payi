@@ -1046,7 +1046,7 @@ git commit -m "feat: add auth context and email-OTP login screen"
 - Create: `src/components/BottomNav.tsx`
 - Create: `src/components/BottomNav.css`
 
-- [ ] **Step 1: Write `src/components/BottomNav.tsx`**
+- [x] **Step 1: Write `src/components/BottomNav.tsx`**
 
 ```tsx
 import { NavLink } from 'react-router-dom';
@@ -1078,7 +1078,7 @@ export function BottomNav() {
 }
 ```
 
-- [ ] **Step 2: Write `src/components/BottomNav.css`**
+- [x] **Step 2: Write `src/components/BottomNav.css`**
 
 ```css
 .bottom-nav {
@@ -1095,7 +1095,7 @@ export function BottomNav() {
 .bottom-nav__icon { font-size: 1.1rem; }
 ```
 
-- [ ] **Step 3: Rewrite `src/App.tsx`**
+- [x] **Step 3: Rewrite `src/App.tsx`**
 
 ```tsx
 import { Navigate, Route, Routes } from 'react-router-dom';
@@ -1138,7 +1138,7 @@ export default function App() {
 }
 ```
 
-- [ ] **Step 4: Add the router to `src/main.tsx`**
+- [x] **Step 4: Add the router to `src/main.tsx`**
 
 ```tsx
 import React from 'react';
@@ -1157,7 +1157,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 );
 ```
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Note: this task references `HomeScreen`, `AddFlow`, `HistoryScreen`, `HistoryDetailScreen`, `ProfileScreen`, which don't exist yet — the build will fail until Tasks 11–18 add them. Skip the build check here and run it at the end of Task 14 (once `AddFlow` exists) and again at the end of Task 19.
 
