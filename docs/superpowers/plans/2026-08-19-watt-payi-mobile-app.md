@@ -228,7 +228,7 @@ git commit -m "chore: scaffold Vite + React + TS + Capacitor project"
 - Create: `src/styles/global.css`
 - Modify: `index.html` (add Google Fonts links)
 
-- [ ] **Step 1: Write `src/styles/tokens.css`** ("Enerji Canlı" palette from the design spec, light + dark)
+- [x] **Step 1: Write `src/styles/tokens.css`** ("Enerji Canlı" palette from the design spec, light + dark)
 
 ```css
 :root {
@@ -268,7 +268,7 @@ git commit -m "chore: scaffold Vite + React + TS + Capacitor project"
 }
 ```
 
-- [ ] **Step 2: Write `src/styles/global.css`**
+- [x] **Step 2: Write `src/styles/global.css`**
 
 ```css
 * { box-sizing: border-box; }
@@ -285,7 +285,7 @@ button { font-family: inherit; }
 a { color: inherit; }
 ```
 
-- [ ] **Step 3: Add font links to `index.html`** (inside `<head>`, after `<title>`)
+- [x] **Step 3: Add font links to `index.html`** (inside `<head>`, after `<title>`)
 
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -293,14 +293,14 @@ a { color: inherit; }
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
 ```
 
-- [ ] **Step 4: Import stylesheets in `src/main.tsx`** (add above `import App`)
+- [x] **Step 4: Import stylesheets in `src/main.tsx`** (add above `import App`)
 
 ```tsx
 import './styles/tokens.css';
 import './styles/global.css';
 ```
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Run: `npm run dev`
 Expected: dev server starts, page background/font visibly match the new tokens when opened in a browser.
