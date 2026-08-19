@@ -702,21 +702,21 @@ git commit -m "feat: add Supabase schema (profiles, devices, bills, bill_items, 
 - Create: `.env.local` (gitignored)
 - Create: `.env.example`
 
-- [ ] **Step 1: Write `.env.example`** (committed, documents the required variables without real secrets)
+- [x] **Step 1: Write `.env.example`** (committed, documents the required variables without real secrets)
 
 ```
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-- [ ] **Step 2: Create `.env.local`** with the real project values (not committed — `.gitignore` already excludes `.env` and `.env.local`)
+- [x] **Step 2: Create `.env.local`** with placeholder values — BLOCKED on real values: no Supabase project exists yet (see Task 5 Step 2). File is gitignored; replace the placeholders with real URL/anon key once a project is created.
 
 ```
-VITE_SUPABASE_URL=<Supabase projesinin URL'i>
-VITE_SUPABASE_ANON_KEY=<Supabase projesinin anon/public key'i>
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-- [ ] **Step 3: Write `src/lib/supabaseClient.ts`**
+- [x] **Step 3: Write `src/lib/supabaseClient.ts`** (also added `src/vite-env.d.ts` with `/// <reference types="vite/client" />` — without it, `tsc -b` fails with "Property 'env' does not exist on type 'ImportMeta'")
 
 ```ts
 import { createClient } from '@supabase/supabase-js';
@@ -745,15 +745,15 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 });
 ```
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 Run: `npm run build`
 Expected: builds without error (env vars are read at runtime, not required for the build to type-check).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
-git add src/lib/supabaseClient.ts .env.example
+git add src/lib/supabaseClient.ts src/vite-env.d.ts .env.example
 git commit -m "feat: add Supabase client with Capacitor-backed session storage"
 ```
 
