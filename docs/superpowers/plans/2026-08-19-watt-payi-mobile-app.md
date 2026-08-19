@@ -1426,7 +1426,7 @@ git commit -m "feat: add Add-flow wizard shell and Fatura step"
 - Modify: `src/screens/add/AddFlow.css`
 - Modify: `src/screens/add/AddFlow.tsx`
 
-- [ ] **Step 1: Add device-grid styles to `src/screens/add/AddFlow.css`** (append)
+- [x] **Step 1: Add device-grid styles to `src/screens/add/AddFlow.css`** (append)
 
 ```css
 .device-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; }
@@ -1441,7 +1441,7 @@ git commit -m "feat: add Add-flow wizard shell and Fatura step"
 .device-card.on span, .device-card.on svg { color: #4A3FCF; }
 ```
 
-- [ ] **Step 2: Write `src/screens/add/steps/DevicesStep.tsx`**
+- [x] **Step 2: Write `src/screens/add/steps/DevicesStep.tsx`**
 
 ```tsx
 import { DEVICE_CATALOG } from '../../../data/deviceCatalog';
@@ -1470,7 +1470,7 @@ export function DevicesStep({ selected, onToggle }: DevicesStepProps) {
 }
 ```
 
-- [ ] **Step 3: Wire the step into `src/screens/add/AddFlow.tsx`**
+- [x] **Step 3: Wire the step into `src/screens/add/AddFlow.tsx`**
 
 Add imports:
 ```tsx
@@ -1504,12 +1504,9 @@ Update the "Devam et" disabled condition:
 disabled={(step === 0 && bill.billTl <= 0) || (step === 1 && selectedDevices.size === 0)}
 ```
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify** — `npm run build` shows only the pre-existing Task 9 errors (missing `HomeScreen`/`HistoryScreen`/`HistoryDetailScreen`/`ProfileScreen`, expected until Tasks 13/15/17 add them); no errors reference `DevicesStep` or `AddFlow`.
 
-Run: `npm run build`
-Expected: builds without TypeScript errors.
-
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/screens/add/steps/DevicesStep.tsx src/screens/add/AddFlow.css src/screens/add/AddFlow.tsx

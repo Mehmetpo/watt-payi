@@ -14,3 +14,14 @@
 .add-btn-primary:disabled { opacity: .4; cursor: not-allowed; }
 .add-btn-ghost { background: transparent; color: var(--ink-muted); border: 1.5px solid var(--line); }
 .add-photo-btn { width: 100%; border: 1.5px dashed var(--line); border-radius: 12px; padding: .9rem; background: transparent; color: var(--accent); font-weight: 700; cursor: pointer; margin-bottom: 1rem; }
+
+.device-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; }
+.device-card {
+  border: 1.5px solid var(--line); border-radius: 13px; background: var(--surface-sunken);
+  padding: .85rem .5rem; text-align: center; cursor: pointer; display: flex;
+  flex-direction: column; align-items: center; gap: .4rem;
+}
+.device-card span { font-size: .7rem; font-weight: 600; color: var(--ink-muted); }
+.device-card svg { color: var(--ink-muted); }
+.device-card.on { background: var(--accent-soft); border-color: var(--accent); }
+.device-card.on span, .device-card.on svg { color: #4A3FCF; }
