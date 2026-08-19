@@ -766,7 +766,7 @@ git commit -m "feat: add Supabase client with Capacitor-backed session storage"
 - Create: `src/data/deviceCatalog.ts`
 - Create: `src/components/ApplianceIcon.tsx`
 
-- [ ] **Step 1: Write `src/types/domain.ts`**
+- [x] **Step 1: Write `src/types/domain.ts`**
 
 ```ts
 export interface DeviceCatalogEntry {
@@ -804,7 +804,7 @@ export interface BillItem {
 }
 ```
 
-- [ ] **Step 2: Write `src/data/deviceCatalog.ts`** (mirrors the seed rows in `0001_init_schema.sql` for offline defaults/tests)
+- [x] **Step 2: Write `src/data/deviceCatalog.ts`** (mirrors the seed rows in `0001_init_schema.sql` for offline defaults/tests)
 
 ```ts
 import type { DeviceCatalogEntry } from '../types/domain';
@@ -826,7 +826,7 @@ export const DEVICE_CATALOG: DeviceCatalogEntry[] = [
 ];
 ```
 
-- [ ] **Step 3: Write `src/components/ApplianceIcon.tsx`** (ported from the approved web prototype's icon set)
+- [x] **Step 3: Write `src/components/ApplianceIcon.tsx`** (ported from the approved web prototype's icon set)
 
 ```tsx
 const PATHS: Record<string, string> = {
@@ -867,12 +867,12 @@ export function ApplianceIcon({ iconKey, size = 20 }: ApplianceIconProps) {
 }
 ```
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 Run: `npm run build`
 Expected: builds without TypeScript errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/types/domain.ts src/data/deviceCatalog.ts src/components/ApplianceIcon.tsx
