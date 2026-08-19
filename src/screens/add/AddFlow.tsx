@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { BillStep, type BillStepValue } from './steps/BillStep';
 import { DevicesStep } from './steps/DevicesStep';
 import { UsageStep } from './steps/UsageStep';
-import type { DeviceUsage } from '../../lib/calc';
+import { ResultStep } from './steps/ResultStep';
+import { calculateBreakdown, type DeviceUsage } from '../../lib/calc';
 import { DEVICE_CATALOG } from '../../data/deviceCatalog';
 import { supabase } from '../../lib/supabaseClient';
 import './AddFlow.css';
@@ -51,6 +52,76 @@ export function AddFlow() {
     });
   }
 
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  async function saveBill() {
+    setSaving(true);
+    setSaveError(null);
+
+    const { data: userData } = await supabase.auth.getUser();
+    const userId = userData.user?.id;
+    if (!userId) {
+      setSaveError('Oturum bulunamadı, tekrar giriş yap.');
+      setSaving(false);
+      return;
+    }
+
+    const devices = Array.from(usageByKey.values());
+    const result = calculateBreakdown(devices, { billTl: bill.billTl, ratePerKwh: bill.ratePerKwh });
+    const periodMonth = new Date();
+    periodMonth.setDate(1);
+
+    const { data: billRow, error: billError } = await supabase
+      .from('bills')
+      .insert({
+        user_id: userId,
+        period_month: periodMonth.toISOString().slice(0, 10),
+        total_tl: bill.billTl,
+        rate_tl_per_kwh: bill.ratePerKwh,
+      })
+      .select()
+      .single();
+
+    if (billError || !billRow) {
+      setSaveError('Fatura kaydedilemedi, tekrar dene.');
+      setSaving(false);
+      return;
+    }
+
+    const catalogByKey = new Map(DEVICE_CATALOG.map((d) => [d.key, d]));
+    const itemRows = result.items.map((item) => ({
+      bill_id: billRow.id,
+      device_key: item.key,
+      device_name: catalogByKey.get(item.key)?.name ?? item.key,
+      watt: devices.find((d) => d.key === item.key)!.watt,
+      hours_per_week: devices.find((d) => d.key === item.key)!.hoursPerWeek,
+      monthly_kwh_raw: item.monthlyKwhRaw,
+      calibrated_tl: item.calibratedTl,
+      pct_share: item.pctShare,
+    }));
+
+    const { error: itemsError } = await supabase.from('bill_items').insert(itemRows);
+
+    if (itemsError) {
+      setSaving(false);
+      setSaveError('Cihaz kırılımı kaydedilemedi, tekrar dene.');
+      return;
+    }
+
+    // Remember any watt values the user edited so the next Add flow starts from them.
+    const overrideRows = devices
+      .filter((d) => d.watt !== (deviceOverrides.get(d.key) ?? catalogByKey.get(d.key)?.defaultWatt))
+      .map((d) => ({ user_id: userId, device_key: d.key, watt: d.watt, is_custom: false }));
+
+    if (overrideRows.length > 0) {
+      await supabase.from('user_devices').upsert(overrideRows, { onConflict: 'user_id,device_key' });
+    }
+
+    setSaving(false);
+    navigate('/');
+  }
+
   return (
     <div className="add-shell">
       <div className="add-progress">
@@ -69,6 +140,9 @@ export function AddFlow() {
             onChange={updateUsage}
           />
         )}
+        {step === 3 && (
+          <ResultStep billTl={bill.billTl} ratePerKwh={bill.ratePerKwh} devices={Array.from(usageByKey.values())} />
+        )}
       </div>
       <div className="add-row-btns">
         {step > 0 ? (
@@ -76,14 +150,21 @@ export function AddFlow() {
         ) : (
           <button className="add-btn add-btn-ghost" onClick={() => navigate('/')}>İptal</button>
         )}
-        <button
-          className="add-btn add-btn-primary"
-          disabled={(step === 0 && bill.billTl <= 0) || (step === 1 && selectedDevices.size === 0)}
-          onClick={() => setStep(Math.min(step + 1, STEP_LABELS.length - 1))}
-        >
-          Devam et
-        </button>
+        {step < STEP_LABELS.length - 1 ? (
+          <button
+            className="add-btn add-btn-primary"
+            disabled={(step === 0 && bill.billTl <= 0) || (step === 1 && selectedDevices.size === 0)}
+            onClick={() => setStep(step + 1)}
+          >
+            Devam et
+          </button>
+        ) : (
+          <button className="add-btn add-btn-primary" disabled={saving} onClick={saveBill}>
+            {saving ? 'Kaydediliyor...' : 'Kaydet'}
+          </button>
+        )}
       </div>
+      {saveError && <p className="login-error">{saveError}</p>}
     </div>
   );
 }

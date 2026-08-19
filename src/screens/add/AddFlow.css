@@ -38,3 +38,5 @@
 .usage-slider-row { display: flex; align-items: center; gap: .8rem; }
 .usage-slider-row input[type=range] { flex: 1; accent-color: var(--accent); }
 .usage-val { font-family: 'IBM Plex Mono', monospace; font-size: .8rem; font-weight: 600; min-width: 5.5rem; text-align: right; }
+
+.add-insight { background: var(--surface-sunken); border-radius: 11px; padding: .8rem .9rem; font-size: .82rem; color: var(--ink-muted); margin-bottom: 1.25rem; line-height: 1.5; }
