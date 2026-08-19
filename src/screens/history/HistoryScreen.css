@@ -1,0 +1,14 @@
+.history-shell { max-width: 640px; margin: 0 auto; padding: 1.5rem 1.25rem 6rem; }
+.history-list { display: flex; flex-direction: column; gap: .6rem; }
+.history-row {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 13px;
+  padding: 1rem 1.1rem; text-decoration: none; color: var(--ink);
+}
+.history-row .month { font-weight: 700; font-size: .88rem; }
+.history-row .amount { font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
+.history-insight {
+  background: var(--good-soft); color: var(--good); border-radius: 12px;
+  padding: .8rem 1rem; margin-bottom: 1.2rem; font-size: .82rem; font-weight: 600;
+}
+.history-back { display: inline-block; margin-bottom: 1rem; color: var(--ink-muted); text-decoration: none; font-size: .85rem; }
