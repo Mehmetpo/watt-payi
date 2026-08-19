@@ -1,0 +1,16 @@
+.add-shell { max-width: 640px; margin: 0 auto; padding: 1.5rem 1.25rem 6rem; }
+.add-progress { display: flex; gap: .4rem; margin-bottom: 1.5rem; }
+.add-progress i { flex: 1; height: 3px; border-radius: 2px; background: var(--line); }
+.add-progress i.done, .add-progress i.active { background: var(--accent); }
+.add-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 1.5rem; }
+.add-field { margin-bottom: 1.25rem; }
+.add-field label { display: block; font-size: .8rem; font-weight: 600; color: var(--ink-muted); margin-bottom: .5rem; }
+.add-amount { display: flex; align-items: baseline; gap: .5rem; border: 1.5px solid var(--line); border-radius: 12px; padding: .8rem 1rem; background: var(--surface-sunken); }
+.add-amount input { border: 0; background: transparent; outline: 0; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 1.5rem; width: 100%; color: var(--ink); }
+.add-amount .unit { color: var(--ink-faint); font-weight: 600; }
+.add-row-btns { display: flex; gap: .7rem; margin-top: 1.5rem; }
+.add-btn { border: 0; border-radius: 11px; padding: .85rem 1.2rem; font-weight: 700; cursor: pointer; }
+.add-btn-primary { background: var(--accent); color: #fff; flex: 1; }
+.add-btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+.add-btn-ghost { background: transparent; color: var(--ink-muted); border: 1.5px solid var(--line); }
+.add-photo-btn { width: 100%; border: 1.5px dashed var(--line); border-radius: 12px; padding: .9rem; background: transparent; color: var(--accent); font-weight: 700; cursor: pointer; margin-bottom: 1rem; }
