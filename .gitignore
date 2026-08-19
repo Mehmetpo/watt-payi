@@ -1,0 +1,10 @@
+node_modules/
+dist/
+build/
+ios/
+android/
+.env
+.env.local
+.superpowers/
+.DS_Store
+*.log
