@@ -1664,7 +1664,7 @@ git commit -m "feat: add Kullanım step to Add flow"
 - Modify: `src/screens/add/AddFlow.tsx`
 - Modify: `src/screens/add/AddFlow.css`
 
-- [ ] **Step 1: Write `src/screens/add/steps/ResultStep.tsx`**
+- [x] **Step 1: Write `src/screens/add/steps/ResultStep.tsx`**
 
 ```tsx
 import { useMemo } from 'react';
@@ -1714,13 +1714,13 @@ export function ResultStep({ billTl, ratePerKwh, devices }: ResultStepProps) {
 }
 ```
 
-- [ ] **Step 2: Append insight styles to `src/screens/add/AddFlow.css`**
+- [x] **Step 2: Append insight styles to `src/screens/add/AddFlow.css`**
 
 ```css
 .add-insight { background: var(--surface-sunken); border-radius: 11px; padding: .8rem .9rem; font-size: .82rem; color: var(--ink-muted); margin-bottom: 1.25rem; line-height: 1.5; }
 ```
 
-- [ ] **Step 3: Wire the step + save action into `src/screens/add/AddFlow.tsx`**
+- [x] **Step 3: Wire the step + save action into `src/screens/add/AddFlow.tsx`**
 
 Add imports:
 ```tsx
@@ -1831,12 +1831,9 @@ Add the error message just above `</div>` closing `.add-shell`:
 {saveError && <p className="login-error">{saveError}</p>}
 ```
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify** — `npm run build` shows only the pre-existing errors (missing `HomeScreen`/`HistoryScreen`/`HistoryDetailScreen`/`ProfileScreen`, expected until Tasks 17–19); no errors reference `ResultStep` or `AddFlow`.
 
-Run: `npm run build`
-Expected: builds without TypeScript errors. This is the first point where `App.tsx`'s full route tree (Task 9) can be build-checked once Tasks 15–18 add the remaining screens — for now, verify `AddFlow` alone compiles.
-
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/screens/add/steps/ResultStep.tsx src/screens/add/AddFlow.tsx src/screens/add/AddFlow.css
