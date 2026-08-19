@@ -1,7 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BillStep, type BillStepValue } from './steps/BillStep';
 import { DevicesStep } from './steps/DevicesStep';
+import { UsageStep } from './steps/UsageStep';
+import type { DeviceUsage } from '../../lib/calc';
+import { DEVICE_CATALOG } from '../../data/deviceCatalog';
+import { supabase } from '../../lib/supabaseClient';
 import './AddFlow.css';
 
 const STEP_LABELS = ['Fatura', 'Cihazlar', 'Kullanım', 'Sonuç'];
@@ -21,6 +25,32 @@ export function AddFlow() {
     });
   }
 
+  const [usageByKey, setUsageByKey] = useState<Map<string, DeviceUsage>>(new Map());
+  const [deviceOverrides, setDeviceOverrides] = useState<Map<string, number>>(new Map());
+
+  useEffect(() => {
+    async function loadOverrides() {
+      const { data } = await supabase.from('user_devices').select('device_key, watt').eq('is_custom', false);
+      const overrides = new Map<string, number>();
+      for (const row of data ?? []) {
+        if (row.device_key) overrides.set(row.device_key, row.watt);
+      }
+      setDeviceOverrides(overrides);
+    }
+    loadOverrides();
+  }, []);
+
+  function updateUsage(key: string, patch: Partial<DeviceUsage>) {
+    setUsageByKey((prev) => {
+      const next = new Map(prev);
+      const catalogEntry = DEVICE_CATALOG.find((d) => d.key === key)!;
+      const defaultWatt = deviceOverrides.get(key) ?? catalogEntry.defaultWatt;
+      const current = next.get(key) ?? { key, watt: defaultWatt, hoursPerWeek: 0 };
+      next.set(key, { ...current, ...patch });
+      return next;
+    });
+  }
+
   return (
     <div className="add-shell">
       <div className="add-progress">
@@ -31,6 +61,14 @@ export function AddFlow() {
       <div className="add-card">
         {step === 0 && <BillStep value={bill} onChange={setBill} />}
         {step === 1 && <DevicesStep selected={selectedDevices} onToggle={toggleDevice} />}
+        {step === 2 && (
+          <UsageStep
+            selectedKeys={selectedDevices}
+            usageByKey={usageByKey}
+            overridesByKey={deviceOverrides}
+            onChange={updateUsage}
+          />
+        )}
       </div>
       <div className="add-row-btns">
         {step > 0 ? (

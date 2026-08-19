@@ -1522,7 +1522,7 @@ git commit -m "feat: add Cihazlar step to Add flow"
 - Modify: `src/screens/add/AddFlow.css`
 - Modify: `src/screens/add/AddFlow.tsx`
 
-- [ ] **Step 1: Add usage-row styles to `src/screens/add/AddFlow.css`** (append)
+- [x] **Step 1: Add usage-row styles to `src/screens/add/AddFlow.css`** (append)
 
 ```css
 .usage-row { padding: .9rem 0; border-bottom: 1px solid var(--line); }
@@ -1539,7 +1539,7 @@ git commit -m "feat: add Cihazlar step to Add flow"
 .usage-val { font-family: 'IBM Plex Mono', monospace; font-size: .8rem; font-weight: 600; min-width: 5.5rem; text-align: right; }
 ```
 
-- [ ] **Step 2: Write `src/screens/add/steps/UsageStep.tsx`**
+- [x] **Step 2: Write `src/screens/add/steps/UsageStep.tsx`**
 
 ```tsx
 import { DEVICE_CATALOG } from '../../../data/deviceCatalog';
@@ -1594,7 +1594,7 @@ export function UsageStep({ selectedKeys, usageByKey, overridesByKey, onChange }
 }
 ```
 
-- [ ] **Step 3: Wire the step into `src/screens/add/AddFlow.tsx`**
+- [x] **Step 3: Wire the step into `src/screens/add/AddFlow.tsx`**
 
 Add import:
 ```tsx
@@ -1646,12 +1646,9 @@ Add to the card body:
 )}
 ```
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify** — `npm run build` shows only the pre-existing Task 9 errors (missing `HomeScreen`/`HistoryScreen`/`HistoryDetailScreen`/`ProfileScreen`, expected until Tasks 15/17/18 add them); no errors reference `UsageStep` or `AddFlow`.
 
-Run: `npm run build`
-Expected: builds without TypeScript errors.
-
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/screens/add/steps/UsageStep.tsx src/screens/add/AddFlow.css src/screens/add/AddFlow.tsx

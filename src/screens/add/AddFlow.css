@@ -25,3 +25,16 @@
 .device-card svg { color: var(--ink-muted); }
 .device-card.on { background: var(--accent-soft); border-color: var(--accent); }
 .device-card.on span, .device-card.on svg { color: #4A3FCF; }
+
+.usage-row { padding: .9rem 0; border-bottom: 1px solid var(--line); }
+.usage-row:first-child { padding-top: 0; }
+.usage-row:last-child { border-bottom: 0; padding-bottom: 0; }
+.usage-top { display: flex; align-items: center; gap: .6rem; margin-bottom: .6rem; }
+.usage-icon { width: 32px; height: 32px; border-radius: 9px; background: var(--surface-sunken); display: flex; align-items: center; justify-content: center; color: var(--ink-muted); }
+.usage-name { font-weight: 700; font-size: .88rem; flex: 1; }
+.usage-watt { display: flex; align-items: center; gap: .2rem; background: var(--surface-sunken); border: 1px solid var(--line); border-radius: 8px; padding: .25rem .45rem; }
+.usage-watt input { width: 3rem; border: 0; background: transparent; outline: 0; font-family: 'IBM Plex Mono', monospace; font-size: .75rem; font-weight: 600; text-align: right; color: var(--ink); }
+.usage-watt span { font-size: .68rem; color: var(--ink-faint); }
+.usage-slider-row { display: flex; align-items: center; gap: .8rem; }
+.usage-slider-row input[type=range] { flex: 1; accent-color: var(--accent); }
+.usage-val { font-family: 'IBM Plex Mono', monospace; font-size: .8rem; font-weight: 600; min-width: 5.5rem; text-align: right; }
