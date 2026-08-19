@@ -60,7 +60,7 @@ watt-payi(mobile app)/
 - Create: `src/main.tsx`
 - Create: `src/App.tsx`
 
-- [ ] **Step 1: Write `package.json`**
+- [x] **Step 1: Write `package.json`**
 
 ```json
 {
@@ -98,7 +98,7 @@ watt-payi(mobile app)/
 }
 ```
 
-- [ ] **Step 2: Write `tsconfig.json`**
+- [x] **Step 2: Write `tsconfig.json`**
 
 ```json
 {
@@ -124,7 +124,7 @@ watt-payi(mobile app)/
 }
 ```
 
-- [ ] **Step 3: Write `tsconfig.node.json`**
+- [x] **Step 3: Write `tsconfig.node.json`**
 
 ```json
 {
@@ -139,7 +139,7 @@ watt-payi(mobile app)/
 }
 ```
 
-- [ ] **Step 4: Write `vite.config.ts`**
+- [x] **Step 4: Write `vite.config.ts`** (added `/// <reference types="vitest/config" />` — without it `tsc -b` fails with "'test' does not exist in type 'UserConfigExport'")
 
 ```ts
 import { defineConfig } from 'vite';
@@ -154,7 +154,7 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Step 5: Write `index.html`**
+- [x] **Step 5: Write `index.html`**
 
 ```html
 <!doctype html>
@@ -171,7 +171,7 @@ export default defineConfig({
 </html>
 ```
 
-- [ ] **Step 6: Write `capacitor.config.ts`**
+- [x] **Step 6: Write `capacitor.config.ts`**
 
 ```ts
 import type { CapacitorConfig } from '@capacitor/cli';
@@ -185,7 +185,7 @@ const config: CapacitorConfig = {
 export default config;
 ```
 
-- [ ] **Step 7: Write minimal `src/App.tsx` and `src/main.tsx`** (routing is filled in by Task 9; this just makes the build succeed)
+- [x] **Step 7: Write minimal `src/App.tsx` and `src/main.tsx`** (routing is filled in by Task 9; this just makes the build succeed)
 
 `src/App.tsx`:
 ```tsx
@@ -207,12 +207,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 );
 ```
 
-- [ ] **Step 8: Install and verify the build**
+- [x] **Step 8: Install and verify the build**
 
 Run: `npm install && npm run build`
 Expected: build succeeds, `dist/` is created, no TypeScript errors.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add package.json tsconfig.json tsconfig.node.json vite.config.ts index.html capacitor.config.ts src/App.tsx src/main.tsx package-lock.json
