@@ -1,0 +1,21 @@
+.breakdown-summary { display: flex; align-items: center; gap: 1.25rem; margin-bottom: 1.25rem; }
+.breakdown-donut { width: 104px; height: 104px; border-radius: 50%; position: relative; flex: none; }
+.breakdown-donut::after { content: ''; position: absolute; inset: 15px; border-radius: 50%; background: var(--surface); }
+.breakdown-donut-center {
+  position: absolute; inset: 15px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+}
+.breakdown-donut-center b { font-size: .9rem; }
+.breakdown-donut-center small { font-size: .6rem; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; }
+.breakdown-total { font-size: 1.9rem; font-weight: 800; }
+.breakdown-total span { font-size: 1rem; color: var(--ink-faint); font-weight: 600; margin-left: .2rem; }
+.breakdown-list { display: flex; flex-direction: column; gap: .9rem; }
+.breakdown-row { display: flex; align-items: center; gap: .7rem; }
+.breakdown-icon { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex: none; }
+.breakdown-main { flex: 1; min-width: 0; }
+.breakdown-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .3rem; gap: .5rem; }
+.breakdown-name { font-weight: 700; font-size: .84rem; }
+.breakdown-amount { font-weight: 600; font-size: .84rem; white-space: nowrap; }
+.breakdown-amount small { color: var(--ink-faint); font-weight: 500; margin-left: .3rem; }
+.breakdown-track { height: 6px; border-radius: 4px; background: var(--surface-sunken); overflow: hidden; }
+.breakdown-fill { height: 100%; border-radius: 4px; }

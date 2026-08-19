@@ -1178,7 +1178,7 @@ git commit -m "feat: add app shell with routing and bottom navigation"
 
 This component renders the donut + line-item list used by the Add flow's result step, the home dashboard, and the history detail screen — written once, reused three times.
 
-- [ ] **Step 1: Write `src/components/BillBreakdown.css`**
+- [x] **Step 1: Write `src/components/BillBreakdown.css`**
 
 ```css
 .breakdown-summary { display: flex; align-items: center; gap: 1.25rem; margin-bottom: 1.25rem; }
@@ -1204,7 +1204,7 @@ This component renders the donut + line-item list used by the Add flow's result 
 .breakdown-fill { height: 100%; border-radius: 4px; }
 ```
 
-- [ ] **Step 2: Write `src/components/BillBreakdown.tsx`**
+- [x] **Step 2: Write `src/components/BillBreakdown.tsx`**
 
 ```tsx
 import { ApplianceIcon } from './ApplianceIcon';
@@ -1274,12 +1274,9 @@ export function BillBreakdown({ totalTl, items, iconKeyFor }: BillBreakdownProps
 }
 ```
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify** — `npm run build` shows only the pre-existing Task 9 errors (missing `HomeScreen`/`AddFlow`/`HistoryScreen`/`HistoryDetailScreen`/`ProfileScreen`, expected until Tasks 11–18); no errors reference `BillBreakdown`, so the new component type-checks cleanly.
 
-Run: `npm run build`
-Expected: builds without TypeScript errors (component is not yet wired into a screen, so this only checks types).
-
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/components/BillBreakdown.tsx src/components/BillBreakdown.css
