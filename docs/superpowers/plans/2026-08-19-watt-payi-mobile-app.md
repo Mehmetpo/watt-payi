@@ -888,7 +888,7 @@ git commit -m "feat: add domain types, device catalog data, and appliance icons"
 - Create: `src/screens/auth/LoginScreen.tsx`
 - Create: `src/screens/auth/LoginScreen.css`
 
-- [ ] **Step 1: Write `src/contexts/AuthContext.tsx`**
+- [x] **Step 1: Write `src/contexts/AuthContext.tsx`**
 
 ```tsx
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
@@ -927,7 +927,7 @@ export function useAuth() {
 }
 ```
 
-- [ ] **Step 2: Write `src/screens/auth/LoginScreen.tsx`** (email + 6-digit OTP, no password to manage)
+- [x] **Step 2: Write `src/screens/auth/LoginScreen.tsx`** (email + 6-digit OTP, no password to manage)
 
 ```tsx
 import { useState, type FormEvent } from 'react';
@@ -1004,7 +1004,7 @@ export function LoginScreen() {
 }
 ```
 
-- [ ] **Step 3: Write `src/screens/auth/LoginScreen.css`**
+- [x] **Step 3: Write `src/screens/auth/LoginScreen.css`**
 
 ```css
 .login-shell { max-width: 360px; margin: 0 auto; padding: 4rem 1.5rem; display: flex; flex-direction: column; gap: .5rem; }
@@ -1024,12 +1024,12 @@ export function LoginScreen() {
 .login-error { color: var(--coral); font-size: .85rem; margin-top: .75rem; }
 ```
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 Run: `npm run build`
 Expected: builds without TypeScript errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/contexts/AuthContext.tsx src/screens/auth/LoginScreen.tsx src/screens/auth/LoginScreen.css
