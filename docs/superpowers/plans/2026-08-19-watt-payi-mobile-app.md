@@ -1929,9 +1929,9 @@ serve(async (req) => {
 });
 ```
 
-- [x] **Step 2: Deploy and configure secrets** — Deployed 2026-08-20 via Supabase MCP to the new `watt-payi` project (`vwdgadvnatgjkmhikuax`), created after temporarily pausing `flort-asistan` to free a slot under the account's 2-project free-tier limit. Function is `ACTIVE` (`supabase functions list` equivalent confirmed via `list_edge_functions`). REMAINING: `ANTHROPIC_API_KEY` secret has NOT been set — that's a credential and must be entered by the user directly (via Supabase Dashboard → Project Settings → Edge Functions → Secrets, or `supabase secrets set ANTHROPIC_API_KEY=<key> --project-ref vwdgadvnatgjkmhikuax`), not by an assistant. Until set, the function will 502 on real vision requests (the JWT-check and 401/400 paths already work).
+- [x] **Step 2: Deploy and configure secrets** — Deployed 2026-08-20 via Supabase MCP to the new `watt-payi` project (`vwdgadvnatgjkmhikuax`), created after temporarily pausing `flort-asistan` to free a slot under the account's 2-project free-tier limit. Function is `ACTIVE`. `ANTHROPIC_API_KEY` secret added by the user directly via the Supabase Dashboard (Project Settings → Edge Functions → Secrets) on 2026-08-20.
 
-- [ ] **Step 3: Smoke-test with curl** — BLOCKED on the `ANTHROPIC_API_KEY` secret (Step 2 remainder). Replace `<anon-jwt>` with a logged-in user's access token and point at a real bill photo encoded as base64 once the secret is set:
+- [x] **Step 3: Smoke-test with curl** — Partial: confirmed the deployed function is live and its auth guard works — a request with no `Authorization` header returned `401` as expected (`curl -o /dev/null -w "%{http_code}" -X POST https://vwdgadvnatgjkmhikuax.functions.supabase.co/extract-bill -d '{}'`). Full end-to-end test (real user JWT + real bill photo → `200` with parsed fields) needs a logged-in session and is deferred to Task 21's on-device manual test, since getting a JWT here requires completing the email OTP flow. To run it manually once signed in on-device:
 
 ```bash
 curl -X POST "https://<project-ref>.functions.supabase.co/extract-bill" \
