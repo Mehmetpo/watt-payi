@@ -684,7 +684,7 @@ create policy "bill_photos_owner_write" on storage.objects
   for insert with check (bucket_id = 'bill-photos' and (storage.foldername(name))[1] = auth.uid()::text);
 ```
 
-- [ ] **Step 2: Apply the migration** — BLOCKED: no Supabase project exists for this app yet. The account's free-project limit (2) is already used by ResumeAI and flort-asistan (both active/live), and the third project ("Mehmetpo's Project") can't be reactivated without pausing one of those — declined per user instruction 2026-08-19. Apply this manually once a project is available: create/reactivate a project, `supabase link`, then `supabase db push`.
+- [x] **Step 2: Apply the migration** — Applied 2026-08-20 via Supabase MCP (`apply_migration`) to the new `watt-payi` project (`vwdgadvnatgjkmhikuax`, region `eu-central-1`). Resolved the free-tier limit by pausing `flort-asistan` (per user instruction 2026-08-20) rather than reactivating "Mehmetpo's Project", then creating a fresh dedicated project. Verified via `list_tables`: `profiles`, `devices_catalog` (13 seed rows), `user_devices`, `bills`, `bill_items` all present with RLS enabled; `get_advisors` (security) returned zero lints.
 
 - [x] **Step 3: Commit**
 
@@ -709,12 +709,7 @@ VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-- [x] **Step 2: Create `.env.local`** with placeholder values — BLOCKED on real values: no Supabase project exists yet (see Task 5 Step 2). File is gitignored; replace the placeholders with real URL/anon key once a project is created.
-
-```
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-```
+- [x] **Step 2: Create `.env.local`** with real values — updated 2026-08-20 with the `watt-payi` project's URL and anon key (`https://vwdgadvnatgjkmhikuax.supabase.co`) once the project existed (see Task 5 Step 2). File remains gitignored.
 
 - [x] **Step 3: Write `src/lib/supabaseClient.ts`** (also added `src/vite-env.d.ts` with `/// <reference types="vite/client" />` — without it, `tsc -b` fails with "Property 'env' does not exist on type 'ImportMeta'")
 
@@ -1934,16 +1929,9 @@ serve(async (req) => {
 });
 ```
 
-- [ ] **Step 2: Deploy and configure secrets** — BLOCKED: same reason as Task 5 Step 2 — no Supabase project exists for this app yet (account's free-project limit of 2 is used by ResumeAI and flort-asistan; re-checked 2026-08-19, still true). Apply once a project is available: `supabase secrets set ANTHROPIC_API_KEY=<key>` then `supabase functions deploy extract-bill`.
+- [x] **Step 2: Deploy and configure secrets** — Deployed 2026-08-20 via Supabase MCP to the new `watt-payi` project (`vwdgadvnatgjkmhikuax`), created after temporarily pausing `flort-asistan` to free a slot under the account's 2-project free-tier limit. Function is `ACTIVE` (`supabase functions list` equivalent confirmed via `list_edge_functions`). REMAINING: `ANTHROPIC_API_KEY` secret has NOT been set — that's a credential and must be entered by the user directly (via Supabase Dashboard → Project Settings → Edge Functions → Secrets, or `supabase secrets set ANTHROPIC_API_KEY=<key> --project-ref vwdgadvnatgjkmhikuax`), not by an assistant. Until set, the function will 502 on real vision requests (the JWT-check and 401/400 paths already work).
 
-Run:
-```bash
-supabase secrets set ANTHROPIC_API_KEY=<gerçek Anthropic API anahtarı>
-supabase functions deploy extract-bill
-```
-Expected: deploy succeeds; `supabase functions list` shows `extract-bill` as active.
-
-- [ ] **Step 3: Smoke-test with curl** — BLOCKED on Step 2 (no deployed function to test against yet). Replace `<anon-jwt>` with a logged-in user's access token and point at a real bill photo encoded as base64 once deployed:
+- [ ] **Step 3: Smoke-test with curl** — BLOCKED on the `ANTHROPIC_API_KEY` secret (Step 2 remainder). Replace `<anon-jwt>` with a logged-in user's access token and point at a real bill photo encoded as base64 once the secret is set:
 
 ```bash
 curl -X POST "https://<project-ref>.functions.supabase.co/extract-bill" \
