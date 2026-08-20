@@ -2577,21 +2577,23 @@ git commit -m "feat: schedule monthly local-notification reminder"
 
 - [x] **Step 1: Add the Android platform** — done: `npm run build`, `npx cap add android`, `npx cap sync android` all succeeded; `android/` directory created (gitignored, nothing to commit).
 
-- [ ] **Step 2: Run on a connected device via adb** — BLOCKED: `adb devices` shows no connected device. Android SDK and adb are installed (`C:\Users\cebem\AppData\Local\Android\Sdk`), so once a device is plugged in with USB debugging enabled, run `npx cap run android`.
+- [x] **Step 2: Run on a connected device via adb** — done: physical device connected (`v8zxge996po75xfa`, Android 11 / API 30, MIUI). Gradle wrapper invocations needed PowerShell, not Bash (`.\gradlew.bat assembleDebug`); installed via `adb install -r`.
 
-- [ ] **Step 3: Manual end-to-end check on the device** — BLOCKED on Step 2 (needs the app actually running on a device).
+- [x] **Step 3: Manual end-to-end check on the device** — done, with one scope change and one real bug found and fixed along the way:
 
-- Log in with email OTP
-- Tap **+ Ekle**, capture a real bill photo, confirm the amount prefills (or the fallback message appears if unreadable)
-- Select 2–3 devices, adjust usage sliders, save
-- Confirm the new bill appears on **Ana Sayfa** and in **Geçmiş**
-- In **Profil**, set a reminder day and confirm the OS notification-permission prompt appears
+  - **Login flow redesigned**: Supabase's default email templates only send `{{ .ConfirmationURL }}` (a link), never `{{ .Token }}` (a 6-digit code) — the original 2-stage OTP-code login screen could never actually be completed. Per explicit product decision, replaced it with a single-step magic-link flow (`LoginScreen.tsx`, `AuthContext.tsx`, `AndroidManifest.xml` intent-filter for `com.mehmetcebe.wattpayi://login-callback`, `@capacitor/app` dependency).
+  - **Real bug found & fixed**: the magic-link redirect actually comes back as a hash-fragment token response (`#access_token=...&refresh_token=...`), not a PKCE `?code=...` response. `AuthContext.tsx`'s `appUrlOpen` listener originally only handled the PKCE case via `exchangeCodeForSession`, so login would silently never complete. Fixed to parse the fragment and call `supabase.auth.setSession({ access_token, refresh_token })`, falling back to `exchangeCodeForSession` only when a `code=` param is present.
+  - Supabase's built-in mailer's email rate limit (2/hour) was hit repeatedly during testing; resolved by configuring Custom SMTP (Resend, via the verified `cvanalyze.com` sending domain) in the Supabase dashboard, which also raised the GoTrue email rate limit to 30/hour.
+  - Verified on-device: login via magic link (delivered link opened directly via `adb shell am start -a android.intent.action.VIEW -d '<url>'`, single-quoted for the remote shell to avoid `&`/`#` mangling) → lands on **Ana Sayfa**.
+  - **+ Ekle**: camera capture tested via the native "Take Picture" action sheet; extraction failed on the test shot as expected and the fallback message **"Fotoğraf işlenemedi, elle girebilir misin?"** correctly appeared, confirming the fallback path works. Manually entered amount (2500 TL) and rate (3.5 TL/kWh, default).
+  - Selected 3–4 devices (Buzdolabı, Klima, Çamaşır Makinesi, Şofben), adjusted usage sliders (54.5 / 90.5 / 36.0 / 18.0 sa/hafta) — confirmed via drag gestures.
+  - Saved → **Sonuç** step showed the donut breakdown (Klima %61, Şofben %20, Çamaşır %14, Buzdolabı %4) and a calibration-accuracy message ("Hesaplanan tüketim faturanın %108'i kadar çıktı"); **Kaydet** navigated back to **Ana Sayfa**, which correctly showed the new bill (2.500 TL, same breakdown).
+  - **Geçmiş** correctly listed "Ağustos 2026 — 2.500 TL".
+  - **Profil**: reminder-day field is correctly wired to `scheduleMonthlyReminder` (confirmed via logcat: `LocalNotifications.schedule` fires with the right `day` on every change). No OS permission dialog appeared — confirmed this is expected, not a bug: the test device runs Android 11 (API 30), and `POST_NOTIFICATIONS` runtime permission only exists from Android 13 (API 33) onward, so notification permission is auto-granted at install time pre-13.
 
-Note: Steps 2–3 also depend on Tasks 5/15 being unblocked (a live Supabase project + deployed Edge Function) since login, saving bills, and photo extraction all call Supabase.
-
-- [ ] **Step 4: Commit** (only if any fixes were needed during manual testing; otherwise this task has no code change to commit)
+- [x] **Step 4: Commit** — magic-link login redesign + hash-fragment session bug fix need to be committed (see below).
 
 ```bash
-git add -A
-git commit -m "fix: address issues found during on-device Android testing"
+git add src/screens/auth/LoginScreen.tsx src/contexts/AuthContext.tsx android/app/src/main/AndroidManifest.xml package.json package-lock.json
+git commit -m "fix: switch to magic-link login and handle hash-fragment session tokens"
 ```

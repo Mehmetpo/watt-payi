@@ -4,33 +4,24 @@ import './LoginScreen.css';
 
 export function LoginScreen() {
   const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState('');
-  const [stage, setStage] = useState<'email' | 'otp'>('email');
+  const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  async function sendOtp(e: FormEvent) {
+  async function sendMagicLink(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
     setError(null);
-    const { error: sendError } = await supabase.auth.signInWithOtp({ email });
+    const { error: sendError } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: 'com.mehmetcebe.wattpayi://login-callback' },
+    });
     setBusy(false);
     if (sendError) {
-      setError('Kod gönderilemedi, e-posta adresini kontrol et.');
+      setError('Giriş linki gönderilemedi, e-posta adresini kontrol et.');
       return;
     }
-    setStage('otp');
-  }
-
-  async function verifyOtp(e: FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setError(null);
-    const { error: verifyError } = await supabase.auth.verifyOtp({ email, token: otp, type: 'email' });
-    setBusy(false);
-    if (verifyError) {
-      setError('Kod hatalı ya da süresi doldu, tekrar dene.');
-    }
+    setSent(true);
   }
 
   return (
@@ -38,8 +29,10 @@ export function LoginScreen() {
       <h1 className="display">Watt Payı</h1>
       <p className="login-sub">Faturanı cihaz cihaz takip et.</p>
 
-      {stage === 'email' ? (
-        <form onSubmit={sendOtp} className="login-form">
+      {sent ? (
+        <p className="login-sub"><strong>{email}</strong> adresine bir giriş linki gönderdik. E-postandaki linke dokunarak giriş yap.</p>
+      ) : (
+        <form onSubmit={sendMagicLink} className="login-form">
           <label htmlFor="email">E-posta</label>
           <input
             id="email"
@@ -49,20 +42,7 @@ export function LoginScreen() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="ornek@eposta.com"
           />
-          <button type="submit" disabled={busy}>{busy ? 'Gönderiliyor...' : 'Giriş kodu gönder'}</button>
-        </form>
-      ) : (
-        <form onSubmit={verifyOtp} className="login-form">
-          <label htmlFor="otp">E-postana gelen 6 haneli kod</label>
-          <input
-            id="otp"
-            inputMode="numeric"
-            required
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            placeholder="123456"
-          />
-          <button type="submit" disabled={busy}>{busy ? 'Doğrulanıyor...' : 'Giriş yap'}</button>
+          <button type="submit" disabled={busy}>{busy ? 'Gönderiliyor...' : 'Giriş linki gönder'}</button>
         </form>
       )}
 
