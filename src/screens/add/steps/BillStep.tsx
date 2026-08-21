@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Camera } from 'lucide-react';
 import { captureBillPhoto, extractBillFromPhoto } from '../../../lib/billExtraction';
 
 export interface BillStepValue {
@@ -42,7 +43,8 @@ export function BillStep({ value, onChange }: BillStepProps) {
   return (
     <div>
       <button type="button" className="add-photo-btn" onClick={handleCapture} disabled={reading}>
-        {reading ? 'Okunuyor...' : '📷 Fatura fotoğrafı çek'}
+        <Camera size={18} strokeWidth={1.7} />
+        {reading ? 'Okunuyor...' : 'Fatura fotoğrafı çek'}
       </button>
       {readError && <p className="login-error">{readError}</p>}
       <div className="add-field">

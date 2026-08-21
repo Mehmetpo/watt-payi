@@ -1,0 +1,37 @@
+.day-picker { width: 100%; }
+.day-picker-trigger {
+  width: 100%; height: 2.75rem; padding: 0 1rem; border-radius: 12px;
+  border: 1.5px solid var(--line); background: var(--surface-sunken); color: var(--ink);
+  font-size: .92rem; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between; gap: .5rem;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+.day-picker-trigger:hover { border-color: var(--accent); }
+.day-picker-trigger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.day-picker-trigger svg { color: var(--ink-faint); flex: none; }
+.day-picker-chevron { transition: transform var(--dur-fast) var(--ease-out); }
+.day-picker-chevron.open { transform: rotate(180deg); }
+
+.day-picker-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: .35rem;
+  margin-top: .6rem; padding: .75rem; border-radius: 12px;
+  background: var(--surface-sunken); border: 1px solid var(--line);
+  animation: day-picker-in var(--dur-fast) var(--ease-out);
+}
+.day-picker-cell {
+  aspect-ratio: 1; border: 0; border-radius: 8px; background: transparent;
+  color: var(--ink); font-size: .8rem; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.day-picker-cell:hover { background: var(--surface); }
+.day-picker-cell:active { transform: scale(.88); }
+.day-picker-cell:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.day-picker-cell.selected { background: var(--accent); color: #fff; }
+.day-picker-cell.selected:hover { background: var(--accent); }
+
+@keyframes day-picker-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .day-picker-chevron, .day-picker-cell, .day-picker-trigger { transition: none; }
+  .day-picker-grid { animation: none; }
+}

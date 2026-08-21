@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
+import { FileClock } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { detectRisingDevices, type BillWithItems } from '../../lib/trends';
+import { Skeleton } from '../../components/ui/skeleton';
 import './HistoryScreen.css';
 
 interface BillRow {
@@ -20,6 +22,7 @@ function formatPeriod(iso: string) {
 export function HistoryScreen() {
   const [bills, setBills] = useState<BillRow[]>([]);
   const [rising, setRising] = useState<{ deviceName: string; months: number }[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
@@ -45,6 +48,7 @@ export function HistoryScreen() {
 
         setRising(detectRisingDevices(billsWithItems));
       }
+      setLoading(false);
     }
     load();
   }, []);
@@ -59,14 +63,55 @@ export function HistoryScreen() {
         </div>
       )}
 
-      <div className="history-list">
-        {bills.map((bill) => (
-          <Link key={bill.id} to={`/history/${bill.id}`} className="history-row">
-            <span className="month">{formatPeriod(bill.period_month)}</span>
-            <span className="amount mono">{Math.round(bill.total_tl).toLocaleString('tr-TR')} TL</span>
-          </Link>
-        ))}
-      </div>
+      {loading ? (
+        <div className="history-list">
+          {[0, 1, 2, 3].map((i) => (
+            <Skeleton key={i} className="history-row-skeleton" />
+          ))}
+        </div>
+      ) : bills.length === 0 ? (
+        <div className="history-empty">
+          <div className="empty-icon-badge">
+            <FileClock size={26} strokeWidth={1.6} />
+          </div>
+          <p>Henüz geçmiş fatura yok.</p>
+          <Link to="/add">+ İlk faturanı ekle</Link>
+        </div>
+      ) : (
+        <div className="history-list">
+          {(() => {
+            const maxTotal = Math.max(...bills.map((b) => b.total_tl));
+            return bills.map((bill, i) => {
+              const prev = bills[i + 1];
+              const delta = prev ? ((bill.total_tl - prev.total_tl) / prev.total_tl) * 100 : null;
+              return (
+                <Link
+                  key={bill.id}
+                  to={`/history/${bill.id}`}
+                  className="history-row"
+                  style={{ '--i': i } as CSSProperties}
+                >
+                  <div
+                    className="history-row-bar"
+                    style={{ transform: `scaleX(${Math.max(0.04, bill.total_tl / maxTotal)})` }}
+                  />
+                  <div className="history-row-content">
+                    <span className="month">{formatPeriod(bill.period_month)}</span>
+                    <div className="history-row-right">
+                      {delta !== null && (
+                        <span className={'history-delta' + (delta > 0 ? ' up' : '')}>
+                          {delta <= 0 ? '↓' : '↑'} %{Math.abs(delta).toFixed(0)}
+                        </span>
+                      )}
+                      <span className="amount mono">{Math.round(bill.total_tl).toLocaleString('tr-TR')} TL</span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            });
+          })()}
+        </div>
+      )}
     </div>
   );
 }

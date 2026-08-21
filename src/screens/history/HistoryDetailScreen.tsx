@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { BillBreakdown } from '../../components/BillBreakdown';
 import { DEVICE_CATALOG } from '../../data/deviceCatalog';
+import { Card, CardContent } from '../../components/ui/card';
 import type { BillItem } from '../../types/domain';
 import './HistoryScreen.css';
 
@@ -38,14 +40,18 @@ export function HistoryDetailScreen() {
     load();
   }, [billId]);
 
-  const iconByKey = (key: string | null) => DEVICE_CATALOG.find((d) => d.key === key)?.iconKey ?? 'lighting';
+  const iconByKey = (key: string | null) => (key ? DEVICE_CATALOG.find((d) => d.key === key)?.iconKey ?? 'other' : 'other');
 
   return (
     <div className="history-shell">
-      <Link to="/history" className="history-back">← Geçmiş</Link>
-      <div className="home-card" style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 16, padding: '1.5rem' }}>
-        <BillBreakdown totalTl={totalTl} items={items} iconKeyFor={iconByKey} />
-      </div>
+      <Link to="/history" className="history-back">
+        <ArrowLeft size={15} strokeWidth={1.8} /> Geçmiş
+      </Link>
+      <Card>
+        <CardContent>
+          <BillBreakdown totalTl={totalTl} items={items} iconKeyFor={iconByKey} />
+        </CardContent>
+      </Card>
     </div>
   );
 }

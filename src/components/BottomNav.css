@@ -1,12 +1,38 @@
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0;
-  display: flex; justify-content: space-around;
+  display: flex; justify-content: space-around; align-items: center;
   background: var(--surface); border-top: 1px solid var(--line);
-  padding: .5rem 0 calc(.5rem + env(safe-area-inset-bottom));
+  padding: .4rem 0 calc(.4rem + env(safe-area-inset-bottom));
+  z-index: 10;
 }
 .bottom-nav__item {
-  display: flex; flex-direction: column; align-items: center; gap: .2rem;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .2rem;
   text-decoration: none; color: var(--ink-faint); font-size: .68rem; font-weight: 600;
+  min-width: 56px; min-height: 44px; padding: .2rem 0;
+  border-radius: 10px;
+  transition: color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
 }
 .bottom-nav__item.active { color: var(--accent); }
-.bottom-nav__icon { font-size: 1.1rem; }
+.bottom-nav__item:active { transform: scale(.92); }
+.bottom-nav__item:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bottom-nav__icon { transition: transform var(--dur-fast) var(--ease-out); }
+.bottom-nav__item.active .bottom-nav__icon { transform: translateY(-1px); }
+
+.bottom-nav__fab {
+  display: flex; align-items: center; justify-content: center;
+  width: 52px; height: 52px; min-width: 52px;
+  margin-top: -26px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 6px 16px -4px color-mix(in srgb, var(--accent) 60%, transparent), var(--shadow);
+  border: 3px solid var(--surface);
+  transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+}
+.bottom-nav__fab:hover { box-shadow: 0 8px 20px -4px color-mix(in srgb, var(--accent) 70%, transparent), var(--shadow); }
+.bottom-nav__fab:active { transform: scale(.92); }
+.bottom-nav__fab:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bottom-nav__item, .bottom-nav__icon, .bottom-nav__fab { transition: none; }
+}

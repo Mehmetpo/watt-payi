@@ -1,6 +1,16 @@
 import { DEVICE_CATALOG } from '../../../data/deviceCatalog';
 import { ApplianceIcon } from '../../../components/ApplianceIcon';
+import { Slider } from '../../../components/ui/slider';
+import { cn } from '../../../lib/utils';
 import type { DeviceUsage } from '../../../lib/calc';
+
+const HOUR_PRESETS = [
+  { label: 'Kullanmıyorum', hours: 0 },
+  { label: 'Az', hours: 7 },
+  { label: 'Orta', hours: 21 },
+  { label: 'Çok', hours: 56 },
+  { label: 'Sürekli', hours: 168 },
+];
 
 export interface UsageStepProps {
   selectedKeys: Set<string>;
@@ -31,14 +41,27 @@ export function UsageStep({ selectedKeys, usageByKey, overridesByKey, onChange }
                 <span>W</span>
               </div>
             </div>
+            <div className="usage-presets">
+              {HOUR_PRESETS.map((preset) => (
+                <button
+                  type="button"
+                  key={preset.label}
+                  className={cn('usage-preset-chip', usage.hoursPerWeek === preset.hours && 'selected')}
+                  aria-pressed={usage.hoursPerWeek === preset.hours}
+                  onClick={() => onChange(device.key, { hoursPerWeek: preset.hours })}
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
             <div className="usage-slider-row">
-              <input
-                type="range"
+              <Slider
+                className="usage-slider"
                 min={0}
                 max={168}
                 step={0.5}
-                value={usage.hoursPerWeek}
-                onChange={(e) => onChange(device.key, { hoursPerWeek: Number(e.target.value) })}
+                value={[usage.hoursPerWeek]}
+                onValueChange={(v) => onChange(device.key, { hoursPerWeek: Array.isArray(v) ? v[0] : v })}
               />
               <span className="usage-val mono">{usage.hoursPerWeek.toFixed(1)} sa/hafta</span>
             </div>

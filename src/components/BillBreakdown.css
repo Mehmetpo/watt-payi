@@ -1,16 +1,27 @@
-.breakdown-summary { display: flex; align-items: center; gap: 1.25rem; margin-bottom: 1.25rem; }
-.breakdown-donut { width: 104px; height: 104px; border-radius: 50%; position: relative; flex: none; }
-.breakdown-donut::after { content: ''; position: absolute; inset: 15px; border-radius: 50%; background: var(--surface); }
-.breakdown-donut-center {
-  position: absolute; inset: 15px; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; text-align: center;
+.breakdown-summary { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.4rem; }
+.breakdown-donut {
+  width: 136px; height: 136px; border-radius: 50%; position: relative; flex: none;
+  animation: breakdown-donut-in 520ms var(--ease-out) backwards;
 }
-.breakdown-donut-center b { font-size: .9rem; }
-.breakdown-donut-center small { font-size: .6rem; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; }
-.breakdown-total { font-size: 1.9rem; font-weight: 800; }
+.breakdown-donut::after { content: ''; position: absolute; inset: 20px; border-radius: 50%; background: var(--surface); z-index: 0; }
+.breakdown-donut-center {
+  position: absolute; inset: 20px; z-index: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center; gap: .15rem;
+}
+.breakdown-donut-top-name { font-size: .66rem; font-weight: 700; color: var(--ink); line-height: 1.15; max-width: 78px; }
+.breakdown-donut-top-pct { font-size: .58rem; font-weight: 600; color: var(--ink-faint); }
+.breakdown-total { font-size: 2.1rem; font-weight: 800; }
+@keyframes breakdown-donut-in { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .breakdown-donut { animation: none; }
+}
 .breakdown-total span { font-size: 1rem; color: var(--ink-faint); font-weight: 600; margin-left: .2rem; }
 .breakdown-list { display: flex; flex-direction: column; gap: .9rem; }
-.breakdown-row { display: flex; align-items: center; gap: .7rem; }
+.breakdown-row {
+  display: flex; align-items: center; gap: .7rem;
+  animation: breakdown-row-in var(--dur-base) var(--ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
 .breakdown-icon { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex: none; }
 .breakdown-main { flex: 1; min-width: 0; }
 .breakdown-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .3rem; gap: .5rem; }
@@ -18,4 +29,13 @@
 .breakdown-amount { font-weight: 600; font-size: .84rem; white-space: nowrap; }
 .breakdown-amount small { color: var(--ink-faint); font-weight: 500; margin-left: .3rem; }
 .breakdown-track { height: 6px; border-radius: 4px; background: var(--surface-sunken); overflow: hidden; }
-.breakdown-fill { height: 100%; border-radius: 4px; }
+.breakdown-fill {
+  width: 100%; height: 100%; border-radius: 4px; transform-origin: left;
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+
+@keyframes breakdown-row-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .breakdown-row { animation: none; }
+  .breakdown-fill { transition: none; }
+}

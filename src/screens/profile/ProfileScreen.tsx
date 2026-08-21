@@ -1,7 +1,14 @@
 import { useEffect, useState } from 'react';
+import { RotateCcw } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { scheduleMonthlyReminder } from '../../lib/notifications';
 import { DEVICE_CATALOG } from '../../data/deviceCatalog';
+import { ApplianceIcon } from '../../components/ApplianceIcon';
+import { DayOfMonthPicker } from '../../components/DayOfMonthPicker';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import './ProfileScreen.css';
 
 export function ProfileScreen() {
@@ -63,38 +70,58 @@ export function ProfileScreen() {
   return (
     <div className="profile-shell">
       <h1 className="display">Profil</h1>
-      <div className="profile-card">
-        <div className="profile-field">
-          <span>Hesap</span>
-          <span className="mono">{email}</span>
-        </div>
-        <div className="profile-field">
-          <span>Ayın kaçında hatırlat</span>
-          <input
-            type="number"
-            min={1}
-            max={28}
-            value={reminderDay}
-            onChange={(e) => saveReminderDay(Number(e.target.value))}
-          />
-        </div>
-      </div>
 
-      <div className="profile-card">
-        <h3>Varsayılan watt değerleri</h3>
-        {DEVICE_CATALOG.map((device) => (
-          <div className="profile-device-row" key={device.key}>
-            <span>{device.name}</span>
-            <input
-              type="number"
-              value={watts.get(device.key) ?? device.defaultWatt}
-              onChange={(e) => saveWatt(device.key, Number(e.target.value))}
-            />
+      <Card className="profile-card">
+        <CardContent>
+          <div className="profile-field">
+            <Label>Hesap</Label>
+            <span className="mono">{email}</span>
           </div>
-        ))}
-      </div>
+          <div className="profile-field profile-field-stack">
+            <Label id="reminderDayLabel">Ayın kaçında hatırlat</Label>
+            <DayOfMonthPicker value={reminderDay} onChange={saveReminderDay} />
+          </div>
+        </CardContent>
+      </Card>
 
-      <button className="profile-signout" onClick={signOut}>Çıkış yap</button>
+      <Card className="profile-card">
+        <CardHeader>
+          <CardTitle>Varsayılan watt değerleri</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {DEVICE_CATALOG.map((device) => {
+            const isOverridden = (watts.get(device.key) ?? device.defaultWatt) !== device.defaultWatt;
+            return (
+              <div className="profile-device-row" key={device.key}>
+                <div className="profile-device-icon">
+                  <ApplianceIcon iconKey={device.iconKey} size={17} />
+                </div>
+                <span>{device.name}</span>
+                {isOverridden && (
+                  <button
+                    type="button"
+                    className="profile-watt-reset"
+                    aria-label="Varsayılana dön"
+                    onClick={() => saveWatt(device.key, device.defaultWatt)}
+                  >
+                    <RotateCcw size={13} strokeWidth={2} />
+                  </button>
+                )}
+                <Input
+                  type="number"
+                  className="profile-num-input profile-watt-input"
+                  value={watts.get(device.key) ?? device.defaultWatt}
+                  onChange={(e) => saveWatt(device.key, Number(e.target.value))}
+                />
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
+
+      <Button variant="destructive" size="lg" className="w-full h-12 text-base" onClick={signOut}>
+        Çıkış yap
+      </Button>
     </div>
   );
 }
