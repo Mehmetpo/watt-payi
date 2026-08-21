@@ -16,18 +16,10 @@
 .login-input-wrap { position: relative; display: flex; align-items: center; }
 .login-input-icon { position: absolute; left: .85rem; color: var(--ink-faint); pointer-events: none; }
 .login-input-wrap input { padding-left: 2.6rem; }
-.login-sent {
-  display: flex; align-items: flex-start; gap: .7rem; background: var(--good-soft); color: var(--good);
-  border-radius: 12px; padding: 1rem; margin-top: .5rem;
-}
-.login-sent svg { flex: none; margin-top: .1rem; animation: login-mail-pulse 2.2s var(--ease-out) infinite; }
-.login-sent .login-sub { margin: 0; color: var(--good); }
-.login-sent .login-sub strong { color: var(--ink); }
 .login-error { color: var(--coral); font-size: .85rem; margin-top: .75rem; }
 
 .login-in { animation: login-in var(--dur-slow) var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 70ms); }
 @keyframes login-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes login-mail-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
 @media (prefers-reduced-motion: reduce) {
-  .login-glow, .login-in, .login-sent svg { animation: none; }
+  .login-glow, .login-in { animation: none; }
 }
