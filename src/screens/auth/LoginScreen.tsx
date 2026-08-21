@@ -1,5 +1,5 @@
 import { useState, type CSSProperties, type FormEvent } from 'react';
-import { Mail } from 'lucide-react';
+import { Mail, Lock } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -9,24 +9,35 @@ import './LoginScreen.css';
 
 export function LoginScreen() {
   const [email, setEmail] = useState('');
-  const [sent, setSent] = useState(false);
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  async function sendMagicLink(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
     setError(null);
-    const { error: sendError } = await supabase.auth.signInWithOtp({
+
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
       email,
-      options: { emailRedirectTo: 'com.mehmetcebe.wattpayi://login-callback' },
+      password,
     });
-    setBusy(false);
-    if (sendError) {
-      setError('Giriş linki gönderilemedi, e-posta adresini kontrol et.');
+
+    if (!signInError && signInData.session) {
+      setBusy(false);
       return;
     }
-    setSent(true);
+
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    setBusy(false);
+
+    if (signUpError || !signUpData.session) {
+      setError('E-posta veya şifre hatalı.');
+    }
   }
 
   return (
@@ -38,33 +49,40 @@ export function LoginScreen() {
       <h1 className="display login-in" style={{ '--i': 1 } as CSSProperties}>Watt Payı</h1>
       <p className="login-sub login-in" style={{ '--i': 2 } as CSSProperties}>Faturanı cihaz cihaz takip et.</p>
 
-      {sent ? (
-        <div className="login-sent login-in" style={{ '--i': 3 } as CSSProperties}>
-          <Mail size={20} strokeWidth={1.7} />
-          <p className="login-sub">
-            <strong>{email}</strong> adresine bir giriş linki gönderdik. E-postandaki linke dokunarak giriş yap.
-          </p>
+      <form onSubmit={handleSubmit} className="login-form login-in" style={{ '--i': 3 } as CSSProperties}>
+        <Label htmlFor="email">E-posta</Label>
+        <div className="login-input-wrap">
+          <Mail size={17} strokeWidth={1.8} className="login-input-icon" />
+          <Input
+            id="email"
+            type="email"
+            required
+            className="h-12 text-base"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="ornek@eposta.com"
+          />
         </div>
-      ) : (
-        <form onSubmit={sendMagicLink} className="login-form login-in" style={{ '--i': 3 } as CSSProperties}>
-          <Label htmlFor="email">E-posta</Label>
-          <div className="login-input-wrap">
-            <Mail size={17} strokeWidth={1.8} className="login-input-icon" />
-            <Input
-              id="email"
-              type="email"
-              required
-              className="h-12 text-base"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="ornek@eposta.com"
-            />
-          </div>
-          <Button type="submit" size="lg" className="h-12 text-base mt-2" disabled={busy}>
-            {busy ? 'Gönderiliyor...' : 'Giriş linki gönder'}
-          </Button>
-        </form>
-      )}
+
+        <Label htmlFor="password">Şifre</Label>
+        <div className="login-input-wrap">
+          <Lock size={17} strokeWidth={1.8} className="login-input-icon" />
+          <Input
+            id="password"
+            type="password"
+            required
+            minLength={6}
+            className="h-12 text-base"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="En az 6 karakter"
+          />
+        </div>
+
+        <Button type="submit" size="lg" className="h-12 text-base mt-2" disabled={busy}>
+          {busy ? 'Giriş yapılıyor...' : 'Giriş yap'}
+        </Button>
+      </form>
 
       {error && <p className="login-error">{error}</p>}
     </div>
