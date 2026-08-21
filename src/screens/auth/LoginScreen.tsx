@@ -1,9 +1,10 @@
 import { useState, type CSSProperties, type FormEvent } from 'react';
-import { Zap, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
+import { BrandMark } from '../../components/BrandMark';
 import './LoginScreen.css';
 
 export function LoginScreen() {
@@ -32,7 +33,7 @@ export function LoginScreen() {
     <div className="login-shell">
       <div className="login-glow" aria-hidden="true" />
       <div className="login-mark login-in" style={{ '--i': 0 } as CSSProperties}>
-        <Zap size={26} strokeWidth={1.8} />
+        <BrandMark size={26} />
       </div>
       <h1 className="display login-in" style={{ '--i': 1 } as CSSProperties}>Watt Payı</h1>
       <p className="login-sub login-in" style={{ '--i': 2 } as CSSProperties}>Faturanı cihaz cihaz takip et.</p>
