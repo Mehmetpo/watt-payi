@@ -19,28 +19,32 @@ export function LoginScreen() {
     setError(null);
     const trimmedEmail = email.trim();
 
-    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-      email: trimmedEmail,
-      password,
-    });
+    try {
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: trimmedEmail,
+        password,
+      });
 
-    if (!signInError && signInData.session) {
+      if (!signInError && signInData.session) {
+        setBusy(false);
+        return;
+      }
+
+      // Auto sign-up on failed sign-in. Relies on "confirm email" being disabled in the
+      // Supabase project — otherwise a brand-new user would get a session-less signUp result
+      // here and see the same "wrong email/password" error as an actual bad password.
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: trimmedEmail,
+        password,
+      });
+
+      if (signUpError || !signUpData.session) {
+        setError('E-posta veya şifre hatalı.');
+      }
+    } catch {
+      setError('Bir şeyler ters gitti, tekrar dene.');
+    } finally {
       setBusy(false);
-      return;
-    }
-
-    // Auto sign-up on failed sign-in. Relies on "confirm email" being disabled in the
-    // Supabase project — otherwise a brand-new user would get a session-less signUp result
-    // here and see the same "wrong email/password" error as an actual bad password.
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-      email: trimmedEmail,
-      password,
-    });
-
-    setBusy(false);
-
-    if (signUpError || !signUpData.session) {
-      setError('E-posta veya şifre hatalı.');
     }
   }
 
