@@ -17,9 +17,10 @@ export function LoginScreen() {
     e.preventDefault();
     setBusy(true);
     setError(null);
+    const trimmedEmail = email.trim();
 
     const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-      email,
+      email: trimmedEmail,
       password,
     });
 
@@ -28,8 +29,11 @@ export function LoginScreen() {
       return;
     }
 
+    // Auto sign-up on failed sign-in. Relies on "confirm email" being disabled in the
+    // Supabase project — otherwise a brand-new user would get a session-less signUp result
+    // here and see the same "wrong email/password" error as an actual bad password.
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-      email,
+      email: trimmedEmail,
       password,
     });
 
