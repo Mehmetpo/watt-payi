@@ -39,6 +39,18 @@ const PATHS: Record<string, string> = {
   minifridge: '<rect x="6" y="4.5" width="12" height="16" rx="2"/><line x1="6" y1="10.5" x2="18" y2="10.5"/><line x1="9" y1="7" x2="9" y2="8.3"/>',
   waterpurifier: '<rect x="5" y="3" width="10" height="12" rx="1.6"/><line x1="7.5" y1="6" x2="12.5" y2="6"/><line x1="7.5" y1="9" x2="12.5" y2="9"/><path d="M15 15h3a1.5 1.5 0 0 1 1.5 1.5v0A1.5 1.5 0 0 1 18 18h-1.5"/><line x1="16.5" y1="18" x2="16.5" y2="21"/>',
   electricblanket: '<rect x="3" y="6" width="15" height="12" rx="2"/><path d="M6 10c1-1 2-1 3 0s2 1 3 0 2-1 3 0"/><path d="M6 14c1-1 2-1 3 0s2 1 3 0 2-1 3 0"/><path d="M18 10c1.5 0 3 .8 3 3s-1.5 3-3 3"/>',
+  laptop: '<rect x="5" y="4" width="14" height="9.5" rx="1.3"/><path d="M2.5 18.5 4 15h16l1.5 3.5a1 1 0 0 1-1 1.3h-17a1 1 0 0 1-1-1.3Z"/>',
+  monitor: '<rect x="3" y="3.5" width="18" height="13" rx="1.6"/><line x1="12" y1="16.5" x2="12" y2="19"/><path d="M8.5 21h7l-1-2h-5Z"/>',
+  soundbar: '<rect x="2.5" y="9.5" width="19" height="5" rx="2.5"/><circle cx="7" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="17" cy="12" r="1" fill="currentColor" stroke="none"/>',
+  mediabox: '<rect x="4" y="9" width="16" height="7" rx="2"/><path d="M10.3 11.3v3.4l3-1.7Z" fill="currentColor" stroke="none"/><circle cx="17.5" cy="12.5" r=".6" fill="currentColor" stroke="none"/>',
+  mixer: '<path d="M6.5 13h10l-1.3 5.2a2.3 2.3 0 0 1-2.2 1.8h-2.9a2.3 2.3 0 0 1-2.2-1.8Z"/><path d="M16 13V7.5A4.5 4.5 0 0 0 11.5 3H9.3"/><circle cx="9" cy="3.6" r="1.5"/><line x1="9" y1="5.1" x2="9" y2="8.5"/>',
+  juicer: '<path d="M9 3.5a3 3 0 0 1 6 0c0 1.4-.9 2-1.5 3H10.5c-.6-1-1.5-1.6-1.5-3Z"/><path d="M7 9h10l-1.3 9.3A2 2 0 0 1 13.7 20h-3.4a2 2 0 0 1-2-1.7Z"/>',
+  waterheatertank: '<path d="M7 5.5a5 5 0 0 1 10 0v13a5 5 0 0 1-10 0Z"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="12" y1="12" x2="12" y2="17"/><circle cx="12" cy="12" r="1.3"/>',
+  handvacuum: '<rect x="8" y="4" width="7" height="10" rx="2.3"/><line x1="11.5" y1="14" x2="11.5" y2="17.5"/><path d="M8 8.5H5a1.5 1.5 0 0 0-1.5 1.5v0A1.5 1.5 0 0 0 5 11.5h1"/><path d="M9 17.5h5a1.7 1.7 0 0 1 1.7 1.7v0a1.7 1.7 0 0 1-1.7 1.7H9Z"/>',
+  sewingmachine: '<rect x="3" y="16" width="16" height="3.5" rx="1"/><path d="M5 16c0-6 2.5-9.5 7-9.5h3a3 3 0 0 1 3 3v1.2"/><line x1="14.5" y1="10.5" x2="14.5" y2="16"/><circle cx="17.3" cy="9.5" r="1.4"/>',
+  aquarium: '<rect x="3" y="6" width="18" height="12" rx="1.4"/><line x1="3" y1="10.5" x2="21" y2="10.5"/><path d="M8 18v-3.5c0-1 .6-1.5 1.3-2M15 18v-2.8c0-1.2.7-1.8 1.5-2.5"/><circle cx="12" cy="8.3" r=".6" fill="currentColor" stroke="none"/>',
+  evcharger: '<rect x="4" y="8" width="10" height="12" rx="2"/><path d="M14 12h3.5a2.5 2.5 0 0 1 2.5 2.5v3a2.5 2.5 0 0 1-2.5 2.5H16"/><path d="M9.5 11 8 15h2.5l-1 4 3.5-5H10.5Z" fill="currentColor" stroke="none"/><line x1="7" y1="5" x2="7" y2="8"/><line x1="11" y1="5" x2="11" y2="8"/>',
+  lawnmower: '<path d="M4 15.5h11.5a2.5 2.5 0 0 0 2.5-2.5v-.3a2.5 2.5 0 0 0-2.2-2.5L9 9.3"/><circle cx="7" cy="18.3" r="2.2"/><circle cx="15.5" cy="18.3" r="2.2"/><path d="M9 9.3 15.5 4"/><line x1="13.5" y1="6" x2="17.5" y2="6"/>',
   other: '<circle cx="12" cy="12" r="9" stroke-dasharray="3 3.6"/><path d="M9.3 9.5a2.7 2.7 0 1 1 4 2.3c-1 .6-1.5 1.1-1.5 2.3"/><circle cx="11.8" cy="17.3" r=".9" fill="currentColor" stroke="none"/>',
 };
 
