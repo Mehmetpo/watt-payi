@@ -1,12 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Zap, Lightbulb } from 'lucide-react';
+import { Zap, Lightbulb, WifiOff, TriangleAlert, Share2 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { BillBreakdown } from '../../components/BillBreakdown';
+import { BillBreakdownSkeleton } from '../../components/BillBreakdownSkeleton';
 import { compareDeviceSpending, type DeviceDeltaResult } from '../../lib/deviceDelta';
+import { useCountUp } from '../../hooks/useCountUp';
 import { DEVICE_CATALOG } from '../../data/deviceCatalog';
+import { formatPeriod } from '../../lib/format';
+import { shareBillBreakdown } from '../../lib/shareBill';
 import { Card, CardContent } from '../../components/ui/card';
-import { Skeleton } from '../../components/ui/skeleton';
 import type { Bill, BillItem } from '../../types/domain';
 import './HomeScreen.css';
 
@@ -16,15 +19,24 @@ export function HomeScreen() {
   const [previousTotal, setPreviousTotal] = useState<number | null>(null);
   const [deviceDelta, setDeviceDelta] = useState<DeviceDeltaResult | null>(null);
   const [aiTip, setAiTip] = useState<string | null>(null);
+  const [budgetTl, setBudgetTl] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function load() {
-      const { data: bills } = await supabase
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data: profile } = await supabase.from('profiles').select('budget_tl').single();
+      setBudgetTl(profile?.budget_tl ?? null);
+
+      const { data: bills, error: billsError } = await supabase
         .from('bills')
         .select('id, period_month, total_tl, rate_tl_per_kwh, photo_url, ai_tip')
         .order('period_month', { ascending: false })
         .limit(2);
+
+      if (billsError) throw billsError;
 
       if (bills && bills.length > 0) {
         const [latest, previous] = bills;
@@ -38,10 +50,12 @@ export function HomeScreen() {
         setPreviousTotal(previous ? previous.total_tl : null);
         setAiTip(latest.ai_tip ?? null);
 
-        const { data: billItems } = await supabase
+        const { data: billItems, error: itemsError } = await supabase
           .from('bill_items')
           .select('id, bill_id, device_key, device_name, watt, hours_per_week, monthly_kwh_raw, calibrated_tl, pct_share')
           .in('bill_id', previous ? [latest.id, previous.id] : [latest.id]);
+
+        if (itemsError) throw itemsError;
 
         const latestItems = (billItems ?? []).filter((row) => row.bill_id === latest.id);
         setItems(
@@ -69,50 +83,71 @@ export function HomeScreen() {
                 .map((row) => ({ key: row.device_key!, name: row.device_name, tl: row.calibrated_tl }))
             )
           );
+        } else {
+          setDeviceDelta(null);
         }
+      } else {
+        setLatestBill(null);
       }
+    } catch (err) {
+      console.error('HomeScreen: fatura verileri yüklenemedi', err);
+      setError('Veriler yüklenemedi. Bağlantını kontrol edip tekrar dene.');
+    } finally {
       setLoading(false);
     }
-    load();
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const iconByKey = (key: string | null) => (key ? DEVICE_CATALOG.find((d) => d.key === key)?.iconKey ?? 'other' : 'other');
 
   const delta =
     latestBill && previousTotal ? ((latestBill.totalTl - previousTotal) / previousTotal) * 100 : null;
+  const heroTotal = useCountUp(latestBill ? Math.round(latestBill.totalTl) : 0);
 
   return (
     <div className="home-shell">
       <div className="home-hero">
-        <div className="home-header">
-          <h1 className="display">Bu Ay</h1>
-          {delta !== null && (
-            <span className="home-delta">
-              {delta <= 0 ? '↓' : '↑'} %{Math.abs(delta).toFixed(0)}
-            </span>
-          )}
-        </div>
+        <div className="home-hero-glow" aria-hidden="true" />
+        <span className="home-eyebrow">Bu Ay</span>
+        {loading ? (
+          <div className="home-hero-skeleton" aria-hidden="true" />
+        ) : latestBill ? (
+          <div className="home-hero-row">
+            <div className="home-hero-total mono">
+              {heroTotal.toLocaleString('tr-TR')}
+              <span>TL</span>
+            </div>
+            {delta !== null && (
+              <span className={'home-delta' + (delta <= 0 ? ' down' : ' up')}>
+                {delta <= 0 ? '↓' : '↑'} %{Math.abs(delta).toFixed(0)}
+              </span>
+            )}
+          </div>
+        ) : (
+          <h1 className="display home-hero-empty-title">Watt Payı</h1>
+        )}
       </div>
 
       <div className="home-card-wrap">
         {loading ? (
           <Card>
-            <CardContent className="home-skeleton">
-              <div className="home-skeleton-summary">
-                <Skeleton className="home-skeleton-donut" />
-                <Skeleton className="home-skeleton-total" />
+            <CardContent>
+              <BillBreakdownSkeleton />
+            </CardContent>
+          </Card>
+        ) : error ? (
+          <Card className="home-card-anim">
+            <CardContent className="home-empty">
+              <div className="empty-icon-badge home-error-icon">
+                <WifiOff size={26} strokeWidth={1.6} />
               </div>
-              <div className="home-skeleton-rows">
-                {[0, 1, 2].map((i) => (
-                  <div className="home-skeleton-row" key={i}>
-                    <Skeleton className="home-skeleton-icon" />
-                    <div className="home-skeleton-row-text">
-                      <Skeleton className="home-skeleton-line" />
-                      <Skeleton className="home-skeleton-line short" />
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <p>{error}</p>
+              <button type="button" className="home-retry-btn" onClick={load}>
+                Tekrar dene
+              </button>
             </CardContent>
           </Card>
         ) : !latestBill ? (
@@ -127,9 +162,30 @@ export function HomeScreen() {
           </Card>
         ) : (
           <>
+            {budgetTl !== null && latestBill.totalTl > budgetTl && (
+              <Card className="home-card-anim home-budget-card">
+                <CardContent className="home-budget">
+                  <TriangleAlert size={18} strokeWidth={1.8} />
+                  <p>
+                    Bu ay {Math.round(latestBill.totalTl - budgetTl)} TL bütçe hedefini aştın (hedef:{' '}
+                    {budgetTl.toLocaleString('tr-TR')} TL).
+                  </p>
+                </CardContent>
+              </Card>
+            )}
             <Card className="home-card-anim">
               <CardContent>
-                <BillBreakdown totalTl={latestBill.totalTl} items={items} iconKeyFor={iconByKey} />
+                <div className="home-breakdown-header">
+                  <button
+                    type="button"
+                    className="home-share-btn"
+                    aria-label="Paylaş"
+                    onClick={() => shareBillBreakdown(formatPeriod(latestBill.periodMonth), latestBill.totalTl, items)}
+                  >
+                    <Share2 size={15} strokeWidth={1.8} />
+                  </button>
+                </div>
+                <BillBreakdown totalTl={latestBill.totalTl} items={items} iconKeyFor={iconByKey} showTotal={false} />
                 {deviceDelta && (deviceDelta.increased || deviceDelta.decreased) && (
                   <div className="home-device-delta">
                     {deviceDelta.increased && (

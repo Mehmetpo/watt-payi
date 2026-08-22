@@ -12,6 +12,8 @@ export function LoginScreen() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+  const [resetBusy, setResetBusy] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -45,6 +47,27 @@ export function LoginScreen() {
       setError('Bir şeyler ters gitti, tekrar dene.');
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function handleForgotPassword() {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setError('Önce e-posta adresini gir.');
+      return;
+    }
+    setError(null);
+    setResetBusy(true);
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
+        redirectTo: 'com.mehmetcebe.wattpayi://login-callback',
+      });
+      if (resetError) throw resetError;
+      setResetSent(true);
+    } catch {
+      setError('Sıfırlama bağlantısı gönderilemedi, tekrar dene.');
+    } finally {
+      setResetBusy(false);
     }
   }
 
@@ -92,7 +115,21 @@ export function LoginScreen() {
         </Button>
       </form>
 
-      {error && <p className="login-error">{error}</p>}
+      {error && <p className="form-error">{error}</p>}
+
+      {resetSent ? (
+        <p className="login-reset-sent">Şifre sıfırlama bağlantısı e-postana gönderildi.</p>
+      ) : (
+        <Button
+          type="button"
+          variant="link"
+          className="login-forgot-link"
+          onClick={handleForgotPassword}
+          disabled={resetBusy}
+        >
+          {resetBusy ? 'Gönderiliyor...' : 'Şifremi unuttum'}
+        </Button>
+      )}
     </div>
   );
 }

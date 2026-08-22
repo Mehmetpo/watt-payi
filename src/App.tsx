@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginScreen } from './screens/auth/LoginScreen';
+import { ResetPasswordScreen } from './screens/auth/ResetPasswordScreen';
 import { HomeScreen } from './screens/home/HomeScreen';
 import { AddFlow } from './screens/add/AddFlow';
 import { HistoryScreen } from './screens/history/HistoryScreen';
@@ -9,9 +10,10 @@ import { ProfileScreen } from './screens/profile/ProfileScreen';
 import { BottomNav } from './components/BottomNav';
 
 function AuthedShell() {
-  const { session, loading } = useAuth();
+  const { session, loading, recovery } = useAuth();
 
   if (loading) return null;
+  if (recovery) return <ResetPasswordScreen />;
   if (!session) return <LoginScreen />;
 
   return (

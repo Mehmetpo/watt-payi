@@ -1,9 +1,18 @@
 .history-shell { max-width: 640px; margin: 0 auto; padding: 1.5rem 1.25rem 6rem; }
+.history-shell h1 { margin: 0 0 1.1rem; }
+.history-in {
+  animation: history-in var(--dur-slow) var(--ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+@keyframes history-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .history-in { animation: none; }
+}
 .history-list { display: flex; flex-direction: column; gap: .6rem; }
 .history-row {
   position: relative; overflow: hidden;
   display: block;
-  background: var(--surface); border: 1px solid var(--line); border-radius: 13px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
   padding: 1rem 1.1rem; text-decoration: none; color: var(--ink);
   box-shadow: var(--shadow);
   transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
@@ -27,25 +36,53 @@
   background: var(--good-soft); padding: .2rem .45rem; border-radius: 999px;
 }
 .history-delta.up { color: var(--coral); background: var(--coral-soft); }
-.history-row-skeleton { height: 54px; border-radius: 13px; }
+.history-row-skeleton { height: 54px; border-radius: var(--radius-lg); }
 .history-insight {
-  background: var(--good-soft); color: var(--good); border-radius: 12px;
+  background: var(--good-soft); color: var(--good); border-radius: var(--radius-lg);
   padding: .8rem 1rem; margin-bottom: 1.2rem; font-size: .82rem; font-weight: 600;
 }
 .history-back {
-  display: inline-flex; align-items: center; gap: .35rem; margin-bottom: 1rem;
+  display: inline-flex; align-items: center; gap: .35rem;
   color: var(--ink-muted); text-decoration: none; font-size: .85rem; font-weight: 600;
   transition: color var(--dur-fast) var(--ease-out);
 }
 .history-back:hover { color: var(--accent); }
+.history-detail-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.history-share-btn {
+  width: 2rem; height: 2rem; border-radius: 50%; border: 0; background: var(--surface-sunken);
+  color: var(--ink-muted); display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.history-share-btn:hover { background: var(--accent-soft); color: var(--accent); }
+.history-share-btn:active { transform: scale(.92); }
+.history-share-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+@media (prefers-reduced-motion: reduce) { .history-share-btn { transition: none; } }
 .history-empty {
   display: flex; flex-direction: column; align-items: center; text-align: center;
   color: var(--ink-faint); padding: 3rem 1rem; gap: .5rem;
 }
 .history-empty p { color: var(--ink-muted); margin: .25rem 0 0; }
-.history-empty a { display: inline-block; margin-top: .75rem; background: var(--accent); color: #fff; padding: .75rem 1.25rem; border-radius: 11px; font-weight: 700; text-decoration: none; }
+.history-empty a { display: inline-block; margin-top: .75rem; background: var(--accent-button); color: #fff; padding: .75rem 1.25rem; border-radius: var(--radius-lg); font-weight: 700; text-decoration: none; }
+.history-error-icon { background: var(--coral-soft); color: var(--coral); }
+.history-retry-btn {
+  display: inline-block; margin-top: .75rem; background: var(--accent-button); color: #fff; border: 0;
+  padding: .75rem 1.25rem; border-radius: var(--radius-lg); font-weight: 700; font-family: inherit;
+  font-size: .85rem; cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out);
+}
+.history-retry-btn:hover { opacity: .92; }
+.history-retry-btn:active { transform: scale(.97); }
+.history-retry-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Shared fade-in for state panels rendered after data resolves (error / not-found
+   / empty), used by both HistoryScreen and HistoryDetailScreen since they share
+   this stylesheet. */
+.history-state-in { animation: history-state-in var(--dur-slow) var(--ease-out) backwards; }
+@keyframes history-state-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
 @keyframes row-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) {
   .history-row { animation: none; transition: none; }
+  .history-retry-btn { transition: none; }
+  .history-state-in { animation: none; }
 }

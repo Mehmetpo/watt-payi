@@ -6,7 +6,7 @@
 }
 @keyframes login-glow-in { from { opacity: 0; transform: scale(.7); } to { opacity: .28; transform: scale(1); } }
 .login-mark {
-  width: 60px; height: 60px; border-radius: 20px; background: var(--hero-gradient); color: #fff;
+  width: 60px; height: 60px; border-radius: var(--radius-2xl); background: var(--hero-gradient); color: #fff;
   display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;
   box-shadow: 0 12px 28px -8px color-mix(in srgb, var(--accent) 60%, transparent);
 }
@@ -16,7 +16,9 @@
 .login-input-wrap { position: relative; display: flex; align-items: center; }
 .login-input-icon { position: absolute; left: .85rem; color: var(--ink-faint); pointer-events: none; }
 .login-input-wrap input { padding-left: 2.6rem; }
-.login-error { color: var(--coral); font-size: .85rem; margin-top: .75rem; }
+
+.login-forgot-link { align-self: center; margin-top: .5rem; color: var(--ink-muted); font-size: .82rem; }
+.login-reset-sent { text-align: center; margin-top: .5rem; font-size: .82rem; font-weight: 600; color: var(--good); }
 
 .login-in { animation: login-in var(--dur-slow) var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 70ms); }
 @keyframes login-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

@@ -1,8 +1,9 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useState, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
-import { FileClock } from 'lucide-react';
+import { FileClock, WifiOff } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { detectRisingDevices, type BillWithItems } from '../../lib/trends';
+import { formatPeriod } from '../../lib/format';
 import { Skeleton } from '../../components/ui/skeleton';
 import './HistoryScreen.css';
 
@@ -12,32 +13,32 @@ interface BillRow {
   total_tl: number;
 }
 
-const MONTH_NAMES = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
-
-function formatPeriod(iso: string) {
-  const d = new Date(iso);
-  return `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`;
-}
-
 export function HistoryScreen() {
   const [bills, setBills] = useState<BillRow[]>([]);
   const [rising, setRising] = useState<{ deviceName: string; months: number }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function load() {
-      const { data: billRows } = await supabase
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data: billRows, error: billsError } = await supabase
         .from('bills')
         .select('id, period_month, total_tl')
         .order('period_month', { ascending: false });
 
+      if (billsError) throw billsError;
+
       setBills(billRows ?? []);
 
       if (billRows && billRows.length >= 3) {
-        const { data: itemRows } = await supabase
+        const { data: itemRows, error: itemsError } = await supabase
           .from('bill_items')
           .select('bill_id, device_key, device_name, calibrated_tl')
           .in('bill_id', billRows.map((b) => b.id));
+
+        if (itemsError) throw itemsError;
 
         const billsWithItems: BillWithItems[] = billRows.map((b) => ({
           periodMonth: b.period_month,
@@ -47,18 +48,27 @@ export function HistoryScreen() {
         }));
 
         setRising(detectRisingDevices(billsWithItems));
+      } else {
+        setRising([]);
       }
+    } catch (err) {
+      console.error('HistoryScreen: geçmiş faturalar yüklenemedi', err);
+      setError('Geçmiş yüklenemedi. Bağlantını kontrol edip tekrar dene.');
+    } finally {
       setLoading(false);
     }
-    load();
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   return (
     <div className="history-shell">
-      <h1 className="display">Geçmiş</h1>
+      <h1 className="display history-in" style={{ '--i': 0 } as CSSProperties}>Geçmiş</h1>
 
       {rising.length > 0 && (
-        <div className="history-insight">
+        <div className="history-insight history-in" style={{ '--i': 1 } as CSSProperties}>
           {rising.map((r) => `${r.deviceName} ${r.months} aydır artıyor`).join(' · ')}
         </div>
       )}
@@ -69,8 +79,18 @@ export function HistoryScreen() {
             <Skeleton key={i} className="history-row-skeleton" />
           ))}
         </div>
+      ) : error ? (
+        <div className="history-empty history-state-in">
+          <div className="empty-icon-badge history-error-icon">
+            <WifiOff size={26} strokeWidth={1.6} />
+          </div>
+          <p>{error}</p>
+          <button type="button" className="history-retry-btn" onClick={load}>
+            Tekrar dene
+          </button>
+        </div>
       ) : bills.length === 0 ? (
-        <div className="history-empty">
+        <div className="history-empty history-state-in">
           <div className="empty-icon-badge">
             <FileClock size={26} strokeWidth={1.6} />
           </div>
