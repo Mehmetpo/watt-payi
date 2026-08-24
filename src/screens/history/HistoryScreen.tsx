@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { detectRisingDevices, type BillWithItems } from '../../lib/trends';
 import { formatPeriod } from '../../lib/format';
 import { Skeleton } from '../../components/ui/skeleton';
+import { EmptyState } from '../../components/EmptyState';
 import './HistoryScreen.css';
 
 interface BillRow {
@@ -91,11 +92,12 @@ export function HistoryScreen() {
         </div>
       ) : bills.length === 0 ? (
         <div className="history-empty history-state-in">
-          <div className="empty-icon-badge">
-            <FileClock size={26} strokeWidth={1.6} />
-          </div>
-          <p>Henüz geçmiş fatura yok.</p>
-          <Link to="/add">+ İlk faturanı ekle</Link>
+          <EmptyState
+            icon={<FileClock size={26} strokeWidth={1.6} />}
+            message="Henüz geçmiş fatura yok."
+            actionTo="/add"
+            actionLabel="+ İlk faturanı ekle"
+          />
         </div>
       ) : (
         <div className="history-list">

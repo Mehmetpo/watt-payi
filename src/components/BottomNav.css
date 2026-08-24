@@ -5,11 +5,21 @@
   padding: .4rem 0 calc(.4rem + env(safe-area-inset-bottom));
   z-index: 10;
 }
+.bottom-nav__pill {
+  position: absolute; top: .3rem; bottom: calc(.3rem + env(safe-area-inset-bottom)); left: 0;
+  background: var(--accent-soft); border-radius: var(--radius-md);
+  transition: transform var(--dur-base) var(--ease-out);
+  z-index: 0; pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bottom-nav__pill { transition: none; }
+}
 .bottom-nav__item {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .2rem;
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
   text-decoration: none; color: var(--ink-faint); font-size: .68rem; font-weight: 600;
   min-width: 56px; min-height: 44px; padding: .2rem 0;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   transition: color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
 }
 .bottom-nav__item.active { color: var(--accent); }
@@ -17,8 +27,14 @@
 .bottom-nav__item:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .bottom-nav__icon { transition: transform var(--dur-fast) var(--ease-out); }
 .bottom-nav__item.active .bottom-nav__icon { transform: translateY(-1px); }
+.bottom-nav__label {
+  max-height: 0; margin-top: 0; opacity: 0; overflow: hidden;
+  transition: max-height var(--dur-fast) var(--ease-out), opacity var(--dur-fast) var(--ease-out), margin-top var(--dur-fast) var(--ease-out);
+}
+.bottom-nav__item.active .bottom-nav__label { max-height: 1rem; margin-top: .2rem; opacity: 1; }
 
 .bottom-nav__fab {
+  position: relative; z-index: 1;
   display: flex; align-items: center; justify-content: center;
   width: 52px; height: 52px; min-width: 52px;
   margin-top: -26px;
@@ -34,5 +50,5 @@
 .bottom-nav__fab:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .bottom-nav__item, .bottom-nav__icon, .bottom-nav__fab { transition: none; }
+  .bottom-nav__item, .bottom-nav__icon, .bottom-nav__fab, .bottom-nav__label { transition: none; }
 }

@@ -1,10 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, type CSSProperties } from 'react';
 import { calculateBreakdown, type DeviceCorrection, type DeviceUsage } from '../../../lib/calc';
 import { BillBreakdown } from '../../../components/BillBreakdown';
 import { ApplianceIcon } from '../../../components/ApplianceIcon';
-import { DEVICE_CATALOG } from '../../../data/deviceCatalog';
+import { DEVICE_CATALOG, COMMON_DEVICE_KEYS } from '../../../data/deviceCatalog';
 
-const COMMON_DEVICE_KEYS = ['fridge', 'lighting', 'tv', 'washer', 'vacuum', 'router', 'kettle', 'iron'];
 const NUDGE_THRESHOLD_PCT = 5;
 
 export interface ResultStepProps {
@@ -83,17 +82,24 @@ export function ResultStep({
     );
   }
 
+  const breakdownDelay = adjustedCount > 0 ? 2 : 1;
+  const nudgeDelay = breakdownDelay + 1;
+
   return (
     <div>
-      <p className="add-insight">{insight}</p>
+      <p className="add-insight result-in" style={{ '--i': 0 } as CSSProperties}>
+        {insight}
+      </p>
       {adjustedCount > 0 && (
-        <p className="add-insight add-insight-muted">
+        <p className="add-insight add-insight-muted result-in" style={{ '--i': 1 } as CSSProperties}>
           {adjustedCount} cihazın tüketimi geçmiş faturalarından öğrenilen verilerle ayarlandı.
         </p>
       )}
-      <BillBreakdown totalTl={billTl} items={items} iconKeyFor={iconByKey} />
+      <div className="result-in" style={{ '--i': breakdownDelay } as CSSProperties}>
+        <BillBreakdown totalTl={billTl} items={items} iconKeyFor={iconByKey} />
+      </div>
       {showNudge && (
-        <div className="result-nudge">
+        <div className="result-nudge result-in" style={{ '--i': nudgeDelay } as CSSProperties}>
           <p>
             Faturanın %{Math.round(result.otherPct)}'i seçmediğin cihazlardan geliyor. Şunlardan birini eklemek ister
             misin?

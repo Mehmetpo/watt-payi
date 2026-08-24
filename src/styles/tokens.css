@@ -4,16 +4,41 @@
   --surface-sunken: #F1F1F6;
   --ink: #191A23;
   --ink-muted: #6B6F80;
-  --ink-faint: #9A9EB0;
+  /* --ink-faint, --coral and --good are tuned a shade darker than a pure
+     brand swatch would be: at full brightness they read under 3:1 against
+     white/--surface (and under --coral-soft/--good-soft too), which fails
+     for real text/icon use (nav labels, error copy, delta badges). These
+     values keep the same hue while clearing ~4.5:1 on plain surfaces and
+     ~4:1+ on their tinted -soft backgrounds. */
+  --ink-faint: #82869A;
   --accent: #6D5EF0;
   --accent-soft: #ECE9FE;
-  --coral: #FF5D5D;
+  --accent-strong: #4A3FCF;
+  --coral: #D63B3B;
   --coral-soft: #FFE7E7;
-  --good: #2BC5A0;
+  --good: #128268;
   --good-soft: #E2F8F2;
   --line: #E4E4EC;
   --shadow: 0 2px 4px color-mix(in srgb, var(--accent) 8%, rgba(25,26,35,.06)), 0 16px 32px -14px color-mix(in srgb, var(--accent) 30%, rgba(25,26,35,.22));
   --hero-gradient: linear-gradient(135deg, var(--accent) 0%, #8F7FF5 55%, var(--coral) 130%);
+
+  /* Extra qualitative hues for multi-series charts (device breakdown donut).
+     --chart-1/2/3 intentionally equal --accent/--coral/--good so the chart
+     and the rest of the UI share the same top colors. */
+  /* Solid accent fills with white text (buttons, filled chips/badges) need
+     their own token: --accent is tuned bright for text/icon legibility on
+     dark surfaces, which fails WCAG AA (4.5:1) as a background under white
+     text in dark mode. --accent-button stays at the light-mode accent value
+     in both themes, since that value already clears 4.5:1 against white. */
+  --accent-button: var(--accent);
+  --chart-1: var(--accent);
+  --chart-2: var(--coral);
+  --chart-3: var(--good);
+  --chart-4: #E0A83F;
+  --chart-5: #3F8FE0;
+  --chart-6: #B85AC9;
+  --chart-7: #5AC98F;
+  --chart-8: #C97A3F;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -26,11 +51,19 @@
     --ink-faint: #6E7186;
     --accent: #8B7DFF;
     --accent-soft: #2C2650;
+    --accent-strong: #C7BEFF;
+    --accent-button: #6D5EF0;
     --coral: #FF7A7A;
     --coral-soft: #3A2020;
     --good: #4FDBB5;
     --good-soft: #16332C;
     --line: #2E2E3D;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 32px -14px color-mix(in srgb, var(--accent) 35%, rgba(0,0,0,.55));
+
+    --chart-4: #F0C065;
+    --chart-5: #6FADFF;
+    --chart-6: #D485E8;
+    --chart-7: #7EE0AC;
+    --chart-8: #E0985A;
   }
 }

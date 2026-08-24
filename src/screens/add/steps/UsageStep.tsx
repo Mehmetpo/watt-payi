@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { DEVICE_CATALOG } from '../../../data/deviceCatalog';
 import { ApplianceIcon } from '../../../components/ApplianceIcon';
 import { Slider } from '../../../components/ui/slider';
@@ -24,17 +25,18 @@ export function UsageStep({ selectedKeys, usageByKey, overridesByKey, onChange }
 
   return (
     <div>
-      {devices.map((device) => {
+      {devices.map((device, i) => {
         const defaultWatt = overridesByKey.get(device.key) ?? device.defaultWatt;
         const usage = usageByKey.get(device.key) ?? { key: device.key, watt: defaultWatt, hoursPerWeek: 0 };
         return (
-          <div className="usage-row" key={device.key}>
+          <div className="usage-row usage-row-in" style={{ '--i': i } as CSSProperties} key={device.key}>
             <div className="usage-top">
               <div className="usage-icon"><ApplianceIcon iconKey={device.iconKey} size={17} /></div>
               <div className="usage-name">{device.name}</div>
               <div className="usage-watt">
                 <input
                   type="number"
+                  aria-label={`${device.name} watt değeri`}
                   value={usage.watt}
                   onChange={(e) => onChange(device.key, { watt: Number(e.target.value) })}
                 />
@@ -57,6 +59,7 @@ export function UsageStep({ selectedKeys, usageByKey, overridesByKey, onChange }
             <div className="usage-slider-row">
               <Slider
                 className="usage-slider"
+                aria-label={`${device.name} haftalık kullanım saati`}
                 min={0}
                 max={168}
                 step={0.5}

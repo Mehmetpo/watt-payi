@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Zap, Lightbulb, WifiOff, TriangleAlert, Share2 } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { BillBreakdown } from '../../components/BillBreakdown';
@@ -10,6 +9,7 @@ import { DEVICE_CATALOG } from '../../data/deviceCatalog';
 import { formatPeriod } from '../../lib/format';
 import { shareBillBreakdown } from '../../lib/shareBill';
 import { Card, CardContent } from '../../components/ui/card';
+import { EmptyState } from '../../components/EmptyState';
 import type { Bill, BillItem } from '../../types/domain';
 import './HomeScreen.css';
 
@@ -153,23 +153,42 @@ export function HomeScreen() {
         ) : !latestBill ? (
           <Card className="home-card-anim">
             <CardContent className="home-empty">
-              <div className="empty-icon-badge">
-                <Zap size={26} strokeWidth={1.6} />
-              </div>
-              <p>Henüz bir fatura eklemedin.</p>
-              <Link to="/add">+ İlk faturanı ekle</Link>
+              <EmptyState
+                icon={<Zap size={26} strokeWidth={1.6} />}
+                message="Henüz bir fatura eklemedin."
+                actionTo="/add"
+                actionLabel="+ İlk faturanı ekle"
+              />
             </CardContent>
           </Card>
         ) : (
           <>
-            {budgetTl !== null && latestBill.totalTl > budgetTl && (
-              <Card className="home-card-anim home-budget-card">
+            {budgetTl !== null && (
+              <Card
+                className={
+                  'home-card-anim home-budget-card home-budget-' +
+                  (latestBill.totalTl >= budgetTl ? 'over' : latestBill.totalTl >= budgetTl * 0.8 ? 'warn' : 'ok')
+                }
+              >
                 <CardContent className="home-budget">
-                  <TriangleAlert size={18} strokeWidth={1.8} />
-                  <p>
-                    Bu ay {Math.round(latestBill.totalTl - budgetTl)} TL bütçe hedefini aştın (hedef:{' '}
-                    {budgetTl.toLocaleString('tr-TR')} TL).
-                  </p>
+                  <div className="home-budget-head">
+                    <span className="home-budget-label">Bütçe hedefi</span>
+                    <span className="home-budget-values mono">
+                      {Math.round(latestBill.totalTl).toLocaleString('tr-TR')} / {budgetTl.toLocaleString('tr-TR')} TL
+                    </span>
+                  </div>
+                  <div className="home-budget-track">
+                    <div
+                      className="home-budget-fill"
+                      style={{ transform: `scaleX(${Math.min(1, latestBill.totalTl / budgetTl)})` }}
+                    />
+                  </div>
+                  {latestBill.totalTl > budgetTl && (
+                    <p className="home-budget-over-msg">
+                      <TriangleAlert size={14} strokeWidth={1.8} />
+                      {Math.round(latestBill.totalTl - budgetTl)} TL bütçe hedefini aştın
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             )}

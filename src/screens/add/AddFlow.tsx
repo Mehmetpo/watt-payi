@@ -20,6 +20,7 @@ const STEP_LABELS = ['Fatura', 'Cihazlar', 'Kullanım', 'Sonuç'];
 export function AddFlow() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
+  const [furthest, setFurthest] = useState(0);
   const prevStepRef = useRef(0);
   const [direction, setDirection] = useState<'forward' | 'back'>('forward');
   const [bill, setBill] = useState<BillStepValue>({ billTl: 0, ratePerKwh: 3.5 });
@@ -29,6 +30,7 @@ export function AddFlow() {
     setDirection(next > step ? 'forward' : 'back');
     prevStepRef.current = step;
     setStep(next);
+    setFurthest((f) => Math.max(f, next));
   }
 
   function toggleDevice(key: string) {
@@ -273,20 +275,37 @@ export function AddFlow() {
 
   return (
     <div className="add-shell">
+      <p aria-live="polite" className="sr-only">
+        {`Adım ${step + 1} / ${STEP_LABELS.length}: ${STEP_LABELS[step]}`}
+      </p>
       <div className="add-progress-head">
         <span className="add-progress-label">{STEP_LABELS[step]}</span>
         <span className="add-progress-count mono">{step + 1} / {STEP_LABELS.length}</span>
       </div>
       <div
         className="add-progress"
-        role="progressbar"
-        aria-valuenow={step + 1}
-        aria-valuemin={1}
-        aria-valuemax={STEP_LABELS.length}
-        aria-label={`Adım ${step + 1} / ${STEP_LABELS.length}: ${STEP_LABELS[step]}`}
+        role="tablist"
+        aria-label="Adımlar"
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowRight') {
+            const next = Math.min(step + 1, furthest);
+            if (next !== step) goToStep(next);
+          } else if (e.key === 'ArrowLeft' && step > 0) {
+            goToStep(step - 1);
+          }
+        }}
       >
-        {STEP_LABELS.map((_, i) => (
-          <i key={i} className={i < step ? 'done' : i === step ? 'active' : ''} />
+        {STEP_LABELS.map((label, i) => (
+          <button
+            key={i}
+            type="button"
+            role="tab"
+            aria-selected={i === step}
+            aria-label={`Adım ${i + 1}: ${label}`}
+            disabled={i > furthest}
+            className={i < step ? 'done' : i === step ? 'active' : ''}
+            onClick={() => i !== step && goToStep(i)}
+          />
         ))}
       </div>
       <div className="add-card">
@@ -343,7 +362,7 @@ export function AddFlow() {
           </Button>
         )}
       </div>
-      {saveError && <p className="login-error">{saveError}</p>}
+      {saveError && <p className="form-error">{saveError}</p>}
     </div>
   );
 }

@@ -4,6 +4,11 @@
   animation: breakdown-donut-in 520ms var(--ease-out) backwards;
 }
 .breakdown-donut::after { content: ''; position: absolute; inset: 20px; border-radius: 50%; background: var(--surface); z-index: 0; }
+.breakdown-donut-seg {
+  position: absolute; inset: 0; border-radius: 50%; cursor: pointer;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+.breakdown-donut-seg.dim { opacity: .3; }
 .breakdown-donut-center {
   position: absolute; inset: 20px; z-index: 1; display: flex; flex-direction: column;
   align-items: center; justify-content: center; text-align: center; gap: .15rem;
@@ -18,11 +23,13 @@
 .breakdown-total span { font-size: 1rem; color: var(--ink-faint); font-weight: 600; margin-left: .2rem; }
 .breakdown-list { display: flex; flex-direction: column; gap: .9rem; }
 .breakdown-row {
-  display: flex; align-items: center; gap: .7rem;
+  display: flex; align-items: center; gap: .7rem; cursor: pointer;
   animation: breakdown-row-in var(--dur-base) var(--ease-out) backwards;
   animation-delay: calc(var(--i, 0) * 40ms);
+  transition: opacity var(--dur-fast) var(--ease-out);
 }
-.breakdown-icon { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex: none; }
+.breakdown-row.dim { opacity: .4; }
+.breakdown-icon { width: 30px; height: 30px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; flex: none; }
 .breakdown-main { flex: 1; min-width: 0; }
 .breakdown-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .3rem; gap: .5rem; }
 .breakdown-name { font-weight: 700; font-size: .84rem; }
@@ -36,6 +43,7 @@
 
 @keyframes breakdown-row-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) {
-  .breakdown-row { animation: none; }
+  .breakdown-row { animation: none; transition: none; }
   .breakdown-fill { transition: none; }
+  .breakdown-donut-seg { transition: none; }
 }

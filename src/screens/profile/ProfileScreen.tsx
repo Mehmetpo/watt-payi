@@ -10,6 +10,7 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Skeleton } from '../../components/ui/skeleton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+import { HoldToConfirmButton } from '../../components/HoldToConfirmButton';
 import './ProfileScreen.css';
 
 export function ProfileScreen() {
@@ -294,9 +295,13 @@ export function ProfileScreen() {
               <Button variant="outline" size="sm" onClick={() => setConfirmingDelete(false)} disabled={deleting}>
                 Vazgeç
               </Button>
-              <Button variant="destructive" size="sm" onClick={deleteAccount} disabled={deleting}>
-                {deleting ? 'Siliniyor...' : 'Evet, hesabımı sil'}
-              </Button>
+              <HoldToConfirmButton
+                className="profile-hold-delete"
+                onConfirm={deleteAccount}
+                disabled={deleting}
+                idleLabel={deleting ? 'Siliniyor...' : 'Basılı tutarak sil'}
+                holdingLabel="Bırakma, siliniyor..."
+              />
             </div>
           </div>
         )}

@@ -72,7 +72,8 @@
   animation: profile-delete-confirm-in var(--dur-base) var(--ease-out);
 }
 .profile-delete-confirm p { margin: 0; font-size: .82rem; font-weight: 600; line-height: 1.4; }
-.profile-delete-confirm-actions { display: flex; gap: .6rem; margin-top: .2rem; }
+.profile-delete-confirm-actions { display: flex; align-items: center; gap: .6rem; margin-top: .2rem; }
+.profile-hold-delete { flex: 1; min-height: 2.25rem; font-size: .78rem; }
 @keyframes profile-delete-confirm-in { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) { .profile-delete-confirm { animation: none; } }
 

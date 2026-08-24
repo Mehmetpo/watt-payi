@@ -78,10 +78,21 @@
 .home-device-delta .up { color: var(--coral); }
 .home-device-delta .down { color: var(--good); }
 
-.home-budget-card { margin-top: 2.25rem; margin-bottom: .8rem; background: var(--coral-soft); }
-.home-budget { display: flex; align-items: flex-start; gap: .7rem; color: var(--coral); }
-.home-budget svg { flex: none; margin-top: .15rem; }
-.home-budget p { margin: 0; font-size: .84rem; font-weight: 600; line-height: 1.5; }
+.home-budget-card { margin-top: 2.25rem; margin-bottom: .8rem; }
+.home-budget-card.home-budget-over { background: var(--coral-soft); }
+.home-budget-head { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; margin-bottom: .5rem; }
+.home-budget-label { font-size: .78rem; font-weight: 700; color: var(--ink-muted); }
+.home-budget-values { font-size: .78rem; font-weight: 600; color: var(--ink-faint); white-space: nowrap; }
+.home-budget-track { height: 8px; border-radius: 4px; background: var(--surface-sunken); overflow: hidden; }
+.home-budget-fill {
+  width: 100%; height: 100%; border-radius: 4px; transform-origin: left; background: var(--accent);
+  transition: transform var(--dur-slow) var(--ease-out), background-color var(--dur-base) var(--ease-out);
+}
+.home-budget-warn .home-budget-fill { background: var(--chart-4); }
+.home-budget-over .home-budget-fill { background: var(--coral); }
+.home-budget-over-msg { display: flex; align-items: center; gap: .35rem; margin: .6rem 0 0; font-size: .78rem; font-weight: 600; color: var(--coral); }
+.home-budget-over-msg svg { flex: none; }
+@media (prefers-reduced-motion: reduce) { .home-budget-fill { transition: none; } }
 
 .home-breakdown-header { display: flex; justify-content: flex-end; margin-bottom: -.4rem; }
 .home-share-btn {
