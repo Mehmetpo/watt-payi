@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type CSSProperties } from 'react';
-import { RotateCcw, WifiOff, TriangleAlert } from 'lucide-react';
+import { RotateCcw, WifiOff, TriangleAlert, PlayCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
+import { useOnboarding } from '../../contexts/OnboardingContext';
 import { scheduleMonthlyReminder } from '../../lib/notifications';
 import { DEVICE_CATALOG } from '../../data/deviceCatalog';
 import { ApplianceIcon } from '../../components/ApplianceIcon';
@@ -24,6 +25,7 @@ export function ProfileScreen() {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const onboarding = useOnboarding();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -273,16 +275,27 @@ export function ProfileScreen() {
       )}
 
       <Button
-        variant="destructive"
+        variant="outline"
         size="lg"
         className="w-full h-12 text-base profile-in"
         style={{ '--i': 3 } as CSSProperties}
+        onClick={onboarding.show}
+      >
+        <PlayCircle size={18} strokeWidth={1.8} />
+        Tanıtımı tekrar izle
+      </Button>
+
+      <Button
+        variant="destructive"
+        size="lg"
+        className="w-full h-12 text-base profile-in"
+        style={{ '--i': 4 } as CSSProperties}
         onClick={signOut}
       >
         Çıkış yap
       </Button>
 
-      <div className="profile-danger-zone profile-in" style={{ '--i': 4 } as CSSProperties}>
+      <div className="profile-danger-zone profile-in" style={{ '--i': 5 } as CSSProperties}>
         {!confirmingDelete ? (
           <Button variant="link" className="profile-delete-link" onClick={() => setConfirmingDelete(true)}>
             Hesabımı kalıcı olarak sil
