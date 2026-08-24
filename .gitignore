@@ -5,6 +5,7 @@ ios/
 .env
 .env.local
 .superpowers/
+.impeccable/
 .DS_Store
 *.log
 *.tsbuildinfo
