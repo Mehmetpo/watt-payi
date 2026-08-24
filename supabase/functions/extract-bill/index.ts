@@ -5,6 +5,11 @@ const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')!;
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
 interface ExtractedBill {
   toplam_tutar: number | null;
   birim_fiyat: number | null;
@@ -14,21 +19,25 @@ interface ExtractedBill {
 }
 
 serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: CORS_HEADERS });
+  }
+
   const authHeader = req.headers.get('Authorization');
   if (!authHeader) {
-    return new Response(JSON.stringify({ error: 'missing_auth' }), { status: 401 });
+    return new Response(JSON.stringify({ error: 'missing_auth' }), { status: 401, headers: CORS_HEADERS });
   }
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
   const token = authHeader.replace('Bearer ', '');
   const { data: userData, error: userError } = await supabase.auth.getUser(token);
   if (userError || !userData.user) {
-    return new Response(JSON.stringify({ error: 'invalid_token' }), { status: 401 });
+    return new Response(JSON.stringify({ error: 'invalid_token' }), { status: 401, headers: CORS_HEADERS });
   }
 
   const { imageBase64, mediaType } = await req.json();
   if (!imageBase64 || !mediaType) {
-    return new Response(JSON.stringify({ error: 'missing_image' }), { status: 400 });
+    return new Response(JSON.stringify({ error: 'missing_image' }), { status: 400, headers: CORS_HEADERS });
   }
 
   const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
@@ -62,7 +71,7 @@ serve(async (req) => {
 
   if (!anthropicRes.ok) {
     const detail = await anthropicRes.text();
-    return new Response(JSON.stringify({ error: 'vision_request_failed', detail }), { status: 502 });
+    return new Response(JSON.stringify({ error: 'vision_request_failed', detail }), { status: 502, headers: CORS_HEADERS });
   }
 
   const anthropicJson = await anthropicRes.json();
@@ -72,11 +81,11 @@ serve(async (req) => {
   try {
     extracted = JSON.parse(rawText);
   } catch {
-    return new Response(JSON.stringify({ error: 'parse_failed', raw: rawText }), { status: 502 });
+    return new Response(JSON.stringify({ error: 'parse_failed', raw: rawText }), { status: 502, headers: CORS_HEADERS });
   }
 
   return new Response(JSON.stringify(extracted), {
     status: 200,
-    headers: { 'content-type': 'application/json' },
+    headers: { ...CORS_HEADERS, 'content-type': 'application/json' },
   });
 });
