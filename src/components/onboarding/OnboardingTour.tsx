@@ -49,6 +49,7 @@ export function OnboardingTour() {
   const { dismiss } = useOnboarding();
   const [activeIndex, setActiveIndex] = useState(0);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const skipButtonRef = useRef<HTMLButtonElement>(null);
 
   const isFirst = activeIndex === 0;
   const isLast = activeIndex === SLIDES.length - 1;
@@ -71,6 +72,13 @@ export function OnboardingTour() {
 
   function handleBack() {
     if (isFirst) return;
+    if (activeIndex === 1) {
+      // About to land on slide 0, where "Geri" becomes disabled/hidden. If focus is
+      // still on "Geri" when that happens, the browser evicts focus to <body>, which
+      // sits outside the dialog and breaks the Tab-trap. Move focus to "Geç" now,
+      // before the re-render, so there's nothing to evict.
+      skipButtonRef.current?.focus();
+    }
     setActiveIndex((i) => i - 1);
   }
 
@@ -150,7 +158,7 @@ export function OnboardingTour() {
             Geri
           </button>
           <div className="onboarding-footer-right">
-            <button type="button" className="onboarding-btn-ghost" onClick={dismiss}>
+            <button ref={skipButtonRef} type="button" className="onboarding-btn-ghost" onClick={dismiss}>
               Geç
             </button>
             <button type="button" className="onboarding-btn-primary" onClick={handleNext}>
