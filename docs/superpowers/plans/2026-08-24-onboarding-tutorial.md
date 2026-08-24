@@ -148,7 +148,7 @@ git commit -m "feat: add onboarding-seen flag storage"
 **Files:**
 - Create: `src/contexts/OnboardingContext.tsx`
 
-- [ ] **Step 1: Write the context**
+- [x] **Step 1: Write the context**
 
 Create `src/contexts/OnboardingContext.tsx`:
 
@@ -209,13 +209,13 @@ Preferences/Supabase writes elsewhere in this codebase) and fires `setOnboarding
 without awaiting it — a failed write only means the tour might show again next login, never a
 crash (see spec's Error handling section).
 
-- [ ] **Step 2: Type-check**
+- [x] **Step 2: Type-check**
 
 Run: `npm run build`
 Expected: succeeds (this file isn't wired into the app yet, but must still type-check on its
 own).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit** — `36ed844`
 
 ```bash
 git add src/contexts/OnboardingContext.tsx

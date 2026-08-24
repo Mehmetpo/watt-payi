@@ -129,8 +129,9 @@ direct-context-consumption style as the rest of the app's screen-level component
 
 ## Files touched
 
-- `src/contexts/OnboardingContext.tsx` (new)
-- `src/contexts/OnboardingContext.test.ts` (new)
+- `src/contexts/OnboardingContext.tsx` (new — no test file; this project has no
+  jsdom/testing-library, so the testable logic lives in `src/lib/onboardingStorage.ts`
+  instead, which does have a test file — see the implementation plan's note on this)
 - `src/components/onboarding/OnboardingTour.tsx` (new)
 - `src/components/onboarding/OnboardingTour.css` (new)
 - `src/App.tsx` (wrap with `OnboardingProvider`, add the auto-show effect and
