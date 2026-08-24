@@ -32,3 +32,41 @@ export async function checkRateLimit(
   const callCount = data as number;
   return callCount <= dailyLimit;
 }
+
+/**
+ * Extracts the caller's IP from the standard proxy header Supabase's gateway
+ * sets. Falls back to a fixed key if absent so those requests share one
+ * bucket instead of bypassing the limit entirely.
+ */
+export function getClientIp(req: Request): string {
+  const forwarded = req.headers.get('x-forwarded-for');
+  if (forwarded) return forwarded.split(',')[0].trim();
+  return 'unknown';
+}
+
+/**
+ * Same as checkRateLimit but keyed by IP instead of user id, via
+ * `increment_ip_usage` (see supabase/migrations/0004_ip_rate_limit.sql).
+ * A second, coarser layer so one IP can't bypass the per-user cap by
+ * creating many accounts. Limit is intentionally higher than the per-user
+ * one to avoid punishing legitimate shared IPs (NAT/household wifi).
+ */
+export async function checkIpRateLimit(
+  adminClient: SupabaseClient,
+  ipAddress: string,
+  functionName: string,
+  dailyLimit: number,
+): Promise<boolean> {
+  const { data, error } = await adminClient.rpc('increment_ip_usage', {
+    p_ip_address: ipAddress,
+    p_function_name: functionName,
+  });
+
+  if (error) {
+    console.error('ip rate limit check failed', functionName, error);
+    return true;
+  }
+
+  const callCount = data as number;
+  return callCount <= dailyLimit;
+}

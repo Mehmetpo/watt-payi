@@ -1,7 +1,7 @@
 import { serve } from 'https://deno.land/std@0.224.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
 import { corsHeaders } from '../_shared/cors.ts';
-import { checkRateLimit } from '../_shared/rateLimit.ts';
+import { checkRateLimit, checkIpRateLimit, getClientIp } from '../_shared/rateLimit.ts';
 
 const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')!;
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
@@ -11,6 +11,13 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 // generous headroom for retries and multiple bills while still capping the
 // Anthropic spend a stolen/abused token could run up.
 const DAILY_LIMIT = 20;
+// Coarser per-IP cap so one IP can't multiply past DAILY_LIMIT by creating
+// many accounts. Sized to tolerate a handful of real users behind one NAT.
+const IP_DAILY_LIMIT = 100;
+const ALLOWED_MEDIA_TYPES = ['image/jpeg', 'image/png'];
+// ~6MB decoded, generous headroom over a quality-80 phone photo — caps the
+// Anthropic payload size/cost an authenticated caller can force per request.
+const MAX_IMAGE_BASE64_LENGTH = 8_000_000;
 
 interface ExtractedBill {
   toplam_tutar: number | null;
@@ -47,9 +54,20 @@ serve(async (req) => {
     });
   }
 
+  const ipAllowed = await checkIpRateLimit(supabase, getClientIp(req), 'extract-bill', IP_DAILY_LIMIT);
+  if (!ipAllowed) {
+    return new Response(JSON.stringify({ error: 'rate_limited' }), {
+      status: 429,
+      headers: { ...CORS_HEADERS, 'content-type': 'application/json' },
+    });
+  }
+
   const { imageBase64, mediaType } = await req.json();
   if (!imageBase64 || !mediaType) {
     return new Response(JSON.stringify({ error: 'missing_image' }), { status: 400, headers: CORS_HEADERS });
+  }
+  if (!ALLOWED_MEDIA_TYPES.includes(mediaType) || imageBase64.length > MAX_IMAGE_BASE64_LENGTH) {
+    return new Response(JSON.stringify({ error: 'invalid_image' }), { status: 400, headers: CORS_HEADERS });
   }
 
   const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {

@@ -11,6 +11,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@aparajita/capacitor-secure-storage": "^8.0.0",
     "@base-ui/react": "^1.7.0",
     "@capacitor-community/admob": "^8.1.0",
     "@capacitor/android": "^8.0.0",
@@ -20,6 +21,7 @@
     "@capacitor/local-notifications": "^8.0.0",
     "@capacitor/preferences": "^8.0.0",
     "@capacitor/share": "^8.0.0",
+    "@marsidev/react-turnstile": "^1.6.0",
     "@supabase/supabase-js": "^2.45.4",
     "@tailwindcss/vite": "^4.3.3",
     "animejs": "^4.5.0",

@@ -1,11 +1,14 @@
-import { useState, type CSSProperties, type FormEvent } from 'react';
+import { useRef, useState, type CSSProperties, type FormEvent } from 'react';
 import { Mail, Lock } from 'lucide-react';
+import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 import { supabase } from '../../lib/supabaseClient';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { BrandMark } from '../../components/BrandMark';
 import './LoginScreen.css';
+
+const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string;
 
 export function LoginScreen() {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
@@ -17,6 +20,13 @@ export function LoginScreen() {
   const [busy, setBusy] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [resetBusy, setResetBusy] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileInstance>(null);
+
+  function resetCaptcha() {
+    setCaptchaToken(null);
+    turnstileRef.current?.reset();
+  }
 
   function switchMode(next: 'login' | 'signup') {
     setMode(next);
@@ -42,6 +52,7 @@ export function LoginScreen() {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email: trimmedEmail,
           password,
+          options: { captchaToken: captchaToken ?? undefined },
         });
         if (signInError) {
           setError('E-posta veya şifre hatalı.');
@@ -50,6 +61,7 @@ export function LoginScreen() {
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email: trimmedEmail,
           password,
+          options: { captchaToken: captchaToken ?? undefined },
         });
 
         if (signUpError) {
@@ -70,6 +82,7 @@ export function LoginScreen() {
       setError('Bir şeyler ters gitti, tekrar dene.');
     } finally {
       setBusy(false);
+      resetCaptcha();
     }
   }
 
@@ -84,6 +97,7 @@ export function LoginScreen() {
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
         redirectTo: 'com.mehmetcebe.wattpayi://login-callback',
+        captchaToken: captchaToken ?? undefined,
       });
       if (resetError) throw resetError;
       setResetSent(true);
@@ -91,6 +105,7 @@ export function LoginScreen() {
       setError('Sıfırlama bağlantısı gönderilemedi, tekrar dene.');
     } finally {
       setResetBusy(false);
+      resetCaptcha();
     }
   }
 
@@ -152,7 +167,17 @@ export function LoginScreen() {
           </>
         )}
 
-        <Button type="submit" size="lg" className="h-12 text-base mt-2" disabled={busy}>
+        <div className="login-captcha">
+          <Turnstile
+            ref={turnstileRef}
+            siteKey={TURNSTILE_SITE_KEY}
+            onSuccess={setCaptchaToken}
+            onExpire={resetCaptcha}
+            onError={resetCaptcha}
+          />
+        </div>
+
+        <Button type="submit" size="lg" className="h-12 text-base mt-2" disabled={busy || !captchaToken}>
           {busy
             ? mode === 'login' ? 'Giriş yapılıyor...' : 'Hesap oluşturuluyor...'
             : mode === 'login' ? 'Giriş yap' : 'Hesap oluştur'}
@@ -171,7 +196,7 @@ export function LoginScreen() {
             variant="link"
             className="login-forgot-link"
             onClick={handleForgotPassword}
-            disabled={resetBusy}
+            disabled={resetBusy || !captchaToken}
           >
             {resetBusy ? 'Gönderiliyor...' : 'Şifremi unuttum'}
           </Button>

@@ -16,7 +16,9 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
+        "npm:@aparajita/capacitor-secure-storage@8",
         "npm:@base-ui/react@^1.7.0",
+        "npm:@capacitor-community/admob@^8.1.0",
         "npm:@capacitor/android@8",
         "npm:@capacitor/app@8",
         "npm:@capacitor/assets@^3.0.5",
@@ -26,6 +28,7 @@
         "npm:@capacitor/local-notifications@8",
         "npm:@capacitor/preferences@8",
         "npm:@capacitor/share@8",
+        "npm:@marsidev/react-turnstile@^1.6.0",
         "npm:@supabase/supabase-js@^2.45.4",
         "npm:@tailwindcss/vite@^4.3.3",
         "npm:@types/node@^26.2.0",

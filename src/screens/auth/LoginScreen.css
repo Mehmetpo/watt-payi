@@ -17,6 +17,8 @@
 .login-input-icon { position: absolute; left: .85rem; color: var(--ink-faint); pointer-events: none; }
 .login-input-wrap input { padding-left: 2.6rem; }
 
+.login-captcha { display: flex; justify-content: center; margin-top: .35rem; }
+
 .login-forgot-link { align-self: center; margin-top: .5rem; color: var(--ink-muted); font-size: .82rem; }
 .login-reset-sent { text-align: center; margin-top: .5rem; font-size: .82rem; font-weight: 600; color: var(--good); }
 
