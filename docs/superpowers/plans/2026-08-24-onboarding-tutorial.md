@@ -557,7 +557,7 @@ git commit -m "feat: auto-show onboarding tour on first login"
 **Files:**
 - Modify: `src/screens/profile/ProfileScreen.tsx`
 
-- [ ] **Step 1: Add the import for the onboarding hook and the new icon**
+- [x] **Step 1: Add the import for the onboarding hook and the new icon**
 
 In `src/screens/profile/ProfileScreen.tsx`, change line 2 from:
 
@@ -577,7 +577,7 @@ Then add a new import right after the existing `supabase` import (currently line
 import { useOnboarding } from '../../contexts/OnboardingContext';
 ```
 
-- [ ] **Step 2: Read the flag inside the component**
+- [x] **Step 2: Read the flag inside the component**
 
 Inside `export function ProfileScreen() {`, right after the existing `useState` declarations
 (after the `deleteError` line, before `const load = useCallback(...)`), add:
@@ -586,7 +586,7 @@ Inside `export function ProfileScreen() {`, right after the existing `useState` 
   const onboarding = useOnboarding();
 ```
 
-- [ ] **Step 3: Insert the replay button**
+- [x] **Step 3: Insert the replay button**
 
 Find this block (currently right before the `Çıkış yap` button):
 
@@ -650,12 +650,13 @@ No `ProfileScreen.css` changes are needed — the shadcn `Button`'s `outline` va
 size (`src/components/ui/button.tsx`) already provide spacing/hover/focus styling consistent
 with the rest of the screen, including the icon+label gap.
 
-- [ ] **Step 4: Type-check**
+- [x] **Step 4: Type-check**
 
 Run: `npm run build`
 Expected: succeeds.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit** — `28b605f`; a follow-up nit fix (`7eb46cc`) removed a redundant
+  icon `size={18}` prop that the Button component's own CSS was silently overriding to 16px.
 
 ```bash
 git add src/screens/profile/ProfileScreen.tsx
