@@ -230,7 +230,7 @@ git commit -m "feat: add OnboardingContext"
 - Create: `src/components/onboarding/OnboardingTour.tsx`
 - Create: `src/components/onboarding/OnboardingTour.css`
 
-- [ ] **Step 1: Write the component**
+- [x] **Step 1: Write the component**
 
 Create `src/components/onboarding/OnboardingTour.tsx`:
 
@@ -355,7 +355,7 @@ this is the project's established way of doing enter animations (e.g.
 `.profile-save-error`'s `animation: profile-save-error-in ...` in `ProfileScreen.css`), used
 here instead of a JS-driven transition library.
 
-- [ ] **Step 2: Write the styles**
+- [x] **Step 2: Write the styles**
 
 Create `src/components/onboarding/OnboardingTour.css`:
 
@@ -438,12 +438,14 @@ Create `src/components/onboarding/OnboardingTour.css`:
 }
 ```
 
-- [ ] **Step 3: Type-check**
+- [x] **Step 3: Type-check**
 
 Run: `npm run build`
 Expected: succeeds.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit** — `037e74b`; two review-driven fix-up commits followed:
+  `47bfbf2` (focus trap, Escape, back-button guard) and `3054fa4` (fixed a focus-eviction
+  bug that `47bfbf2` introduced on the "Geri"→slide-0 transition).
 
 ```bash
 git add src/components/onboarding/OnboardingTour.tsx src/components/onboarding/OnboardingTour.css
