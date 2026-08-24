@@ -1,5 +1,7 @@
+import { useEffect, useRef } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { OnboardingProvider, useOnboarding } from './contexts/OnboardingContext';
 import { LoginScreen } from './screens/auth/LoginScreen';
 import { ResetPasswordScreen } from './screens/auth/ResetPasswordScreen';
 import { HomeScreen } from './screens/home/HomeScreen';
@@ -8,9 +10,25 @@ import { HistoryScreen } from './screens/history/HistoryScreen';
 import { HistoryDetailScreen } from './screens/history/HistoryDetailScreen';
 import { ProfileScreen } from './screens/profile/ProfileScreen';
 import { BottomNav } from './components/BottomNav';
+import { OnboardingTour } from './components/onboarding/OnboardingTour';
 
 function AuthedShell() {
   const { session, loading, recovery } = useAuth();
+  const onboarding = useOnboarding();
+  const autoShown = useRef(false);
+
+  useEffect(() => {
+    if (
+      session &&
+      !recovery &&
+      !onboarding.loading &&
+      !onboarding.seen &&
+      !autoShown.current
+    ) {
+      autoShown.current = true;
+      onboarding.show();
+    }
+  }, [session, recovery, onboarding.loading, onboarding.seen, onboarding.show]);
 
   if (loading) return null;
   if (recovery) return <ResetPasswordScreen />;
@@ -27,6 +45,7 @@ function AuthedShell() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <BottomNav />
+      {onboarding.open && <OnboardingTour />}
     </>
   );
 }
@@ -34,7 +53,9 @@ function AuthedShell() {
 export default function App() {
   return (
     <AuthProvider>
-      <AuthedShell />
+      <OnboardingProvider>
+        <AuthedShell />
+      </OnboardingProvider>
     </AuthProvider>
   );
 }
