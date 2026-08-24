@@ -669,19 +669,19 @@ git commit -m "feat: add onboarding replay button to ProfileScreen"
 
 **Files:** none (verification only)
 
-- [ ] **Step 1: Run the full test suite**
+- [x] **Step 1: Run the full test suite**
 
 Run: `npm run test`
 Expected: all `onboardingStorage.test.ts` cases pass. `calc.test.ts` may show its one
 pre-existing failing assertion (documented in `CLAUDE.md` as unrelated to unrelated changes)
 — that is not a regression from this work.
 
-- [ ] **Step 2: Run the full build**
+- [x] **Step 2: Run the full build**
 
 Run: `npm run build`
 Expected: `tsc -b && vite build` succeeds with no errors across the whole project.
 
-- [ ] **Step 3: Manual verification in the dev server**
+- [x] **Step 3: Manual verification in the dev server**
 
 Run: `npm run dev`, open the app, log in with an existing account (the "seen" flag is almost
 certainly already set from earlier testing, so the tour won't auto-open — that's expected).
@@ -699,14 +699,20 @@ Go to **Profil** and click **"Tanıtımı tekrar izle"**. Verify:
   component mounts new local state).
 - Clicking "Geç" on any slide closes the dialog immediately.
 
-- [ ] **Step 4: Verify the first-login auto-show path**
+- [x] **Step 4: Verify the first-login auto-show path** — happened naturally: the test
+  account had no stored flag yet, so the tour auto-opened immediately on login (visible
+  behind it: HomeScreen was already fully rendered, confirming the tour is a pure overlay
+  and doesn't block the rest of the app from loading).
 
 This requires a state with no stored flag. Easiest path: in the browser devtools console
 while the dev server tab is open, run `localStorage.removeItem('onboarding_seen_v1')` (the web
 Preferences implementation is backed by `localStorage`), then reload the app while already
 logged in. Verify the tour auto-opens without visiting Profile.
 
-- [ ] **Step 5: Commit if any fixes were needed**
+- [x] **Step 5: Commit if any fixes were needed** — none needed; live verification found no
+  issues in the onboarding-tutorial code itself (a separate, pre-existing bug was found and
+  fixed in `AuthContext.tsx` during this session, but as its own standalone commit `9173f61`,
+  out of this plan's scope).
 
 If manual verification surfaced any issue, fix it, re-run the affected step above, then:
 
