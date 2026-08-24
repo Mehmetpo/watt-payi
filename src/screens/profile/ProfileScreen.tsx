@@ -281,7 +281,7 @@ export function ProfileScreen() {
         style={{ '--i': 3 } as CSSProperties}
         onClick={onboarding.show}
       >
-        <PlayCircle size={18} strokeWidth={1.8} />
+        <PlayCircle strokeWidth={1.8} />
         Tanıtımı tekrar izle
       </Button>
 
