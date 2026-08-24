@@ -41,7 +41,7 @@ itself unit-tested — consistent with `AuthContext.tsx`, which also has no test
 - Create: `src/lib/onboardingStorage.ts`
 - Test: `src/lib/onboardingStorage.test.ts`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `src/lib/onboardingStorage.test.ts`:
 
@@ -96,12 +96,12 @@ describe('setOnboardingSeen', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run: `npx vitest run src/lib/onboardingStorage.test.ts`
 Expected: FAIL — `Cannot find module './onboardingStorage'` (the module doesn't exist yet).
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 Create `src/lib/onboardingStorage.ts`:
 
@@ -129,12 +129,12 @@ export async function setOnboardingSeen(): Promise<void> {
 }
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run: `npx vitest run src/lib/onboardingStorage.test.ts`
 Expected: PASS — 5 tests green.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit** — `31eff60`
 
 ```bash
 git add src/lib/onboardingStorage.ts src/lib/onboardingStorage.test.ts
