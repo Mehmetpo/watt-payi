@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { User, Camera, Zap, PieChart, type LucideIcon } from 'lucide-react';
 import { useOnboarding } from '../../contexts/OnboardingContext';
 import './OnboardingTour.css';
@@ -48,10 +48,18 @@ const SLIDES: Slide[] = [
 export function OnboardingTour() {
   const { dismiss } = useOnboarding();
   const [activeIndex, setActiveIndex] = useState(0);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   const isFirst = activeIndex === 0;
   const isLast = activeIndex === SLIDES.length - 1;
   const slide = SLIDES[activeIndex];
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const firstFocusable = dialog.querySelector<HTMLElement>('button:not([disabled])');
+    firstFocusable?.focus();
+  }, []);
 
   function handleNext() {
     if (isLast) {
@@ -61,9 +69,52 @@ export function OnboardingTour() {
     setActiveIndex((i) => i + 1);
   }
 
+  function handleBack() {
+    if (isFirst) return;
+    setActiveIndex((i) => i - 1);
+  }
+
+  function handleDialogKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      dismiss();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const focusable = Array.from(dialog.querySelectorAll<HTMLElement>('button:not([disabled])'));
+    if (focusable.length === 0) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const current = document.activeElement;
+
+    if (event.shiftKey) {
+      if (current === first || !dialog.contains(current)) {
+        event.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (current === last || !dialog.contains(current)) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  }
+
   return (
     <div className="onboarding-backdrop">
-      <div className="onboarding-dialog" role="dialog" aria-modal="true" aria-label="Uygulama tanıtımı">
+      <div
+        ref={dialogRef}
+        className="onboarding-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Uygulama tanıtımı"
+        tabIndex={-1}
+        onKeyDown={handleDialogKeyDown}
+      >
         {/* Badge stays a fixed white circle in both themes (see .onboarding-badge),
             so the icon uses a fixed dark hex rather than --ink — --ink flips to a
             light color in dark mode and would vanish against this white badge. */}
@@ -92,7 +143,8 @@ export function OnboardingTour() {
           <button
             type="button"
             className="onboarding-btn-ghost"
-            onClick={() => setActiveIndex((i) => i - 1)}
+            onClick={handleBack}
+            disabled={isFirst}
             style={{ visibility: isFirst ? 'hidden' : 'visible' }}
           >
             Geri
