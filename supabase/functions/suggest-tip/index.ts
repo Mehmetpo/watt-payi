@@ -1,14 +1,16 @@
 import { serve } from 'https://deno.land/std@0.224.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4';
+import { corsHeaders } from '../_shared/cors.ts';
+import { checkRateLimit } from '../_shared/rateLimit.ts';
 
 const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')!;
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+// Normal usage is roughly one bill (and its device tips) per month; 20/day
+// per user leaves generous headroom for retries while still capping the
+// Anthropic spend a stolen/abused token could run up.
+const DAILY_LIMIT = 20;
 
 interface TipRequest {
   deviceName: string;
@@ -19,6 +21,8 @@ interface TipRequest {
 }
 
 serve(async (req) => {
+  const CORS_HEADERS = corsHeaders(req);
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: CORS_HEADERS });
   }
@@ -33,6 +37,14 @@ serve(async (req) => {
   const { data: userData, error: userError } = await supabase.auth.getUser(token);
   if (userError || !userData.user) {
     return new Response(JSON.stringify({ error: 'invalid_token' }), { status: 401, headers: CORS_HEADERS });
+  }
+
+  const allowed = await checkRateLimit(supabase, userData.user.id, 'suggest-tip', DAILY_LIMIT);
+  if (!allowed) {
+    return new Response(JSON.stringify({ error: 'rate_limited' }), {
+      status: 429,
+      headers: { ...CORS_HEADERS, 'content-type': 'application/json' },
+    });
   }
 
   const body: TipRequest = await req.json();

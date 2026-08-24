@@ -36,6 +36,127 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, .15);
 }
 
+.onboarding-scene {
+  position: relative; width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+.onboarding-scene-bill { overflow: hidden; border-radius: 50%; }
+
+/* Welcome: the icon gives a friendly nod while sparkles twinkle around it */
+.onboarding-welcome-icon {
+  animation: onboarding-nod 2.4s var(--ease-out) infinite;
+  transform-origin: 50% 80%;
+}
+@keyframes onboarding-nod {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-8deg); }
+  75% { transform: rotate(8deg); }
+}
+
+.onboarding-sparkle {
+  position: absolute; opacity: 0;
+  animation: onboarding-twinkle 2s var(--ease-out) infinite;
+}
+.onboarding-sparkle-1 { top: -2px; right: 0; animation-delay: 0s; }
+.onboarding-sparkle-2 { bottom: 4px; left: -6px; animation-delay: .65s; }
+.onboarding-sparkle-3 { top: 20px; right: -10px; animation-delay: 1.3s; }
+@keyframes onboarding-twinkle {
+  0%, 100% { opacity: 0; transform: scale(.4) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(20deg); }
+}
+
+/* Bill: a line scans down the badge, leaving a translucent blue "already
+   scanned" wash behind it — reads clearly as a document being scanned.
+   The fill grows via scaleY (not height) to stay compositor-friendly, and
+   the whole group fades in/out around the loop so the scaleY reset at the
+   seam is never visible. */
+.onboarding-scan-group {
+  position: absolute; inset: 0;
+  animation: onboarding-scan-group-fade 2.6s var(--ease-out) infinite;
+}
+@keyframes onboarding-scan-group-fade {
+  0%   { opacity: 0; }
+  4%   { opacity: 1; }
+  82%  { opacity: 1; }
+  92%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+.onboarding-scan-fill {
+  position: absolute; inset: 0;
+  background: color-mix(in srgb, var(--chart-5) 32%, transparent);
+  transform: scaleY(0);
+  transform-origin: top;
+  animation: onboarding-scan-fill-grow 2.6s linear infinite;
+}
+@keyframes onboarding-scan-fill-grow {
+  0%   { transform: scaleY(0); }
+  62%  { transform: scaleY(1); }
+  100% { transform: scaleY(1); }
+}
+
+.onboarding-scan-line {
+  position: absolute; left: 8%; right: 8%; top: 0; height: 2px; border-radius: 2px;
+  background: var(--chart-5);
+  box-shadow: 0 0 6px 1px var(--chart-5);
+  animation: onboarding-scan-line-sweep 2.6s linear infinite;
+}
+@keyframes onboarding-scan-line-sweep {
+  0%   { transform: translateY(0); opacity: 1; }
+  58%  { transform: translateY(60px); opacity: 1; }
+  62%  { transform: translateY(60px); opacity: 1; }
+  72%  { transform: translateY(60px); opacity: 0; }
+  100% { transform: translateY(60px); opacity: 0; }
+}
+
+/* Devices: the zap icon breathes while a spark truly sparks around the badge —
+   flickering in place, not just riding a mechanical orbit. */
+.onboarding-zap-pulse {
+  animation: onboarding-zap-pulse 1.8s var(--ease-out) infinite;
+  transform-origin: center;
+  will-change: transform;
+}
+@keyframes onboarding-zap-pulse {
+  0%   { transform: scale(1); }
+  38%  { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
+.onboarding-spark-orbit {
+  position: absolute; inset: 0;
+  animation: onboarding-spin 3.6s linear infinite;
+  will-change: transform;
+}
+.onboarding-spark-dot {
+  position: absolute; top: 2px; left: 50%; width: 6px; height: 6px; margin-left: -3px;
+  border-radius: 50%; background: var(--tile-color);
+  box-shadow: 0 0 6px 1px var(--tile-color);
+  animation: onboarding-spark-flicker 1.2s var(--ease-out) infinite;
+}
+@keyframes onboarding-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes onboarding-spark-flicker {
+  0%, 100% { transform: scale(.7); opacity: .55; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+
+/* Result: a donut ring draws itself in, like the real chart filling up. */
+.onboarding-donut { position: absolute; inset: 0; transform: rotate(-90deg); }
+.onboarding-donut-track, .onboarding-donut-progress { fill: none; stroke-width: 5; }
+.onboarding-donut-track { stroke: rgba(25, 26, 35, .12); }
+.onboarding-donut-progress {
+  stroke: var(--tile-color);
+  stroke-linecap: round;
+  stroke-dasharray: 163.36;
+  stroke-dashoffset: 163.36;
+  animation: onboarding-donut-draw 2.6s var(--ease-out) infinite;
+}
+@keyframes onboarding-donut-draw {
+  0%   { stroke-dashoffset: 163.36; opacity: 0; }
+  10%  { opacity: 1; }
+  60%  { stroke-dashoffset: 41; opacity: 1; }
+  85%  { stroke-dashoffset: 41; opacity: 1; }
+  100% { stroke-dashoffset: 41; opacity: 0; }
+}
+
 .onboarding-dots { display: flex; justify-content: center; gap: 6px; margin-top: .9rem; }
 .onboarding-dot {
   width: 16px; height: 6px; border-radius: 999px; background: var(--line); opacity: .5;
@@ -73,4 +194,13 @@
 @media (prefers-reduced-motion: reduce) {
   .onboarding-backdrop, .onboarding-dialog, .onboarding-tile, .onboarding-text { animation: none; }
   .onboarding-dot, .onboarding-btn-ghost, .onboarding-btn-primary { transition: none; }
+
+  /* Pure decoration: safe to remove entirely. The camera icon itself has no
+     motion class, so it stays visible untouched. */
+  .onboarding-sparkle, .onboarding-spark-orbit, .onboarding-scan-group {
+    animation: none;
+    display: none;
+  }
+  .onboarding-welcome-icon, .onboarding-zap-pulse { animation: none; }
+  .onboarding-donut-progress { animation: none; stroke-dashoffset: 41; opacity: 1; }
 }

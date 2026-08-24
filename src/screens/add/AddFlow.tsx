@@ -7,6 +7,7 @@ import { UsageStep } from './steps/UsageStep';
 import { ResultStep } from './steps/ResultStep';
 import { calculateBreakdown, type CalcResult, type DeviceCorrection, type DeviceUsage } from '../../lib/calc';
 import { learnDeviceCorrections, type HistoricalBillSample } from '../../lib/learnCalibration';
+import { maybeShowBillAddedInterstitial } from '../../lib/ads';
 import { DEVICE_CATALOG } from '../../data/deviceCatalog';
 import { supabase } from '../../lib/supabaseClient';
 import { Button } from '../../components/ui/button';
@@ -255,6 +256,7 @@ export function AddFlow() {
     }
 
     generateTip(billRow.id, result, devices).catch(() => {});
+    maybeShowBillAddedInterstitial().catch(() => {});
 
     setSaving(false);
     setSaved(true);

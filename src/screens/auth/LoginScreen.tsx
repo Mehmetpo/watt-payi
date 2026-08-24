@@ -8,40 +8,63 @@ import { BrandMark } from '../../components/BrandMark';
 import './LoginScreen.css';
 
 export function LoginScreen() {
+  const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [resetBusy, setResetBusy] = useState(false);
 
+  function switchMode(next: 'login' | 'signup') {
+    setMode(next);
+    setError(null);
+    setInfo(null);
+    setConfirm('');
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setBusy(true);
     setError(null);
+    setInfo(null);
     const trimmedEmail = email.trim();
 
+    if (mode === 'signup' && password !== confirm) {
+      setError('Şifreler eşleşmiyor.');
+      return;
+    }
+
+    setBusy(true);
     try {
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email: trimmedEmail,
-        password,
-      });
+      if (mode === 'login') {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: trimmedEmail,
+          password,
+        });
+        if (signInError) {
+          setError('E-posta veya şifre hatalı.');
+        }
+      } else {
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: trimmedEmail,
+          password,
+        });
 
-      if (!signInError && signInData.session) {
-        setBusy(false);
-        return;
-      }
-
-      // Auto sign-up on failed sign-in. Relies on "confirm email" being disabled in the
-      // Supabase project — otherwise a brand-new user would get a session-less signUp result
-      // here and see the same "wrong email/password" error as an actual bad password.
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: trimmedEmail,
-        password,
-      });
-
-      if (signUpError || !signUpData.session) {
-        setError('E-posta veya şifre hatalı.');
+        if (signUpError) {
+          setError('Kayıt oluşturulamadı, tekrar dene.');
+        } else if (!signUpData.session) {
+          // No session back means Supabase is waiting on email confirmation.
+          setInfo('Hesabını onaylamak için e-postana gelen bağlantıya tıkla.');
+        }
+        // NOTE: whether signUp returns a session instantly depends on the "Confirm email"
+        // toggle in the Supabase Auth dashboard (Authentication > Providers > Email). That
+        // toggle is currently off, so a successful signUp logs the user in immediately
+        // without verifying they actually own the address. This client code can't enforce
+        // email verification on its own — enabling "Confirm email" in the dashboard is a
+        // manual follow-up outside this codebase, and until it's done this is a known,
+        // accepted gap.
       }
     } catch {
       setError('Bir şeyler ters gitti, tekrar dene.');
@@ -102,34 +125,67 @@ export function LoginScreen() {
             id="password"
             type="password"
             required
-            minLength={6}
+            minLength={8}
             className="h-12 text-base"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="En az 6 karakter"
+            placeholder="En az 8 karakter"
           />
         </div>
 
+        {mode === 'signup' && (
+          <>
+            <Label htmlFor="confirmPassword">Şifre (tekrar)</Label>
+            <div className="login-input-wrap">
+              <Lock size={17} strokeWidth={1.8} className="login-input-icon" />
+              <Input
+                id="confirmPassword"
+                type="password"
+                required
+                minLength={8}
+                className="h-12 text-base"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                placeholder="Tekrar gir"
+              />
+            </div>
+          </>
+        )}
+
         <Button type="submit" size="lg" className="h-12 text-base mt-2" disabled={busy}>
-          {busy ? 'Giriş yapılıyor...' : 'Giriş yap'}
+          {busy
+            ? mode === 'login' ? 'Giriş yapılıyor...' : 'Hesap oluşturuluyor...'
+            : mode === 'login' ? 'Giriş yap' : 'Hesap oluştur'}
         </Button>
       </form>
 
       {error && <p className="form-error">{error}</p>}
+      {info && <p className="login-reset-sent">{info}</p>}
 
-      {resetSent ? (
-        <p className="login-reset-sent">Şifre sıfırlama bağlantısı e-postana gönderildi.</p>
-      ) : (
-        <Button
-          type="button"
-          variant="link"
-          className="login-forgot-link"
-          onClick={handleForgotPassword}
-          disabled={resetBusy}
-        >
-          {resetBusy ? 'Gönderiliyor...' : 'Şifremi unuttum'}
-        </Button>
-      )}
+      {mode === 'login' ? (
+        resetSent ? (
+          <p className="login-reset-sent">Şifre sıfırlama bağlantısı e-postana gönderildi.</p>
+        ) : (
+          <Button
+            type="button"
+            variant="link"
+            className="login-forgot-link"
+            onClick={handleForgotPassword}
+            disabled={resetBusy}
+          >
+            {resetBusy ? 'Gönderiliyor...' : 'Şifremi unuttum'}
+          </Button>
+        )
+      ) : null}
+
+      <Button
+        type="button"
+        variant="link"
+        className="login-forgot-link"
+        onClick={() => switchMode(mode === 'login' ? 'signup' : 'login')}
+      >
+        {mode === 'login' ? 'Hesabın yok mu? Kayıt ol' : 'Zaten hesabın var mı? Giriş yap'}
+      </Button>
     </div>
   );
 }

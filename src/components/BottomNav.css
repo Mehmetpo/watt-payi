@@ -1,9 +1,15 @@
 .bottom-nav {
-  position: fixed; bottom: 0; left: 0; right: 0;
+  /* --ad-banner-height is set by HomeScreen while its AdMob banner is
+     showing, so the nav sits just above the ad instead of under it. */
+  position: fixed; bottom: var(--ad-banner-height, 0px); left: 0; right: 0;
   display: flex; justify-content: space-around; align-items: center;
   background: var(--surface); border-top: 1px solid var(--line);
   padding: .4rem 0 calc(.4rem + env(safe-area-inset-bottom));
   z-index: 10;
+  transition: bottom var(--dur-base) var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .bottom-nav { transition: none; }
 }
 .bottom-nav__pill {
   position: absolute; top: .3rem; bottom: calc(.3rem + env(safe-area-inset-bottom)); left: 0;

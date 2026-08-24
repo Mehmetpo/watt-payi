@@ -51,11 +51,11 @@ export function ResetPasswordScreen() {
             id="newPassword"
             type="password"
             required
-            minLength={6}
+            minLength={8}
             className="h-12 text-base"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="En az 6 karakter"
+            placeholder="En az 8 karakter"
           />
         </div>
 
@@ -66,7 +66,7 @@ export function ResetPasswordScreen() {
             id="confirmPassword"
             type="password"
             required
-            minLength={6}
+            minLength={8}
             className="h-12 text-base"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
