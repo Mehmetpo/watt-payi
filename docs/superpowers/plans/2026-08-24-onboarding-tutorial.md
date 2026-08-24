@@ -459,7 +459,7 @@ git commit -m "feat: add OnboardingTour component"
 **Files:**
 - Modify: `src/App.tsx`
 
-- [ ] **Step 1: Replace the file's contents**
+- [x] **Step 1: Replace the file's contents**
 
 `src/App.tsx` currently has no onboarding wiring. Replace it entirely with:
 
@@ -535,12 +535,15 @@ carry a `session` while `recovery` is true — see `AuthContext.tsx`'s `handleAu
 `<OnboardingTour />` is only rendered once we've already passed the `!session`/`recovery`
 early returns, so it's implicitly impossible to render it on the login or recovery screens.
 
-- [ ] **Step 2: Type-check**
+- [x] **Step 2: Type-check**
 
 Run: `npm run build`
 Expected: succeeds.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit** — `85d6cfd`. Code review surfaced a pre-existing, unrelated race
+  in `AuthContext.tsx` (session can briefly be truthy before `recovery` flips true during the
+  password-reset deep link), out of scope for this task — flagged as a separate follow-up
+  rather than fixed here.
 
 ```bash
 git add src/App.tsx
