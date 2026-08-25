@@ -43,7 +43,8 @@ Deno.serve(async (req: Request) => {
   const adminClient = createClient(supabaseUrl, serviceRoleKey);
   const { error: deleteError } = await adminClient.auth.admin.deleteUser(callerData.user.id);
   if (deleteError) {
-    return new Response(JSON.stringify({ error: deleteError.message }), {
+    console.error('delete-account: admin.deleteUser failed', deleteError);
+    return new Response(JSON.stringify({ error: 'delete_failed' }), {
       status: 500,
       headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
     });
