@@ -27,6 +27,22 @@ interface ExtractedBill {
   donem_bitis: string | null;
 }
 
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function isValidExtractedBill(value: unknown): value is ExtractedBill {
+  if (typeof value !== 'object' || value === null) return false;
+  const v = value as Record<string, unknown>;
+  const isNullableNumber = (x: unknown) => x === null || (typeof x === 'number' && Number.isFinite(x) && x >= 0);
+  const isNullableDate = (x: unknown) => x === null || (typeof x === 'string' && DATE_RE.test(x));
+  return (
+    isNullableNumber(v.toplam_tutar) &&
+    isNullableNumber(v.birim_fiyat) &&
+    isNullableNumber(v.kwh) &&
+    isNullableDate(v.donem_baslangic) &&
+    isNullableDate(v.donem_bitis)
+  );
+}
+
 serve(async (req) => {
   const CORS_HEADERS = corsHeaders(req);
 
@@ -70,48 +86,61 @@ serve(async (req) => {
     return new Response(JSON.stringify({ error: 'invalid_image' }), { status: 400, headers: CORS_HEADERS });
   }
 
-  const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-5',
-      max_tokens: 1024,
-      messages: [
-        {
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: mediaType, data: imageBase64 } },
-            {
-              type: 'text',
-              text:
-                'Bu bir Türkiye elektrik faturası fotoğrafı. Şu alanları JSON olarak çıkar: ' +
-                '{"toplam_tutar": number|null, "birim_fiyat": number|null, "kwh": number|null, ' +
-                '"donem_baslangic": "YYYY-MM-DD"|null, "donem_bitis": "YYYY-MM-DD"|null}. ' +
-                'Emin olmadığın alanı null bırak. Sadece JSON döndür, başka metin ekleme.',
-            },
-          ],
-        },
-      ],
-    }),
-  });
+  let anthropicRes: Response;
+  try {
+    anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-5',
+        max_tokens: 1024,
+        messages: [
+          {
+            role: 'user',
+            content: [
+              { type: 'image', source: { type: 'base64', media_type: mediaType, data: imageBase64 } },
+              {
+                type: 'text',
+                text:
+                  'Bu bir Türkiye elektrik faturası fotoğrafı. Şu alanları JSON olarak çıkar: ' +
+                  '{"toplam_tutar": number|null, "birim_fiyat": number|null, "kwh": number|null, ' +
+                  '"donem_baslangic": "YYYY-MM-DD"|null, "donem_bitis": "YYYY-MM-DD"|null}. ' +
+                  'Emin olmadığın alanı null bırak. Sadece JSON döndür, başka metin ekleme.',
+              },
+            ],
+          },
+        ],
+      }),
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch (err) {
+    console.error('extract-bill: anthropic request failed', err);
+    return new Response(JSON.stringify({ error: 'vision_request_failed' }), { status: 502, headers: CORS_HEADERS });
+  }
 
   if (!anthropicRes.ok) {
-    const detail = await anthropicRes.text();
-    return new Response(JSON.stringify({ error: 'vision_request_failed', detail }), { status: 502, headers: CORS_HEADERS });
+    console.error('extract-bill: anthropic error', anthropicRes.status, await anthropicRes.text());
+    return new Response(JSON.stringify({ error: 'vision_request_failed' }), { status: 502, headers: CORS_HEADERS });
   }
 
   const anthropicJson = await anthropicRes.json();
   const rawText: string = anthropicJson.content?.[0]?.text ?? '{}';
 
-  let extracted: ExtractedBill;
+  let extracted: unknown;
   try {
     extracted = JSON.parse(rawText);
   } catch {
-    return new Response(JSON.stringify({ error: 'parse_failed', raw: rawText }), { status: 502, headers: CORS_HEADERS });
+    console.error('extract-bill: model returned non-JSON', rawText);
+    return new Response(JSON.stringify({ error: 'parse_failed' }), { status: 502, headers: CORS_HEADERS });
+  }
+
+  if (!isValidExtractedBill(extracted)) {
+    console.error('extract-bill: model returned unexpected shape', extracted);
+    return new Response(JSON.stringify({ error: 'invalid_extraction' }), { status: 502, headers: CORS_HEADERS });
   }
 
   return new Response(JSON.stringify(extracted), {

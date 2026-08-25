@@ -73,33 +73,40 @@ serve(async (req) => {
   // sentence in the prompt and inject instructions of its own.
   const sanitizedDeviceName = deviceName.replace(/[\r\n\t]+/g, ' ').trim();
 
-  const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-5',
-      max_tokens: 200,
-      messages: [
-        {
-          role: 'user',
-          content:
-            `Bir Türk hane, bu ayki elektrik faturasının en büyük payını "${sanitizedDeviceName}" cihazından harcamış: ` +
-            `${watt}W, haftada ${hoursPerWeek.toFixed(1)} saat kullanılmış, faturanın %${pctShare.toFixed(0)}'i (${calibratedTl.toFixed(0)} TL) bu cihaza ait. ` +
-            'Kullanıcıya bu cihaz için 1-2 cümlelik, samimi, somut ve pratik uygulanabilir bir tasarruf önerisi yaz. ' +
-            'Türkçe yaz. Kesin/uydurma TL veya % rakamı verme (gerçek veriyi bilmiyorsun), ama "yaklaşık" gibi kalifiye ifadelerle kabaca bir fayda belirtebilirsin. ' +
-            'Sadece öneri metnini döndür, başka açıklama, tırnak işareti veya başlık ekleme.',
-        },
-      ],
-    }),
-  });
+  let anthropicRes: Response;
+  try {
+    anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-5',
+        max_tokens: 200,
+        messages: [
+          {
+            role: 'user',
+            content:
+              `Bir Türk hane, bu ayki elektrik faturasının en büyük payını "${sanitizedDeviceName}" cihazından harcamış: ` +
+              `${watt}W, haftada ${hoursPerWeek.toFixed(1)} saat kullanılmış, faturanın %${pctShare.toFixed(0)}'i (${calibratedTl.toFixed(0)} TL) bu cihaza ait. ` +
+              'Kullanıcıya bu cihaz için 1-2 cümlelik, samimi, somut ve pratik uygulanabilir bir tasarruf önerisi yaz. ' +
+              'Türkçe yaz. Kesin/uydurma TL veya % rakamı verme (gerçek veriyi bilmiyorsun), ama "yaklaşık" gibi kalifiye ifadelerle kabaca bir fayda belirtebilirsin. ' +
+              'Sadece öneri metnini döndür, başka açıklama, tırnak işareti veya başlık ekleme.',
+          },
+        ],
+      }),
+      signal: AbortSignal.timeout(15_000),
+    });
+  } catch (err) {
+    console.error('suggest-tip: anthropic request failed', err);
+    return new Response(JSON.stringify({ error: 'tip_request_failed' }), { status: 502, headers: CORS_HEADERS });
+  }
 
   if (!anthropicRes.ok) {
-    const detail = await anthropicRes.text();
-    return new Response(JSON.stringify({ error: 'tip_request_failed', detail }), { status: 502, headers: CORS_HEADERS });
+    console.error('suggest-tip: anthropic error', anthropicRes.status, await anthropicRes.text());
+    return new Response(JSON.stringify({ error: 'tip_request_failed' }), { status: 502, headers: CORS_HEADERS });
   }
 
   const anthropicJson = await anthropicRes.json();
