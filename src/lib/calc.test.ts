@@ -26,10 +26,12 @@ describe('calculateBreakdown', () => {
   });
 
   it('allocates the full bill amount proportionally across devices', () => {
+    // Tracked devices must imply more kWh than the bill covers (totalAdjKwh > impliedKwh)
+    // to hit the proportional-scaling branch instead of the leave-remainder-as-"other" branch.
     const result = calculateBreakdown(
       [
+        { key: 'heater', watt: 1500, hoursPerWeek: 40 },
         { key: 'fridge', watt: 130, hoursPerWeek: 168 },
-        { key: 'toaster', watt: 800, hoursPerWeek: 1 },
       ],
       { billTl: 1000, ratePerKwh: 3.5 }
     );
