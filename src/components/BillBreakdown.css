@@ -1,8 +1,10 @@
 .breakdown-summary { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.4rem; }
+.breakdown-summary--donut-only { justify-content: center; }
 .breakdown-donut {
   width: 136px; height: 136px; border-radius: 50%; position: relative; flex: none;
   animation: breakdown-donut-in 520ms var(--ease-out) backwards;
 }
+.breakdown-summary--donut-only .breakdown-donut { width: 152px; height: 152px; }
 .breakdown-donut::after { content: ''; position: absolute; inset: 20px; border-radius: 50%; background: var(--surface); z-index: 0; }
 .breakdown-donut-seg {
   position: absolute; inset: 0; border-radius: 50%; cursor: pointer;

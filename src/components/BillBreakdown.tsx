@@ -1,7 +1,8 @@
 import { useState, type CSSProperties } from 'react';
-import { ApplianceIcon } from './ApplianceIcon';
+import { ApplianceVisual } from './ApplianceVisual';
 import { useCountUp } from '../hooks/useCountUp';
 import type { BillItem } from '../types/domain';
+import { donutSegmentGradient } from '../lib/donutGradient';
 import './BillBreakdown.css';
 
 const CAT_COLORS = [
@@ -14,6 +15,9 @@ const CAT_COLORS = [
   'var(--chart-7)',
   'var(--chart-8)',
 ];
+
+/** Angular gap between donut segments, in % of the full circle. Applied only when >1 segment. */
+const DONUT_GAP_PCT = 1.4;
 
 export interface BillBreakdownProps {
   totalTl: number;
@@ -42,7 +46,7 @@ export function BillBreakdown({ totalTl, items, iconKeyFor, showTotal = true }: 
 
   return (
     <div>
-      <div className="breakdown-summary">
+      <div className={'breakdown-summary' + (showTotal ? '' : ' breakdown-summary--donut-only')}>
         <div className="breakdown-donut">
           {arcs.length === 0 && <div className="breakdown-donut-seg" style={{ background: 'var(--surface-sunken)' }} />}
           {arcs.map((a, i) => (
@@ -50,14 +54,19 @@ export function BillBreakdown({ totalTl, items, iconKeyFor, showTotal = true }: 
               key={a.deviceKey ?? a.deviceName}
               className={'breakdown-donut-seg' + (active !== null && active !== i ? ' dim' : '')}
               style={{
-                background: `conic-gradient(transparent 0 ${a.start}%, ${a.color} ${a.start}% ${a.end}%, transparent ${a.end}% 100%)`,
+                background: donutSegmentGradient(
+                  a.start,
+                  a.end,
+                  a.color,
+                  arcs.length > 1 ? DONUT_GAP_PCT : 0
+                ),
               }}
               onClick={() => toggle(i)}
             />
           ))}
           {top && (
             <div className="breakdown-donut-center" style={{ color: CAT_COLORS[0] }}>
-              <ApplianceIcon iconKey={iconKeyFor(top.deviceKey)} size={20} />
+              <ApplianceVisual iconKey={iconKeyFor(top.deviceKey)} size={20} imageSize={30} />
               <span className="breakdown-donut-top-name">{top.deviceName}</span>
               <span className="breakdown-donut-top-pct mono">%{top.pctShare.toFixed(0)}</span>
             </div>
@@ -83,7 +92,7 @@ export function BillBreakdown({ totalTl, items, iconKeyFor, showTotal = true }: 
               className="breakdown-icon"
               style={{ background: `color-mix(in srgb, ${item.color} 15%, transparent)`, color: item.color }}
             >
-              <ApplianceIcon iconKey={iconKeyFor(item.deviceKey)} size={16} />
+              <ApplianceVisual iconKey={iconKeyFor(item.deviceKey)} size={16} imageSize={24} />
             </div>
             <div className="breakdown-main">
               <div className="breakdown-top">
