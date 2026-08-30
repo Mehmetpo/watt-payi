@@ -57,14 +57,23 @@
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; margin: 0; }
 body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+/* Fixed gradient layer behind all content — replaces `background-attachment:
+   fixed` on body, which janks / repaints on scroll in the Android WebView. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background:
     radial-gradient(1000px 560px at 100% -8%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%),
     radial-gradient(800px 480px at -8% 108%, color-mix(in srgb, var(--coral) 9%, transparent), transparent 60%),
     var(--bg);
-  background-attachment: fixed;
-  color: var(--ink);
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  -webkit-font-smoothing: antialiased;
 }
 h1, h2, h3, .display {
   font-family: 'Manrope', system-ui, sans-serif;
