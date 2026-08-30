@@ -8,13 +8,13 @@
 }
 .home-hero-glow {
   position: absolute; inset: -20% -10% auto -10%; height: 220px;
-  background: radial-gradient(closest-side, rgba(255,255,255,.4), transparent 70%);
-  opacity: .5; filter: blur(6px); pointer-events: none;
-  animation: home-hero-glow-drift 9s var(--ease-out) infinite alternate;
+  background: radial-gradient(closest-side, rgba(255,255,255,.34), rgba(255,255,255,.12) 45%, transparent 75%);
+  opacity: .55; pointer-events: none; will-change: transform;
+  animation: home-hero-glow-drift 16s ease-in-out infinite alternate;
 }
 @keyframes home-hero-glow-drift {
-  from { transform: translate(-6%, -4%) scale(1); }
-  to { transform: translate(6%, 4%) scale(1.12); }
+  from { transform: translate3d(-4%, -3%, 0) scale(1); }
+  to { transform: translate3d(4%, 3%, 0) scale(1.08); }
 }
 .home-eyebrow {
   position: relative; display: block; color: rgba(255,255,255,.78);
