@@ -4,7 +4,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { useOnboarding } from '../../contexts/OnboardingContext';
 import { scheduleMonthlyReminder } from '../../lib/notifications';
 import { DEVICE_CATALOG } from '../../data/deviceCatalog';
-import { ApplianceIcon } from '../../components/ApplianceIcon';
+import { ApplianceVisual } from '../../components/ApplianceVisual';
 import { DayOfMonthPicker } from '../../components/DayOfMonthPicker';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -241,7 +241,7 @@ export function ProfileScreen() {
                     style={{ '--i': Math.min(i, 12) } as CSSProperties}
                   >
                     <div className="profile-device-icon">
-                      <ApplianceIcon iconKey={device.iconKey} size={17} />
+                      <ApplianceVisual iconKey={device.iconKey} size={17} imageSize={25} />
                     </div>
                     <span>{device.name}</span>
                     {isOverridden && (
@@ -275,7 +275,7 @@ export function ProfileScreen() {
       )}
 
       <Button
-        variant="outline"
+        variant="ghost"
         size="lg"
         className="w-full h-12 text-base profile-in"
         style={{ '--i': 3 } as CSSProperties}
@@ -286,7 +286,7 @@ export function ProfileScreen() {
       </Button>
 
       <Button
-        variant="destructive"
+        variant="outline"
         size="lg"
         className="w-full h-12 text-base profile-in"
         style={{ '--i': 4 } as CSSProperties}
