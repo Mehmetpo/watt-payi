@@ -26,8 +26,7 @@ export const DEVICE_CATALOG: DeviceCatalogEntry[] = [
   { key: 'coffee', name: 'Kahve Makinesi', defaultWatt: 1000, iconKey: 'coffee' },
   { key: 'fan', name: 'Vantilatör', defaultWatt: 60, iconKey: 'fan' },
   { key: 'router', name: 'Modem / Router', defaultWatt: 10, iconKey: 'router' },
-  { key: 'playstation', name: 'PlayStation', defaultWatt: 200, iconKey: 'gameconsole' },
-  { key: 'xbox', name: 'Xbox', defaultWatt: 195, iconKey: 'gameconsole' },
+  { key: 'gameconsole', name: 'Oyun Konsolu', defaultWatt: 200, iconKey: 'gameconsole' },
   { key: 'hood', name: 'Davlumbaz', defaultWatt: 150, iconKey: 'hood' },
   { key: 'stove', name: 'Elektrikli Ocak', defaultWatt: 1500, iconKey: 'stove' },
   { key: 'waterdispenser', name: 'Su Sebili', defaultWatt: 100, iconKey: 'waterdispenser' },
@@ -71,7 +70,7 @@ export interface DeviceCategory {
 }
 
 // Everything outside COMMON_DEVICE_KEYS, grouped so the device picker can
-// disclose the long tail progressively instead of one 33-card wall.
+// disclose the long tail progressively instead of one long card wall.
 export const DEVICE_CATEGORIES: DeviceCategory[] = [
   { label: 'Beyaz Eşya', keys: ['dishwasher', 'dryer', 'freezer', 'minifridge'] },
   {
@@ -83,7 +82,7 @@ export const DEVICE_CATEGORIES: DeviceCategory[] = [
     ],
   },
   { label: 'Isıtma & Soğutma', keys: ['ac', 'heater', 'fan', 'spaceheater', 'dehumidifier', 'airpurifier', 'electricblanket', 'waterheatertank'] },
-  { label: 'Elektronik', keys: ['pc', 'playstation', 'xbox', 'projector', 'smartspeaker', 'printer', 'laptop', 'monitor', 'soundbar', 'mediabox'] },
+  { label: 'Elektronik', keys: ['pc', 'gameconsole', 'projector', 'smartspeaker', 'printer', 'laptop', 'monitor', 'soundbar', 'mediabox'] },
   { label: 'Temizlik', keys: ['robotvacuum', 'handvacuum'] },
   { label: 'Kişisel Bakım', keys: ['hairdryer', 'hairstraightener', 'shaver'] },
   { label: 'Diğer Ev Aletleri', keys: ['sewingmachine', 'aquarium', 'evcharger', 'lawnmower'] },

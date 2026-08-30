@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import { DEVICE_CATALOG, COMMON_DEVICE_KEYS, DEVICE_CATEGORIES } from '../../../data/deviceCatalog';
-import { ApplianceIcon } from '../../../components/ApplianceIcon';
+import { ApplianceVisual } from '../../../components/ApplianceVisual';
 
 export interface DevicesStepProps {
   selected: Set<string>;
@@ -49,7 +49,7 @@ export function DevicesStep({ selected, onToggle }: DevicesStepProps) {
             <Check size={11} strokeWidth={3} />
           </span>
         )}
-        <ApplianceIcon iconKey={device.iconKey} size={22} />
+        <ApplianceVisual iconKey={device.iconKey} size={22} imageSize={34} />
         <span>{device.name}</span>
       </div>
     );

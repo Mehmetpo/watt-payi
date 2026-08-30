@@ -12,3 +12,8 @@ ios/
 vite.config.d.ts
 vite.config.js
 supabase/.temp/
+
+# Local debugging captures (phone screenshots + uiautomator dumps)
+artifacts/
+# 4K screenshot source renders — only the exported play-ready/ JPGs are tracked
+store-assets/4k/*.png

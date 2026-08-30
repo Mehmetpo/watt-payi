@@ -1,7 +1,7 @@
 import { useMemo, type CSSProperties } from 'react';
 import { calculateBreakdown, type DeviceCorrection, type DeviceUsage } from '../../../lib/calc';
 import { BillBreakdown } from '../../../components/BillBreakdown';
-import { ApplianceIcon } from '../../../components/ApplianceIcon';
+import { ApplianceVisual } from '../../../components/ApplianceVisual';
 import { DEVICE_CATALOG, COMMON_DEVICE_KEYS } from '../../../data/deviceCatalog';
 
 const NUDGE_THRESHOLD_PCT = 5;
@@ -112,7 +112,7 @@ export function ResultStep({
                 className="result-nudge-chip"
                 onClick={() => onAddDevice(device.key)}
               >
-                <ApplianceIcon iconKey={device.iconKey} size={15} />
+                <ApplianceVisual iconKey={device.iconKey} size={15} imageSize={22} />
                 {device.name}
               </button>
             ))}

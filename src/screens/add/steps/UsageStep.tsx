@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import { DEVICE_CATALOG } from '../../../data/deviceCatalog';
-import { ApplianceIcon } from '../../../components/ApplianceIcon';
+import { ApplianceVisual } from '../../../components/ApplianceVisual';
 import { Slider } from '../../../components/ui/slider';
 import { cn } from '../../../lib/utils';
 import type { DeviceUsage } from '../../../lib/calc';
@@ -31,7 +31,7 @@ export function UsageStep({ selectedKeys, usageByKey, overridesByKey, onChange }
         return (
           <div className="usage-row usage-row-in" style={{ '--i': i } as CSSProperties} key={device.key}>
             <div className="usage-top">
-              <div className="usage-icon"><ApplianceIcon iconKey={device.iconKey} size={17} /></div>
+              <div className="usage-icon"><ApplianceVisual iconKey={device.iconKey} size={17} imageSize={25} /></div>
               <div className="usage-name">{device.name}</div>
               <div className="usage-watt">
                 <input
