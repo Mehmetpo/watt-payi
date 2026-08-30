@@ -51,6 +51,18 @@
 }
 .history-summary-label { font-size: .68rem; font-weight: 600; color: var(--ink-faint); }
 .history-summary-value { font-size: .82rem; font-weight: 700; color: var(--ink); white-space: nowrap; }
+.history-nudge {
+  display: flex; flex-direction: column; gap: .5rem; margin-top: 1rem;
+  padding: 1rem 1.1rem; border-radius: var(--radius-lg);
+  background: var(--accent-soft); color: var(--accent-strong);
+  text-decoration: none; font-size: .82rem; font-weight: 600; line-height: 1.45;
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.history-nudge:active { transform: scale(.99); }
+.history-nudge:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.history-nudge-cta { font-weight: 700; color: var(--accent); }
+@media (prefers-reduced-motion: reduce) { .history-nudge { transition: none; } }
 .history-back {
   display: inline-flex; align-items: center; gap: .35rem;
   color: var(--ink-muted); text-decoration: none; font-size: .85rem; font-weight: 600;

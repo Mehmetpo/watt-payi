@@ -157,6 +157,13 @@ export function HistoryScreen() {
           })()}
         </div>
       )}
+
+      {!loading && !error && bills.length >= 1 && bills.length < 3 && (
+        <Link to="/add" className="history-nudge history-state-in">
+          <span>Trend grafiğini ve cihaz artış uyarılarını görmek için en az 3 fatura ekle.</span>
+          <span className="history-nudge-cta">+ Fatura ekle</span>
+        </Link>
+      )}
     </div>
   );
 }
