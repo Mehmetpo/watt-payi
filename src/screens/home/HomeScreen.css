@@ -1,4 +1,8 @@
-.home-shell { max-width: 640px; margin: 0 auto; padding: 0 1.25rem 6rem; }
+/* Bottom padding must clear the fixed BottomNav *and* the AdMob banner it
+   sits above — the banner's live height is published to --ad-banner-height
+   by HomeScreen while it's mounted (0px everywhere else). Without the
+   banner term the last breakdown-delta line scrolls under the nav. */
+.home-shell { max-width: 640px; margin: 0 auto; padding: 0 1.25rem calc(6rem + var(--ad-banner-height, 0px)); }
 .home-hero {
   position: relative; overflow: hidden;
   background: var(--hero-gradient);
