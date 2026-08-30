@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { OnboardingProvider, useOnboarding } from './contexts/OnboardingContext';
 import { LoginScreen } from './screens/auth/LoginScreen';
@@ -16,6 +16,7 @@ function AuthedShell() {
   const { session, loading, recovery } = useAuth();
   const onboarding = useOnboarding();
   const autoShown = useRef(false);
+  const location = useLocation();
 
   useEffect(() => {
     if (
@@ -36,14 +37,16 @@ function AuthedShell() {
 
   return (
     <>
-      <Routes>
-        <Route path="/" element={<HomeScreen />} />
-        <Route path="/add" element={<AddFlow />} />
-        <Route path="/history" element={<HistoryScreen />} />
-        <Route path="/history/:billId" element={<HistoryDetailScreen />} />
-        <Route path="/profile" element={<ProfileScreen />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <div className="route-view" key={location.pathname}>
+        <Routes location={location}>
+          <Route path="/" element={<HomeScreen />} />
+          <Route path="/add" element={<AddFlow />} />
+          <Route path="/history" element={<HistoryScreen />} />
+          <Route path="/history/:billId" element={<HistoryDetailScreen />} />
+          <Route path="/profile" element={<ProfileScreen />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
       <BottomNav />
       {onboarding.open && <OnboardingTour />}
     </>

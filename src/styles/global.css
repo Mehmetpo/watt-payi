@@ -95,8 +95,14 @@ a { color: inherit; }
    so it lives here instead of one screen's own stylesheet. */
 .form-error { color: var(--coral); font-size: .85rem; margin-top: .75rem; }
 
+/* Container-level fade on route change (keyed by pathname in App.tsx). Opacity
+   only and short, so it sits under each screen's own content entrance anims. */
+.route-view { animation: route-view-in var(--dur-base) var(--ease-out); }
+@keyframes route-view-in { from { opacity: 0; } to { opacity: 1; } }
+
 /* Tailwind's animate-pulse (shadcn Skeleton) has no built-in reduced-motion
    guard, unlike every other animation in this app. */
 @media (prefers-reduced-motion: reduce) {
   .animate-pulse { animation: none; }
+  .route-view { animation: none; }
 }
