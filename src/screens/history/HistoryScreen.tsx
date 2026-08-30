@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FileClock, WifiOff } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { detectRisingDevices, type BillWithItems } from '../../lib/trends';
+import { summarizeBills } from '../../lib/billStats';
 import { formatPeriod } from '../../lib/format';
 import { Skeleton } from '../../components/ui/skeleton';
 import { EmptyState } from '../../components/EmptyState';
@@ -64,12 +65,31 @@ export function HistoryScreen() {
     load();
   }, [load]);
 
+  const summary = summarizeBills(bills);
+
   return (
     <div className="history-shell">
       <h1 className="display history-in" style={{ '--i': 0 } as CSSProperties}>Geçmiş</h1>
 
+      {!loading && !error && summary && (
+        <div className="history-summary history-in" style={{ '--i': 1 } as CSSProperties}>
+          <div className="history-summary-cell">
+            <span className="history-summary-label">Ortalama</span>
+            <span className="history-summary-value mono">{summary.averageTl.toLocaleString('tr-TR')} TL</span>
+          </div>
+          <div className="history-summary-cell">
+            <span className="history-summary-label">En yüksek</span>
+            <span className="history-summary-value mono">{summary.highestTl.toLocaleString('tr-TR')} TL</span>
+          </div>
+          <div className="history-summary-cell">
+            <span className="history-summary-label">En düşük</span>
+            <span className="history-summary-value mono">{summary.lowestTl.toLocaleString('tr-TR')} TL</span>
+          </div>
+        </div>
+      )}
+
       {rising.length > 0 && (
-        <div className="history-insight history-in" style={{ '--i': 1 } as CSSProperties}>
+        <div className="history-insight history-in" style={{ '--i': 2 } as CSSProperties}>
           {rising.map((r) => `${r.deviceName} ${r.months} aydır artıyor`).join(' · ')}
         </div>
       )}
@@ -103,6 +123,7 @@ export function HistoryScreen() {
         <div className="history-list">
           {(() => {
             const maxTotal = Math.max(...bills.map((b) => b.total_tl));
+            const showBars = bills.length >= 2;
             return bills.map((bill, i) => {
               const prev = bills[i + 1];
               const delta = prev ? ((bill.total_tl - prev.total_tl) / prev.total_tl) * 100 : null;
@@ -113,10 +134,12 @@ export function HistoryScreen() {
                   className="history-row"
                   style={{ '--i': i } as CSSProperties}
                 >
-                  <div
-                    className="history-row-bar"
-                    style={{ transform: `scaleX(${Math.max(0.04, bill.total_tl / maxTotal)})` }}
-                  />
+                  {showBars && (
+                    <div
+                      className="history-row-bar"
+                      style={{ transform: `scaleX(${Math.max(0.04, bill.total_tl / maxTotal)})` }}
+                    />
+                  )}
                   <div className="history-row-content">
                     <span className="month">{formatPeriod(bill.period_month)}</span>
                     <div className="history-row-right">
