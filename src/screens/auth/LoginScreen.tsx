@@ -1,5 +1,5 @@
 import { useRef, useState, type CSSProperties, type FormEvent } from 'react';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, MailCheck } from 'lucide-react';
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 import { supabase } from '../../lib/supabaseClient';
 import { Button } from '../../components/ui/button';
@@ -68,7 +68,7 @@ export function LoginScreen() {
           setError('Kayıt oluşturulamadı, tekrar dene.');
         } else if (!signUpData.session) {
           // No session back means Supabase is waiting on email confirmation.
-          setInfo('Hesabını onaylamak için e-postana gelen bağlantıya tıkla.');
+          setInfo('Son bir adım: e-postana gönderdiğimiz onay bağlantısına tıkla, sonra buradan giriş yap.');
         }
         // NOTE: whether signUp returns a session instantly depends on the "Confirm email"
         // toggle in the Supabase Auth dashboard (Authentication > Providers > Email). That
@@ -185,7 +185,12 @@ export function LoginScreen() {
       </form>
 
       {error && <p className="form-error">{error}</p>}
-      {info && <p className="login-reset-sent">{info}</p>}
+      {info && (
+        <div className="login-confirm-callout" role="status">
+          <MailCheck size={18} strokeWidth={1.8} />
+          <p>{info}</p>
+        </div>
+      )}
 
       {mode === 'login' ? (
         resetSent ? (
