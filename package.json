@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "assets:appliances": "node scripts/build-app-appliance-assets.mjs",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",
@@ -24,7 +25,6 @@
     "@marsidev/react-turnstile": "^1.6.0",
     "@supabase/supabase-js": "^2.45.4",
     "@tailwindcss/vite": "^4.3.3",
-    "animejs": "^4.5.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.33.0",
