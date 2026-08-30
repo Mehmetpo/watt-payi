@@ -39,6 +39,16 @@
 .profile-watt-reset:active { transform: scale(.9); }
 .profile-watt-reset:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 @media (prefers-reduced-motion: reduce) { .profile-watt-reset { transition: none; } }
+.profile-devices-toggle {
+  width: 100%; margin-top: .8rem; padding: .6rem; border: 0; background: transparent;
+  color: var(--accent); font-family: inherit; font-size: .82rem; font-weight: 700; cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+.profile-devices-toggle:hover { background: var(--accent-soft); }
+.profile-devices-toggle:active { transform: scale(.99); }
+.profile-devices-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+@media (prefers-reduced-motion: reduce) { .profile-devices-toggle { transition: none; } }
 
 .profile-error { text-align: center; color: var(--ink-muted); padding: 1rem; }
 .profile-error p { margin: 0 0 .25rem; }

@@ -25,6 +25,7 @@ export function ProfileScreen() {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [showAllDevices, setShowAllDevices] = useState(false);
   const onboarding = useOnboarding();
 
   const load = useCallback(async () => {
@@ -155,6 +156,16 @@ export function ProfileScreen() {
     }
   }
 
+  const DEVICES_COLLAPSED_COUNT = 4;
+  const visibleDevices = showAllDevices
+    ? DEVICE_CATALOG
+    : DEVICE_CATALOG.filter(
+        (device, i) =>
+          i < DEVICES_COLLAPSED_COUNT ||
+          (watts.get(device.key) ?? device.defaultWatt) !== device.defaultWatt
+      );
+  const hiddenDeviceCount = DEVICE_CATALOG.length - visibleDevices.length;
+
   return (
     <div className="profile-shell">
       <h1 className="display profile-in" style={{ '--i': 0 } as CSSProperties}>Profil</h1>
@@ -232,7 +243,7 @@ export function ProfileScreen() {
                   <Skeleton className="profile-skeleton-input" />
                 </div>
               ))
-            : DEVICE_CATALOG.map((device, i) => {
+            : visibleDevices.map((device, i) => {
                 const isOverridden = (watts.get(device.key) ?? device.defaultWatt) !== device.defaultWatt;
                 return (
                   <div
@@ -264,6 +275,15 @@ export function ProfileScreen() {
                   </div>
                 );
               })}
+          {!loading && (hiddenDeviceCount > 0 || showAllDevices) && (
+            <button
+              type="button"
+              className="profile-devices-toggle"
+              onClick={() => setShowAllDevices((v) => !v)}
+            >
+              {showAllDevices ? 'Daha az göster' : `Tüm cihazları göster (${hiddenDeviceCount})`}
+            </button>
+          )}
         </CardContent>
       </Card>
 
