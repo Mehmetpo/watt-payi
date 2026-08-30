@@ -134,21 +134,30 @@ export function HomeScreen() {
     <div className="home-shell">
       <div className="home-hero">
         <div className="home-hero-glow" aria-hidden="true" />
-        <span className="home-eyebrow">Bu Ay</span>
+        <span className="home-eyebrow">
+          {latestBill ? formatPeriod(latestBill.periodMonth) : 'Bu Ay'}
+        </span>
         {loading ? (
           <div className="home-hero-skeleton" aria-hidden="true" />
         ) : latestBill ? (
-          <div className="home-hero-row">
-            <div className="home-hero-total mono">
-              {heroTotal.toLocaleString('tr-TR')}
-              <span>TL</span>
+          <>
+            <div className="home-hero-row">
+              <div className="home-hero-total mono">
+                {heroTotal.toLocaleString('tr-TR')}
+                <span>TL</span>
+              </div>
+              {delta !== null && (
+                <span className={'home-delta' + (delta <= 0 ? ' down' : ' up')}>
+                  {delta <= 0 ? '↓' : '↑'} %{Math.abs(delta).toFixed(0)}
+                </span>
+              )}
             </div>
-            {delta !== null && (
-              <span className={'home-delta' + (delta <= 0 ? ' down' : ' up')}>
-                {delta <= 0 ? '↓' : '↑'} %{Math.abs(delta).toFixed(0)}
+            {latestBill.rateTlPerKwh != null && (
+              <span className="home-hero-sub mono">
+                {latestBill.rateTlPerKwh.toLocaleString('tr-TR', { maximumFractionDigits: 2 })} ₺/kWh birim fiyat
               </span>
             )}
-          </div>
+          </>
         ) : (
           <h1 className="display home-hero-empty-title">Watt Payı</h1>
         )}

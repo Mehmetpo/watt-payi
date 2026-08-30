@@ -24,6 +24,7 @@
 }
 .home-hero-row {
   position: relative; display: flex; align-items: center; gap: .75rem; flex-wrap: wrap;
+  min-height: 2.75rem;
   animation: home-hero-in var(--dur-slow) var(--ease-out) backwards;
   animation-delay: 60ms;
 }
@@ -31,6 +32,12 @@
   color: #fff; font-size: 2.75rem; font-weight: 800; line-height: 1; letter-spacing: -0.01em;
 }
 .home-hero-total span { font-size: 1.1rem; font-weight: 700; color: rgba(255,255,255,.72); margin-left: .3rem; }
+.home-hero-sub {
+  position: relative; display: block; margin-top: .4rem;
+  color: rgba(255,255,255,.72); font-size: .8rem; font-weight: 600;
+  animation: home-hero-in var(--dur-slow) var(--ease-out) backwards;
+  animation-delay: 120ms;
+}
 .home-hero-empty-title { position: relative; color: #fff; margin: 0; animation: home-hero-in var(--dur-slow) var(--ease-out) backwards; }
 .home-hero-skeleton {
   position: relative; height: 2.75rem; width: 60%; border-radius: var(--radius-md);
@@ -47,7 +54,11 @@
 }
 .home-delta.up { background: color-mix(in srgb, var(--coral) 40%, rgba(255,255,255,.22)); border-color: color-mix(in srgb, var(--coral) 45%, rgba(255,255,255,.3)); }
 .home-delta.down { background: color-mix(in srgb, var(--good) 40%, rgba(255,255,255,.22)); border-color: color-mix(in srgb, var(--good) 45%, rgba(255,255,255,.3)); }
-.home-card-wrap { margin-top: -2.25rem; }
+/* position + z-index so the tucked-up white card paints above .home-hero
+   (which is position:relative → a positioned sibling that would otherwise
+   always paint on top of this non-positioned block, covering the card's
+   top-right share button in the -2.25rem overlap band). */
+.home-card-wrap { margin-top: -2.25rem; position: relative; z-index: 1; }
 .home-empty { text-align: center; color: var(--ink-muted); padding: 2.5rem 1rem; }
 .home-empty a { display: inline-block; margin-top: 1rem; background: var(--accent-button); color: #fff; padding: .75rem 1.25rem; border-radius: var(--radius-lg); font-weight: 700; text-decoration: none; }
 .home-error-icon { background: var(--coral-soft); color: var(--coral); }
@@ -68,7 +79,7 @@
 @keyframes home-card-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) {
   .home-card-anim { animation: none; }
-  .home-hero-glow, .home-eyebrow, .home-hero-row, .home-hero-empty-title, .home-hero-skeleton { animation: none; }
+  .home-hero-glow, .home-eyebrow, .home-hero-row, .home-hero-empty-title, .home-hero-skeleton, .home-hero-sub { animation: none; }
 }
 
 .home-device-delta {
