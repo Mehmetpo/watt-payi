@@ -36,7 +36,6 @@
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
-    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.0.0",
     "@types/node": "^26.2.0",
     "@types/react": "^18.3.5",
@@ -47,5 +46,10 @@
     "typescript": "^5.5.4",
     "vite": "^7.3.6",
     "vitest": "^3.2.4"
+  },
+  "overrides": {
+    "xcode": {
+      "uuid": "^11.1.1"
+    }
   }
 }
