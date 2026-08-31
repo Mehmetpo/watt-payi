@@ -37,6 +37,18 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+            ndk {
+                // Ask AGP to package native debug symbols into the AAB so Play
+                // Console can symbolicate native crash/ANR stack traces.
+                // NOTE: the only native code in this app is prebuilt, fully
+                // stripped CameraX JNI shims (libimage_processing_util_jni.so,
+                // libsurface_util_jni.so) that carry no extractable symbols, so
+                // today this produces an empty extraction and the Play Console
+                // "native code, no debug symbols" notice stays (it is advisory,
+                // not blocking). Kept so any future symbol-bearing native lib is
+                // covered automatically.
+                debugSymbolLevel 'SYMBOL_TABLE'
+            }
         }
     }
 }
