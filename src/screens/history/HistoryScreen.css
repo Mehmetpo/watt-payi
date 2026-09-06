@@ -1,4 +1,4 @@
-.history-shell { max-width: 640px; margin: 0 auto; padding: 1.5rem 1.25rem 6rem; }
+.history-shell { max-width: 640px; margin: 0 auto; padding: 1.5rem 1.25rem var(--content-bottom-pad); }
 .history-shell h1 { margin: 0 0 1.1rem; }
 .history-in {
   animation: history-in var(--dur-slow) var(--ease-out) backwards;

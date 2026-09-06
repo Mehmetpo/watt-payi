@@ -1,4 +1,4 @@
-.add-shell { max-width: 640px; margin: 0 auto; padding: 1.5rem 1.25rem 6rem; }
+.add-shell { max-width: 640px; margin: 0 auto; padding: 1.5rem 1.25rem var(--content-bottom-pad); }
 .add-progress-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .6rem; }
 .add-progress-label { font-size: .95rem; font-weight: 700; color: var(--ink); }
 .add-progress-count { font-size: .72rem; font-weight: 600; color: var(--ink-faint); }

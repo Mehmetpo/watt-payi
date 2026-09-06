@@ -39,6 +39,16 @@
   --chart-6: #B85AC9;
   --chart-7: #5AC98F;
   --chart-8: #C97A3F;
+
+  /* Bottom-nav clearance. --bottom-nav-h is the opaque nav-bar body height
+     (a touch above what its padding + 44px touch targets actually render at);
+     --safe-bottom is the device's bottom inset (gesture pill / 3-button bar),
+     which BottomNav also adds to its own padding. Screen shells reserve
+     --content-bottom-pad so their last row clears the bar — the extra 2.5rem
+     also covers the centre FAB, which pokes ~20px above it. */
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --bottom-nav-h: 4.25rem;
+  --content-bottom-pad: calc(var(--bottom-nav-h) + var(--safe-bottom) + 2.5rem);
 }
 
 @media (prefers-color-scheme: dark) {

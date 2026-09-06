@@ -1,4 +1,4 @@
-.profile-shell { max-width: 640px; margin: 0 auto; padding: 1.5rem 1.25rem 6rem; }
+.profile-shell { max-width: 640px; margin: 0 auto; padding: 1.5rem 1.25rem var(--content-bottom-pad); }
 .profile-shell h1 { margin: 0 0 1.1rem; }
 .profile-card { margin-bottom: 1rem; }
 
