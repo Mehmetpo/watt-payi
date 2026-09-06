@@ -41,6 +41,16 @@ Deno.serve(async (req: Request) => {
   }
 
   const adminClient = createClient(supabaseUrl, serviceRoleKey);
+
+  // Clean up owned storage objects first: once the auth.users row is gone,
+  // auth.uid() for this user's path prefix is gone too, so no RLS policy
+  // could ever reach these objects again to remove them later.
+  const userId = callerData.user.id;
+  const { data: ownedFiles } = await adminClient.storage.from("bill-photos").list(userId);
+  if (ownedFiles && ownedFiles.length > 0) {
+    await adminClient.storage.from("bill-photos").remove(ownedFiles.map((f) => `${userId}/${f.name}`));
+  }
+
   const { error: deleteError } = await adminClient.auth.admin.deleteUser(callerData.user.id);
   if (deleteError) {
     console.error('delete-account: admin.deleteUser failed', deleteError);

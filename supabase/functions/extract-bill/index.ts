@@ -82,7 +82,16 @@ serve(async (req) => {
   if (!imageBase64 || !mediaType) {
     return new Response(JSON.stringify({ error: 'missing_image' }), { status: 400, headers: CORS_HEADERS });
   }
-  if (!ALLOWED_MEDIA_TYPES.includes(mediaType) || imageBase64.length > MAX_IMAGE_BASE64_LENGTH) {
+  // typeof checks matter here, not just truthiness: a truthy non-string body
+  // (e.g. `imageBase64: {}`) has `.length === undefined`, which silently
+  // fails the `> MAX_IMAGE_BASE64_LENGTH` comparison and would otherwise
+  // reach JSON.stringify()/the Anthropic fetch below unbounded.
+  if (
+    typeof imageBase64 !== 'string' ||
+    typeof mediaType !== 'string' ||
+    !ALLOWED_MEDIA_TYPES.includes(mediaType) ||
+    imageBase64.length > MAX_IMAGE_BASE64_LENGTH
+  ) {
     return new Response(JSON.stringify({ error: 'invalid_image' }), { status: 400, headers: CORS_HEADERS });
   }
 
