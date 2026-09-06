@@ -33,6 +33,12 @@ const capacitorStorageAdapter = {
   },
   removeItem: async (key: string) => {
     await SecureStorage.remove(key).catch(() => {});
+    // Also clear the legacy Preferences copy: getItem migrates it into
+    // SecureStorage on the next read, but that migration's own
+    // Preferences.remove() call is best-effort (see the comment above) and
+    // can silently fail, leaving a stale unencrypted session that would
+    // otherwise survive an apparent sign-out.
+    await Preferences.remove({ key }).catch(() => {});
   },
 };
 

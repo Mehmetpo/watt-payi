@@ -1,7 +1,8 @@
 import { useRef, useState, type CSSProperties, type FormEvent } from 'react';
-import { Mail, Lock, MailCheck } from 'lucide-react';
+import { Mail, Lock } from 'lucide-react';
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
 import { supabase } from '../../lib/supabaseClient';
+import { beginRecoveryRequest } from '../../lib/recoveryNonce';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
@@ -16,7 +17,7 @@ export function LoginScreen() {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
+  const [loginFailed, setLoginFailed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [resetBusy, setResetBusy] = useState(false);
@@ -31,14 +32,25 @@ export function LoginScreen() {
   function switchMode(next: 'login' | 'signup') {
     setMode(next);
     setError(null);
-    setInfo(null);
+    setLoginFailed(false);
     setConfirm('');
+  }
+
+  // Reached from the "hesabın yok mu?" nudge after a failed login: jump to the
+  // signup form but keep the email + password the user already typed (and
+  // pre-fill the confirm field with it) so they don't re-enter anything.
+  function goToSignupKeepingCredentials() {
+    setMode('signup');
+    setError(null);
+    setLoginFailed(false);
+    setResetSent(false);
+    setConfirm(password);
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
-    setInfo(null);
+    setLoginFailed(false);
     const trimmedEmail = email.trim();
 
     if (mode === 'signup' && password !== confirm) {
@@ -55,7 +67,11 @@ export function LoginScreen() {
           options: { captchaToken: captchaToken ?? undefined },
         });
         if (signInError) {
-          setError('E-posta veya şifre hatalı.');
+          // Supabase returns the same error for a wrong password and a
+          // non-existent account, so the copy covers both and the nudge below
+          // offers the signup path.
+          setError('Giriş yapılamadı. Şifreni kontrol et — ya da bu e-postayla bir hesabın yoksa yeni bir tane oluştur.');
+          setLoginFailed(true);
         }
       } else {
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -67,16 +83,11 @@ export function LoginScreen() {
         if (signUpError) {
           setError('Kayıt oluşturulamadı, tekrar dene.');
         } else if (!signUpData.session) {
-          // No session back means Supabase is waiting on email confirmation.
-          setInfo('Son bir adım: e-postana gönderdiğimiz onay bağlantısına tıkla, sonra buradan giriş yap.');
+          // "Confirm email" is off in the Supabase Auth dashboard, so a successful
+          // signUp returns a session and logs the user straight in. If no session
+          // comes back, something went wrong rather than an email being pending.
+          setError('Kayıt tamamlanamadı, tekrar dene.');
         }
-        // NOTE: whether signUp returns a session instantly depends on the "Confirm email"
-        // toggle in the Supabase Auth dashboard (Authentication > Providers > Email). That
-        // toggle is currently off, so a successful signUp logs the user in immediately
-        // without verifying they actually own the address. This client code can't enforce
-        // email verification on its own — enabling "Confirm email" in the dashboard is a
-        // manual follow-up outside this codebase, and until it's done this is a known,
-        // accepted gap.
       }
     } catch {
       setError('Bir şeyler ters gitti, tekrar dene.');
@@ -95,8 +106,9 @@ export function LoginScreen() {
     setError(null);
     setResetBusy(true);
     try {
+      const nonce = await beginRecoveryRequest();
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
-        redirectTo: 'com.mehmetcebe.wattpayi://login-callback',
+        redirectTo: `com.mehmetcebe.wattpayi://login-callback?nonce=${nonce}`,
         captchaToken: captchaToken ?? undefined,
       });
       if (resetError) throw resetError;
@@ -185,11 +197,13 @@ export function LoginScreen() {
       </form>
 
       {error && <p className="form-error">{error}</p>}
-      {info && (
-        <div className="login-confirm-callout" role="status">
-          <MailCheck size={18} strokeWidth={1.8} />
-          <p>{info}</p>
-        </div>
+      {loginFailed && mode === 'login' && (
+        <p className="login-nudge">
+          Böyle bir hesap yok mu?{' '}
+          <button type="button" className="login-nudge-link" onClick={goToSignupKeepingCredentials}>
+            Buraya tıklayarak hesap aç
+          </button>
+        </p>
       )}
 
       {mode === 'login' ? (

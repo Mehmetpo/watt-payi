@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState, type ReactNode 
 import type { Session } from '@supabase/supabase-js';
 import { App as CapacitorApp } from '@capacitor/app';
 import { supabase } from '../lib/supabaseClient';
+import { consumeRecoveryNonce } from '../lib/recoveryNonce';
 
 interface AuthContextValue {
   session: Session | null;
@@ -18,15 +19,22 @@ const AuthContext = createContext<AuthContextValue>({
 });
 
 // Deep link back from the password-reset email, e.g.
-// com.mehmetcebe.wattpayi://login-callback#access_token=...&refresh_token=...&type=recovery
-function parseRecoveryTokens(url: string): { accessToken: string; refreshToken: string } | null {
+// com.mehmetcebe.wattpayi://login-callback?nonce=...#access_token=...&refresh_token=...&type=recovery
+// The `nonce` query param (added by LoginScreen.beginRecoveryRequest via
+// resetPasswordForEmail's redirectTo) is checked separately in the caller
+// against this device's own pending recovery — see recoveryNonce.ts for why
+// the custom scheme alone can't be trusted as proof this callback is ours.
+function parseRecoveryTokens(url: string): { accessToken: string; refreshToken: string; nonce: string | null } | null {
   const hashIndex = url.indexOf('#');
   if (hashIndex === -1) return null;
-  const params = new URLSearchParams(url.slice(hashIndex + 1));
-  const accessToken = params.get('access_token');
-  const refreshToken = params.get('refresh_token');
-  if (params.get('type') !== 'recovery' || !accessToken || !refreshToken) return null;
-  return { accessToken, refreshToken };
+  const beforeHash = url.slice(0, hashIndex);
+  const queryIndex = beforeHash.indexOf('?');
+  const searchParams = new URLSearchParams(queryIndex === -1 ? '' : beforeHash.slice(queryIndex + 1));
+  const hashParams = new URLSearchParams(url.slice(hashIndex + 1));
+  const accessToken = hashParams.get('access_token');
+  const refreshToken = hashParams.get('refresh_token');
+  if (hashParams.get('type') !== 'recovery' || !accessToken || !refreshToken) return null;
+  return { accessToken, refreshToken, nonce: searchParams.get('nonce') };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -64,15 +72,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // late failure would call setRecovery(false) and kick the user out of
       // an already-legitimate recovery session.
       setRecovery(true);
-      supabase.auth
-        .setSession({ access_token: tokens.accessToken, refresh_token: tokens.refreshToken })
-        .then(({ error }) => {
-          if (error) {
-            if (!recoveryEstablished.current) setRecovery(false);
-          } else {
-            recoveryEstablished.current = true;
-          }
-        });
+      // Require the nonce to match a request this device actually made
+      // (see recoveryNonce.ts) before trusting the token pair at all — the
+      // custom scheme this callback arrived through isn't exclusive to this
+      // app, so a token pair alone isn't proof it's ours.
+      consumeRecoveryNonce(tokens.nonce).then((nonceValid) => {
+        if (!nonceValid) {
+          if (!recoveryEstablished.current) setRecovery(false);
+          return;
+        }
+        supabase.auth
+          .setSession({ access_token: tokens.accessToken, refresh_token: tokens.refreshToken })
+          .then(({ error }) => {
+            if (error) {
+              if (!recoveryEstablished.current) setRecovery(false);
+            } else {
+              recoveryEstablished.current = true;
+            }
+          });
+      });
     });
 
     return () => {

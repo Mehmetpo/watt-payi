@@ -21,19 +21,16 @@
 
 .login-forgot-link { align-self: center; margin-top: .5rem; color: var(--ink-muted); font-size: .82rem; }
 .login-reset-sent { text-align: center; margin-top: .5rem; font-size: .82rem; font-weight: 600; color: var(--good); }
-.login-confirm-callout {
-  display: flex; align-items: flex-start; gap: .6rem; margin-top: .9rem;
-  padding: .9rem 1rem; border-radius: var(--radius-lg);
-  background: var(--accent-soft); color: var(--accent-strong);
-  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
-  animation: login-confirm-callout-in var(--dur-base) var(--ease-out);
+
+.login-nudge { text-align: center; margin: .1rem 0 0; font-size: .82rem; color: var(--ink-muted); line-height: 1.5; }
+.login-nudge-link {
+  border: 0; background: none; padding: 0; font: inherit; cursor: pointer;
+  color: var(--accent); font-weight: 700; text-decoration: underline; text-underline-offset: 2px;
 }
-.login-confirm-callout svg { flex: none; margin-top: .1rem; color: var(--accent); }
-.login-confirm-callout p { margin: 0; font-size: .86rem; font-weight: 600; line-height: 1.45; text-align: left; }
-@keyframes login-confirm-callout-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+.login-nudge-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--radius-sm); }
 
 .login-in { animation: login-in var(--dur-slow) var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 70ms); }
 @keyframes login-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) {
-  .login-glow, .login-in, .login-confirm-callout { animation: none; }
+  .login-glow, .login-in { animation: none; }
 }
