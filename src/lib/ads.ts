@@ -60,9 +60,38 @@ export function initAds(): Promise<void> {
   return initPromise;
 }
 
+const BANNER_HEIGHT_CACHE_KEY = 'wp.adBannerHeightPx';
+
+// Anchored adaptive banners run ~50-60 CSS px on phones (up to 90 on tablets).
+// The SDK only reports the real height once the ad has loaded (SizeChanged
+// fires from onAdLoaded), so callers that must reserve layout space *before*
+// the banner paints use this: the last height we actually observed, or a
+// conservative default the first time this device ever shows a banner.
+export function getReservedBannerHeightPx(): number {
+  try {
+    const cached = Number(localStorage.getItem(BANNER_HEIGHT_CACHE_KEY));
+    if (Number.isFinite(cached) && cached >= 32 && cached <= 120) return cached;
+  } catch {
+    // localStorage can throw in locked-down WebViews — fall through to default.
+  }
+  return 60;
+}
+
+// Reports the banner's live height in CSS px, or 0 when nothing is on screen
+// (ad failed to fill, or the banner was hidden / torn down). Non-zero heights
+// are cached so getReservedBannerHeightPx() pre-reserves the right amount next
+// time. Emitting the 0 lets callers reclaim the space instead of leaving a gap.
 export function onBannerHeightChange(callback: (heightPx: number) => void): () => void {
   const handle = AdMob.addListener(BannerAdPluginEvents.SizeChanged, (size: AdMobBannerSize) => {
-    if (size?.height) callback(size.height);
+    const heightPx = size?.height ?? 0;
+    if (heightPx > 0) {
+      try {
+        localStorage.setItem(BANNER_HEIGHT_CACHE_KEY, String(heightPx));
+      } catch {
+        // best-effort cache only
+      }
+    }
+    callback(heightPx);
   });
   return () => {
     handle.then((h) => h.remove());

@@ -10,7 +10,8 @@ import { formatPeriod } from '../../lib/format';
 import { shareBillBreakdown } from '../../lib/shareBill';
 import { Card, CardContent } from '../../components/ui/card';
 import { EmptyState } from '../../components/EmptyState';
-import { initAds, showHomeBanner, hideHomeBanner, onBannerHeightChange } from '../../lib/ads';
+import { Capacitor } from '@capacitor/core';
+import { initAds, showHomeBanner, hideHomeBanner, onBannerHeightChange, getReservedBannerHeightPx } from '../../lib/ads';
 import type { Bill, BillItem } from '../../types/domain';
 import './HomeScreen.css';
 
@@ -113,13 +114,28 @@ export function HomeScreen() {
   // app session. Home is the first screen to actually mount post-login, by
   // which point that attachment has long since happened.
   useEffect(() => {
-    const removeListener = onBannerHeightChange((heightPx) => {
-      document.documentElement.style.setProperty('--ad-banner-height', `${heightPx}px`);
-    });
+    const setBannerSpace = (px: number) => {
+      document.documentElement.style.setProperty('--ad-banner-height', `${px}px`);
+      document.body.classList.toggle('has-ad-banner', px > 0);
+    };
+
+    // Reserve the banner's space *before* it paints. The native banner view is
+    // layered over the WebView and never resizes it, and the SDK only reports
+    // its height after the ad loads — so reacting to onBannerHeightChange alone
+    // leaves the banner covering the nav for the whole fill latency plus the
+    // nav's slide-up transition, and again after every resume/rotate (the SDK
+    // re-anchors the banner above the gesture inset without re-reporting).
+    // Pre-reserving from the cached height closes that gap; the listener then
+    // trims it to the exact height, or back to 0 if the ad never fills.
+    if (Capacitor.isNativePlatform()) {
+      setBannerSpace(getReservedBannerHeightPx());
+    }
+
+    const removeListener = onBannerHeightChange(setBannerSpace);
     initAds().then(showHomeBanner);
     return () => {
       removeListener();
-      document.documentElement.style.setProperty('--ad-banner-height', '0px');
+      setBannerSpace(0);
       hideHomeBanner();
     };
   }, []);

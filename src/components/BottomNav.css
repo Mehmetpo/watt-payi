@@ -1,13 +1,22 @@
 .bottom-nav {
-  /* --ad-banner-height is set by HomeScreen while its AdMob banner is
-     showing, so the nav sits just above the ad instead of under it. */
-  position: fixed; bottom: var(--ad-banner-height, 0px); left: 0; right: 0;
+  /* Flush to the bottom, its own padding clearing the gesture inset. */
+  position: fixed; bottom: 0; left: 0; right: 0;
   display: flex; justify-content: space-around; align-items: center;
   background: var(--surface); border-top: 1px solid var(--line);
   padding: .4rem 0 calc(.4rem + env(safe-area-inset-bottom));
   z-index: 10;
   transition: bottom var(--dur-base) var(--ease-out);
 }
+/* While Home's AdMob banner is up (body.has-ad-banner, --ad-banner-height set
+   by HomeScreen) the nav lifts above it. The native banner is layered over the
+   WebView, anchored *above* the system gesture inset, and the SDK reports only
+   its own height — so clear the banner and the inset, and drop the nav's own
+   inset padding, which now sits behind the banner. */
+body.has-ad-banner .bottom-nav {
+  bottom: calc(var(--ad-banner-height, 0px) + env(safe-area-inset-bottom));
+  padding-bottom: .4rem;
+}
+body.has-ad-banner .bottom-nav__pill { bottom: .3rem; }
 @media (prefers-reduced-motion: reduce) {
   .bottom-nav { transition: none; }
 }
