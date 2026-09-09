@@ -11,7 +11,7 @@ import { shareBillBreakdown } from '../../lib/shareBill';
 import { Card, CardContent } from '../../components/ui/card';
 import { EmptyState } from '../../components/EmptyState';
 import { Capacitor } from '@capacitor/core';
-import { initAds, showHomeBanner, hideHomeBanner, onBannerHeightChange, getReservedBannerHeightPx } from '../../lib/ads';
+import { initAds, showBanner, hideBanner, onBannerHeightChange, getReservedBannerHeightPx } from '../../lib/ads';
 import type { Bill, BillItem } from '../../types/domain';
 import './HomeScreen.css';
 
@@ -132,11 +132,11 @@ export function HomeScreen() {
     }
 
     const removeListener = onBannerHeightChange(setBannerSpace);
-    initAds().then(showHomeBanner);
+    initAds().then(showBanner);
     return () => {
       removeListener();
       setBannerSpace(0);
-      hideHomeBanner();
+      hideBanner();
     };
   }, []);
 
