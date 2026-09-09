@@ -11,6 +11,7 @@ import { HistoryDetailScreen } from './screens/history/HistoryDetailScreen';
 import { ProfileScreen } from './screens/profile/ProfileScreen';
 import { BottomNav } from './components/BottomNav';
 import { OnboardingTour } from './components/onboarding/OnboardingTour';
+import { AdOrchestrator } from './components/ads/AdOrchestrator';
 
 function AuthedShell() {
   const { session, loading, recovery } = useAuth();
@@ -48,6 +49,7 @@ function AuthedShell() {
         </Routes>
       </div>
       <BottomNav />
+      <AdOrchestrator />
       {onboarding.open && <OnboardingTour />}
     </>
   );
