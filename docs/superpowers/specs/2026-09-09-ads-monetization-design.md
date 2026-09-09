@@ -219,14 +219,25 @@ export const AD_UNITS = AD_TEST_MODE ? TEST : PROD;
 export const REVENUECAT_ANDROID_API_KEY = '<<TODO: Mehmet supplies the public SDK key>>';
 ```
 
-`AD_TEST_MODE` is a plain manual flag (there is no CI/hook enforcing it —
-just the comment convention). Move the existing explanatory comment block
-from `src/lib/ads.ts` into this file unchanged so the "flip before release"
-instruction travels with the constant. `initAds()` still passes
-`initializeForTesting: AD_TEST_MODE` and `isTesting: AD_TEST_MODE` on
-`prepareInterstitial` / `showBanner`; `loadAppOpen` has no `isTesting` field,
-so app-open test ads rely on the test `appOpen` unit id plus
-`initializeForTesting`.
+Move the existing explanatory comment block from `src/lib/ads.ts` into this
+file unchanged so the "flip before release" instruction travels with the
+constant. `initAds()` still passes `initializeForTesting: AD_TEST_MODE` and
+`isTesting: AD_TEST_MODE` on `prepareInterstitial` / `showBanner`;
+`loadAppOpen` has no `isTesting` field, so app-open test ads rely on the test
+`appOpen` unit id plus `initializeForTesting`.
+
+**Release-guard hook — must be updated in the same change.** A `Bash`
+`PreToolUse` hook in `~/.claude/settings.json` (added 2026-08-29) denies any
+`bundleRelease` / `assembleRelease` command while
+`src/lib/ads.ts` still contains a line matching `^export const AD_TEST_MODE =
+true`. Deleting `src/lib/ads.ts` makes the hook's `[ -f "$f" ] || exit 0`
+guard pass silently — the release guard would be **gone**. So this refactor
+must also edit that hook: change its `f="$proj/src/lib/ads.ts"` to
+`f="$proj/src/lib/ads/adConfig.ts"` (the `grep -qE '^export const
+AD_TEST_MODE = true'` line-anchor still matches the snippet above). This is a
+manual edit to a global settings file — call it out to Mehmet explicitly and
+do not consider the feature done until it is verified (try a dry-run
+`bundleRelease` with the flag `true` and confirm the deny still fires).
 
 ## Integration points
 
@@ -354,5 +365,6 @@ Target: full `npx vitest run` green, `npx tsc -b` clean, `npm run build` ok.
 | `src/screens/profile/ProfileScreen.tsx` | remove-ads row |
 | `src/components/ads/RemoveAdsSheet.tsx` | new |
 | `src/components/ads/RemoveAdsStrip.tsx` | new |
+| `~/.claude/settings.json` | re-point the release-guard hook's `f=` at `src/lib/ads/adConfig.ts` (manual, Mehmet) |
 | `package.json` | `+ @revenuecat/purchases-capacitor` |
 | `android/app/src/main/AndroidManifest.xml` | RevenueCat / Play Billing may need `com.android.vending.BILLING` (added by `cap sync`) — verify after sync |
