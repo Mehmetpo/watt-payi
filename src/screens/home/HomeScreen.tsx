@@ -10,6 +10,7 @@ import { formatPeriod } from '../../lib/format';
 import { shareBillBreakdown } from '../../lib/shareBill';
 import { Card, CardContent } from '../../components/ui/card';
 import { EmptyState } from '../../components/EmptyState';
+import { RemoveAdsStrip } from '../../components/ads/RemoveAdsStrip';
 import { Capacitor } from '@capacitor/core';
 import { initAds, showBanner, hideBanner, onBannerHeightChange, getReservedBannerHeightPx, isAdFree, onEntitlementChange } from '../../lib/ads';
 import type { Bill, BillItem } from '../../types/domain';
@@ -160,6 +161,7 @@ export function HomeScreen() {
 
   return (
     <div className="home-shell">
+      <RemoveAdsStrip />
       <div className="home-hero">
         <div className="home-hero-glow" aria-hidden="true" />
         <span className="home-eyebrow">
