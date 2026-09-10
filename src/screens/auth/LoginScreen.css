@@ -29,6 +29,25 @@
 }
 .login-nudge-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--radius-sm); }
 
+.login-signup-cta {
+  align-self: stretch; margin-top: 1.1rem; padding: .95rem 1rem;
+  display: flex; flex-direction: column; align-items: center; gap: .3rem; text-align: center;
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
+  border-radius: var(--radius-lg);
+}
+.login-signup-cta > span { font-size: .82rem; color: var(--ink-muted); }
+.login-signup-cta-link {
+  border: 0; background: none; padding: .1rem .2rem; font: inherit; cursor: pointer;
+  color: var(--accent); font-weight: 700; font-size: .95rem; letter-spacing: -.01em;
+  text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 2px;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.login-signup-cta-link:hover { color: var(--accent-strong, var(--accent)); }
+.login-signup-cta-link:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 3px; border-radius: var(--radius-sm);
+}
+
 .login-in { animation: login-in var(--dur-slow) var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 70ms); }
 @keyframes login-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) {

@@ -222,14 +222,27 @@ export function LoginScreen() {
         )
       ) : null}
 
-      <Button
-        type="button"
-        variant="link"
-        className="login-forgot-link"
-        onClick={() => switchMode(mode === 'login' ? 'signup' : 'login')}
-      >
-        {mode === 'login' ? 'Hesabın yok mu? Kayıt ol' : 'Zaten hesabın var mı? Giriş yap'}
-      </Button>
+      {mode === 'login' ? (
+        <div className="login-signup-cta">
+          <span>Hesabın yok mu?</span>
+          <button
+            type="button"
+            className="login-signup-cta-link"
+            onClick={() => switchMode('signup')}
+          >
+            Buraya tıklayarak hesap aç
+          </button>
+        </div>
+      ) : (
+        <Button
+          type="button"
+          variant="link"
+          className="login-forgot-link"
+          onClick={() => switchMode('login')}
+        >
+          Zaten hesabın var mı? Giriş yap
+        </Button>
+      )}
     </div>
   );
 }
