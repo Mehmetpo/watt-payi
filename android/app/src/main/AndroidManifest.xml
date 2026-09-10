@@ -37,7 +37,7 @@
 
         <!-- Real AdMob App ID (Watt Payı, registered in the AdMob console).
              Ad units still request test-mode ads while AD_TEST_MODE is true
-             in src/lib/ads.ts — this App ID alone does not turn on real ads. -->
+             in src/lib/ads/adConfig.ts — this App ID alone does not turn on real ads. -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-1121247025375805~9086591444" />
@@ -46,4 +46,8 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Google Play Billing — required by @revenuecat/purchases-capacitor for the
+         one-time ad-free purchase (wp_ad_free). -->
+    <uses-permission android:name="com.android.vending.BILLING" />
 </manifest>
