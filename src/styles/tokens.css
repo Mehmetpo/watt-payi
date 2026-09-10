@@ -53,22 +53,38 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #14141C;
-    --surface: #1E1E29;
-    --surface-sunken: #262632;
-    --ink: #EDEDF4;
-    --ink-muted: #A6A9BC;
-    --ink-faint: #6E7186;
-    --accent: #8B7DFF;
-    --accent-soft: #2C2650;
-    --accent-strong: #C7BEFF;
+    /* "Midnight ledger": a deep, slightly blue-violet ink rather than a
+       neutral grey. Elevation is carried by LIGHTNESS + a visible --line,
+       not by shadow (shadows barely register on a near-black ground):
+       --surface sits above --bg, --surface-sunken recesses below it. */
+    --bg: #111119;
+    --surface: #1B1B25;
+    --surface-sunken: #0C0C14;
+    --ink: #ECECF3;
+    --ink-muted: #9EA1B4;
+    /* Same rationale as the light-mode note: --ink-faint / --coral / --good
+       are pulled toward mid-tone so they clear ~3.5:1 on --surface and their
+       own -soft fills (nav labels, error copy, delta badges). */
+    --ink-faint: #6C6F84;
+    --accent: #9E90FF;
+    /* A real tinted violet well, not a muddy near-black — used behind the
+       active nav pill and on chips, so it has to read as "accent", faintly. */
+    --accent-soft: #262041;
+    --accent-strong: #D0C8FF;
+    /* Solid-fill accent under white text: keep the light-mode value, which
+       already clears 4.5:1 on white (the brighter --accent does not). */
     --accent-button: #6D5EF0;
-    --coral: #FF7A7A;
-    --coral-soft: #3A2020;
-    --good: #4FDBB5;
-    --good-soft: #16332C;
-    --line: #2E2E3D;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 32px -14px color-mix(in srgb, var(--accent) 35%, rgba(0,0,0,.55));
+    --coral: #FF8C8C;
+    --coral-soft: #341F26;
+    --good: #46D7AE;
+    --good-soft: #123029;
+    --line: #2A2A3A;
+    /* Honest near-black shadow — no accent tint (that reads as a purple
+       smear on dark). Elevation is mostly --line + --surface lightness. */
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 28px -12px rgba(0,0,0,.55);
+    /* A moody twilight, not the light-mode candy gradient: deep indigo →
+       plum, dark enough to keep the hero's white text at ~11:1. */
+    --hero-gradient: linear-gradient(140deg, #2A2350 0%, #3B2F63 45%, #4A2E52 100%);
 
     --chart-4: #F0C065;
     --chart-5: #6FADFF;

@@ -20,6 +20,17 @@
   from { transform: translate3d(-4%, -3%, 0) scale(1); }
   to { transform: translate3d(4%, 3%, 0) scale(1.08); }
 }
+/* On the dark twilight hero a white radial reads as a harsh smear — swap it
+   for a soft violet aurora that belongs to the same palette as the accent. */
+@media (prefers-color-scheme: dark) {
+  .home-hero-glow {
+    background: radial-gradient(closest-side,
+      color-mix(in srgb, var(--accent) 50%, transparent),
+      color-mix(in srgb, var(--accent) 18%, transparent) 45%,
+      transparent 75%);
+    opacity: .42;
+  }
+}
 .home-eyebrow {
   position: relative; display: block; color: rgba(255,255,255,.78);
   font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;

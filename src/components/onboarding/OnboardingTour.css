@@ -36,6 +36,22 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, .15);
 }
 
+/* The tile gradient lightens --tile-color toward white, and the badge is a
+   near-white disc — both blow out on a dark dialog. In dark mode, deepen the
+   tile toward black and settle the badge onto a lifted surface tone. */
+@media (prefers-color-scheme: dark) {
+  .onboarding-tile {
+    background: linear-gradient(135deg,
+      color-mix(in srgb, var(--tile-color) 78%, black) 0%,
+      color-mix(in srgb, var(--tile-color) 30%, black) 100%);
+  }
+  .onboarding-badge {
+    background: color-mix(in srgb, var(--surface) 82%, white);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .45);
+  }
+  .onboarding-donut-track { stroke: rgba(255, 255, 255, .16); }
+}
+
 .onboarding-scene {
   position: relative; width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center;
