@@ -18,8 +18,7 @@ const TEST = {
 const PROD = {
   banner: 'ca-app-pub-1121247025375805/1970518759',
   interstitial: 'ca-app-pub-1121247025375805/6688598166',
-  // TODO(Mehmet): create an App Open ad unit in AdMob for this app and paste its id here.
-  appOpen: 'TODO_MEHMET_APP_OPEN_AD_UNIT_ID',
+  appOpen: 'ca-app-pub-1121247025375805/2782836694',
 };
 
 export const AD_UNITS = AD_TEST_MODE ? TEST : PROD;
