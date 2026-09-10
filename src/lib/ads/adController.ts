@@ -16,7 +16,7 @@ import {
   setPendingRemoveAdsPrompt,
   loadPersistentState,
 } from './adState';
-import { isAdFree, onEntitlementChange } from './entitlement';
+import { isAdFree, onEntitlementChange, entitlementReady } from './entitlement';
 
 let initPromise: Promise<void> | null = null;
 let initResolved = false;
@@ -52,6 +52,13 @@ export function initAds(): Promise<void> {
   if (!initPromise) {
     initPromise = (async () => {
       await loadPersistentState();
+      // Let the entitlement cache settle first (with a cap so an offline first
+      // run still initializes) — otherwise a paying user gets the consent form
+      // and an ad preload on every cold start.
+      await Promise.race([
+        entitlementReady,
+        new Promise<void>((resolve) => setTimeout(resolve, 2000)),
+      ]);
       if (!isAdFree()) {
         try {
           const consent = await AdMob.requestConsentInfo();
@@ -146,6 +153,23 @@ export async function requestInterstitial(kind: 'bill-add' | 'navigation'): Prom
   if (!gate(kind)) return;
 
   interstitialShowing = true;
+
+  let settled = false;
+  const settle = () => {
+    if (settled) return;
+    settled = true;
+    clearTimeout(watchdog);
+    interstitialShowing = false;
+    dismiss.remove();
+    failed.remove();
+    void prepareInterstitial();
+  };
+
+  // Belt-and-braces: if neither Dismissed nor FailedToShow ever fires (plugin
+  // quirk, process suspended mid-ad), don't latch the flag for the session.
+  const watchdog = setTimeout(settle, 90_000);
+  (watchdog as unknown as { unref?: () => void }).unref?.();
+
   const dismiss = await AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
     recordFullScreenAd();
     if (kind === 'navigation') {
@@ -154,18 +178,19 @@ export async function requestInterstitial(kind: 'bill-add' | 'navigation'): Prom
       // bill-add just closed → offer the Home "remove ads" strip once.
       setPendingRemoveAdsPrompt(true);
     }
-    interstitialShowing = false;
-    dismiss.remove();
-    void prepareInterstitial();
+    settle();
+  });
+  // No-fill / show failure resolves showInterstitial() but never emits Dismissed.
+  const failed = await AdMob.addListener(InterstitialAdPluginEvents.FailedToShow, () => {
+    console.error('ads: geçiş reklamı gösterilemedi (FailedToShow)');
+    settle();
   });
 
   try {
     await AdMob.showInterstitial();
   } catch (err) {
     console.error('ads: geçiş reklamı gösterilemedi', err);
-    interstitialShowing = false;
-    dismiss.remove();
-    void prepareInterstitial();
+    settle();
   }
 }
 

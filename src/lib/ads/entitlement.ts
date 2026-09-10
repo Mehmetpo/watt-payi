@@ -13,9 +13,20 @@ import {
 export type PurchaseOutcome = 'success' | 'cancelled' | 'pending' | 'error';
 
 let configured = false;
+let configurePromise: Promise<void> | null = null;
 let adFreeCache = false;
 let priceStringCache: string | null = null;
 const listeners = new Set<(adFree: boolean) => void>();
+
+/**
+ * Resolves once the entitlement cache reflects a real answer (or init gave up).
+ * `initAds()` awaits this so it never runs the UMP consent flow / ad preload
+ * for a customer who already bought ad-free.
+ */
+let markEntitlementReady!: () => void;
+export const entitlementReady: Promise<void> = new Promise((resolve) => {
+  markEntitlementReady = resolve;
+});
 
 // CustomerInfo shape varies across platforms; we only read entitlements.active.
 type MinimalCustomerInfo = { entitlements: { active: Record<string, unknown> } };
@@ -31,24 +42,36 @@ function applyCustomerInfo(ci: unknown): void {
 
 /** Configure RevenueCat for the logged-in user and prime the entitlement cache. */
 export async function initPurchases(appUserID: string | null): Promise<void> {
-  if (!Capacitor.isNativePlatform()) return;
+  if (!Capacitor.isNativePlatform()) {
+    markEntitlementReady();
+    return;
+  }
   try {
-    if (!configured) {
-      await Purchases.setLogLevel({ level: LOG_LEVEL.ERROR });
-      await Purchases.configure(
-        appUserID
-          ? { apiKey: REVENUECAT_ANDROID_API_KEY, appUserID }
-          : { apiKey: REVENUECAT_ANDROID_API_KEY },
-      );
-      configured = true;
-      await Purchases.addCustomerInfoUpdateListener((ci) => applyCustomerInfo(ci));
-    } else if (appUserID) {
-      const { customerInfo } = await Purchases.logIn({ appUserID });
-      applyCustomerInfo(customerInfo);
+    // Promise-cached so React StrictMode's double-mount can't configure twice.
+    if (!configurePromise) {
+      configurePromise = (async () => {
+        await Purchases.setLogLevel({ level: LOG_LEVEL.ERROR });
+        await Purchases.configure(
+          appUserID
+            ? { apiKey: REVENUECAT_ANDROID_API_KEY, appUserID }
+            : { apiKey: REVENUECAT_ANDROID_API_KEY },
+        );
+        await Purchases.addCustomerInfoUpdateListener((ci) => applyCustomerInfo(ci));
+        configured = true;
+      })();
+      await configurePromise;
+    } else {
+      await configurePromise;
+      if (appUserID) {
+        const { customerInfo } = await Purchases.logIn({ appUserID });
+        applyCustomerInfo(customerInfo);
+      }
     }
     await refreshEntitlement();
   } catch (err) {
     console.error('entitlement: RevenueCat başlatılamadı', err);
+  } finally {
+    markEntitlementReady();
   }
 }
 
@@ -82,11 +105,15 @@ export function onEntitlementChange(cb: (adFree: boolean) => void): () => void {
   return () => { listeners.delete(cb); };
 }
 
-async function findAdFreePackage(): Promise<{ product: { priceString: string } } | null> {
+async function findAdFreePackage(
+  opts: { exact?: boolean } = {},
+): Promise<{ product: { priceString: string } } | null> {
   const offerings = await Purchases.getOfferings();
   const pkgs = offerings.current?.availablePackages ?? [];
   const match = pkgs.find((p) => p.product.identifier === AD_FREE_PRODUCT_ID);
-  return (match ?? pkgs[0] ?? null) as { product: { priceString: string } } | null;
+  // Price display tolerates a fallback; a real charge must be the exact product.
+  const picked = opts.exact ? match : (match ?? pkgs[0]);
+  return (picked ?? null) as { product: { priceString: string } } | null;
 }
 
 export async function getAdFreePriceString(): Promise<string | null> {
@@ -105,7 +132,7 @@ export async function getAdFreePriceString(): Promise<string | null> {
 export async function purchaseAdFree(): Promise<PurchaseOutcome> {
   if (!Capacitor.isNativePlatform()) return 'error';
   try {
-    const pkg = await findAdFreePackage();
+    const pkg = await findAdFreePackage({ exact: true });
     if (!pkg) return 'error';
     const { customerInfo } = await Purchases.purchasePackage({
       aPackage: pkg as never,
@@ -137,6 +164,7 @@ export async function restorePurchases(): Promise<boolean> {
 /** Test-only: reset module state. */
 export function __resetForTests(): void {
   configured = false;
+  configurePromise = null;
   adFreeCache = false;
   priceStringCache = null;
   listeners.clear();

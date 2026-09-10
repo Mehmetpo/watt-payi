@@ -28,7 +28,10 @@ vi.mock('@capacitor-community/admob', () => ({
   BannerAdPosition: { BOTTOM_CENTER: 'BOTTOM_CENTER' },
   BannerAdSize: { ADAPTIVE_BANNER: 'ADAPTIVE_BANNER' },
   BannerAdPluginEvents: { SizeChanged: 'bannerAdSizeChanged' },
-  InterstitialAdPluginEvents: { Dismissed: 'interstitialAdDismissed' },
+  InterstitialAdPluginEvents: {
+    Dismissed: 'interstitialAdDismissed',
+    FailedToShow: 'interstitialAdFailedToShow',
+  },
   AppOpenAdPluginEvents: { Closed: 'appOpenAdClosed', FailedToShow: 'appOpenAdFailedToShow' },
 }));
 
@@ -43,6 +46,7 @@ const onEntitlementChange = vi.fn().mockReturnValue(() => {});
 vi.mock('./entitlement', () => ({
   isAdFree: (...a: unknown[]) => isAdFree(...a),
   onEntitlementChange: (...a: unknown[]) => onEntitlementChange(...a),
+  entitlementReady: Promise.resolve(),
 }));
 
 vi.mock('./adState', () => ({
