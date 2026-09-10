@@ -9,16 +9,13 @@ export interface AdGateState {
   sessionInterstitialCount: number;
   firstInstallAt: number;
   isColdStart: boolean;
-  isAdFree: boolean;
 }
 
 export type AdKind = 'bill-add' | 'navigation' | 'app-open';
 
 /** Pure decision function. No side effects. Fully unit-testable. */
 export function canShowAd(kind: AdKind, s: AdGateState): boolean {
-  if (s.isAdFree) return false;
-
-  // The user's own action — guaranteed, only gated by isAdFree.
+  // The user's own action — guaranteed.
   if (kind === 'bill-add') return true;
 
   // Grace window applies to navigation + app-open only.

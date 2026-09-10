@@ -3,6 +3,12 @@
 Date: 2026-09-09
 Status: approved (design)
 
+> **Superseded 2026-09-10:** the one-time ₺500 "remove ads" purchase was dropped
+> before release. RevenueCat, the `wp_ad_free` product, the `ad_free` entitlement,
+> Play Billing, and the `RemoveAdsSheet` / `RemoveAdsStrip` UI are all removed —
+> ads always show. Everything below about the purchase is historical. The
+> interstitial / App Open / banner policy still stands.
+
 ## Problem
 
 The current ad setup earns very little:

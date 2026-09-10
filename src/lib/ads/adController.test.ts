@@ -41,19 +41,10 @@ vi.mock('./adPolicy', async (orig) => ({
   canShowAd: (...a: unknown[]) => canShowAd(...a),
 }));
 
-const isAdFree = vi.fn();
-const onEntitlementChange = vi.fn().mockReturnValue(() => {});
-vi.mock('./entitlement', () => ({
-  isAdFree: (...a: unknown[]) => isAdFree(...a),
-  onEntitlementChange: (...a: unknown[]) => onEntitlementChange(...a),
-  entitlementReady: Promise.resolve(),
-}));
-
 vi.mock('./adState', () => ({
   getGateState: vi.fn().mockReturnValue({}),
   recordFullScreenAd: vi.fn(),
   recordNavigationInterstitial: vi.fn(),
-  setPendingRemoveAdsPrompt: vi.fn(),
   loadPersistentState: vi.fn().mockResolvedValue(undefined),
 }));
 
@@ -61,7 +52,6 @@ import { initAds, requestInterstitial, hideBanner } from './adController';
 
 beforeEach(() => {
   vi.clearAllMocks();
-  isAdFree.mockReturnValue(false);
 });
 
 describe('adController', () => {
@@ -69,14 +59,6 @@ describe('adController', () => {
     await initAds();
     canShowAd.mockReturnValue(false);
     await requestInterstitial('navigation');
-    expect(showInterstitial).not.toHaveBeenCalled();
-  });
-
-  it('does not show an interstitial when ad-free', async () => {
-    await initAds();
-    isAdFree.mockReturnValue(true);
-    canShowAd.mockReturnValue(true);
-    await requestInterstitial('bill-add');
     expect(showInterstitial).not.toHaveBeenCalled();
   });
 

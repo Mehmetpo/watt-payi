@@ -4,19 +4,16 @@ import { App as CapacitorApp } from '@capacitor/app';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   initAds,
-  initPurchases,
-  logoutPurchases,
   teardownBanner,
   requestInterstitial,
   maybeShowAppOpen,
-  refreshEntitlement,
   markWarmStart,
 } from '../../lib/ads';
 
 /**
  * Headless. Lives as a sibling of the route-keyed <div> in App.tsx so it
- * persists across navigations. Boots RevenueCat for the logged-in user and
- * wires resume + route-change events to the ad controller.
+ * persists across navigations. Wires resume + route-change events to the ad
+ * controller.
  *
  * initAds() is NOT called here for its banner side effects — HomeScreen owns
  * that timing — but calling it (idempotent, promise-cached) is safe and lets
@@ -27,24 +24,17 @@ export function AdOrchestrator() {
   const location = useLocation();
   const userId = session?.user?.id ?? null;
 
-  // Boot purchases + ads, keyed to the logged-in user.
+  // Boot ads once the user is logged in.
   useEffect(() => {
     if (!userId) return;
-    let cancelled = false;
-    (async () => {
-      await initPurchases(userId);
-      if (cancelled) return;
-      await initAds();
-    })();
+    void initAds();
     return () => {
-      cancelled = true;
       void teardownBanner();
-      void logoutPurchases();
     };
   }, [userId]);
 
   // Resume → app-open ad. Skip the very first appStateChange (see spec);
-  // use it only to leave cold-start and refresh the entitlement.
+  // use it only to leave cold-start.
   useEffect(() => {
     if (!userId) return;
     let firstFire = true;
@@ -53,10 +43,8 @@ export function AdOrchestrator() {
       if (firstFire) {
         firstFire = false;
         markWarmStart();
-        void refreshEntitlement();
         return;
       }
-      void refreshEntitlement();
       void maybeShowAppOpen();
     });
     return () => { handle.then((l) => l.remove()); };

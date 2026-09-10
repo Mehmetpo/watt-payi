@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type CSSProperties } from 'react';
-import { RotateCcw, WifiOff, TriangleAlert, PlayCircle, Sparkles, CheckCircle2 } from 'lucide-react';
+import { RotateCcw, WifiOff, TriangleAlert, PlayCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { useOnboarding } from '../../contexts/OnboardingContext';
 import { scheduleMonthlyReminder } from '../../lib/notifications';
@@ -13,8 +13,6 @@ import { Skeleton } from '../../components/ui/skeleton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { HoldToConfirmButton } from '../../components/HoldToConfirmButton';
 import './ProfileScreen.css';
-import { RemoveAdsSheet } from '../../components/ads/RemoveAdsSheet';
-import { isAdFree, onEntitlementChange, restorePurchases } from '../../lib/ads';
 
 export function ProfileScreen() {
   const [reminderDay, setReminderDay] = useState(5);
@@ -28,9 +26,6 @@ export function ProfileScreen() {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [showAllDevices, setShowAllDevices] = useState(false);
-  const [adFree, setAdFree] = useState(isAdFree());
-  const [showRemoveAds, setShowRemoveAds] = useState(false);
-  const [restoreMsg, setRestoreMsg] = useState<string | null>(null);
   const onboarding = useOnboarding();
 
   const load = useCallback(async () => {
@@ -77,11 +72,6 @@ export function ProfileScreen() {
   useEffect(() => {
     load();
   }, [load]);
-
-  useEffect(() => {
-    setAdFree(isAdFree());
-    return onEntitlementChange(setAdFree);
-  }, []);
 
   async function saveReminderDay(day: number) {
     const previous = reminderDay;
@@ -304,42 +294,11 @@ export function ProfileScreen() {
         </div>
       )}
 
-      {adFree ? (
-        <div className="profile-adfree-row profile-in" style={{ '--i': 3 } as CSSProperties}>
-          <span className="profile-adfree-badge">
-            <CheckCircle2 size={16} strokeWidth={1.8} /> Reklamsız
-          </span>
-          <Button
-            variant="link"
-            className="profile-adfree-restore"
-            onClick={async () => {
-              setRestoreMsg(null);
-              const ok = await restorePurchases();
-              setRestoreMsg(ok ? 'Satın alımlar geri yüklendi.' : 'Geri yüklenecek satın alma bulunamadı.');
-            }}
-          >
-            Satın alımları geri yükle
-          </Button>
-          {restoreMsg && <p className="profile-adfree-msg">{restoreMsg}</p>}
-        </div>
-      ) : (
-        <Button
-          variant="outline"
-          size="lg"
-          className="w-full h-12 text-base profile-in"
-          style={{ '--i': 3 } as CSSProperties}
-          onClick={() => setShowRemoveAds(true)}
-        >
-          <Sparkles strokeWidth={1.8} />
-          Reklamları kaldır
-        </Button>
-      )}
-
       <Button
         variant="ghost"
         size="lg"
         className="w-full h-12 text-base profile-in"
-        style={{ '--i': 4 } as CSSProperties}
+        style={{ '--i': 3 } as CSSProperties}
         onClick={onboarding.show}
       >
         <PlayCircle strokeWidth={1.8} />
@@ -350,13 +309,13 @@ export function ProfileScreen() {
         variant="outline"
         size="lg"
         className="w-full h-12 text-base profile-in"
-        style={{ '--i': 5 } as CSSProperties}
+        style={{ '--i': 4 } as CSSProperties}
         onClick={signOut}
       >
         Çıkış yap
       </Button>
 
-      <div className="profile-danger-zone profile-in" style={{ '--i': 6 } as CSSProperties}>
+      <div className="profile-danger-zone profile-in" style={{ '--i': 5 } as CSSProperties}>
         {!confirmingDelete ? (
           <Button variant="link" className="profile-delete-link" onClick={() => setConfirmingDelete(true)}>
             Hesabımı kalıcı olarak sil
@@ -386,8 +345,6 @@ export function ProfileScreen() {
           </div>
         )}
       </div>
-
-      {showRemoveAds && <RemoveAdsSheet onClose={() => setShowRemoveAds(false)} />}
     </div>
   );
 }

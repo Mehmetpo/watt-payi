@@ -13,17 +13,9 @@ const base: AdGateState = {
   sessionInterstitialCount: 0,
   firstInstallAt: 10_000_000 - INITIAL_GRACE_MS - 1, // grace already over
   isColdStart: false,
-  isAdFree: false,
 };
 
 describe('canShowAd', () => {
-  it('never shows anything when ad-free', () => {
-    const s = { ...base, isAdFree: true };
-    expect(canShowAd('bill-add', s)).toBe(false);
-    expect(canShowAd('navigation', s)).toBe(false);
-    expect(canShowAd('app-open', s)).toBe(false);
-  });
-
   it('always shows a bill-add interstitial (bypasses grace, gate, cap)', () => {
     const s: AdGateState = {
       ...base,

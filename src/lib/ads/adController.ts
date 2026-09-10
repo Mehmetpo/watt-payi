@@ -13,17 +13,15 @@ import {
   getGateState,
   recordFullScreenAd,
   recordNavigationInterstitial,
-  setPendingRemoveAdsPrompt,
   loadPersistentState,
 } from './adState';
-import { isAdFree, onEntitlementChange, entitlementReady } from './entitlement';
 
 let initPromise: Promise<void> | null = null;
 let initResolved = false;
 let interstitialShowing = false;
 
 function gate(kind: AdKind): boolean {
-  return canShowAd(kind, getGateState({ isAdFree: isAdFree() }));
+  return canShowAd(kind, getGateState());
 }
 
 async function prepareInterstitial(): Promise<void> {
@@ -52,39 +50,23 @@ export function initAds(): Promise<void> {
   if (!initPromise) {
     initPromise = (async () => {
       await loadPersistentState();
-      // Let the entitlement cache settle first (with a cap so an offline first
-      // run still initializes) — otherwise a paying user gets the consent form
-      // and an ad preload on every cold start.
-      await Promise.race([
-        entitlementReady,
-        new Promise<void>((resolve) => setTimeout(resolve, 2000)),
-      ]);
-      if (!isAdFree()) {
-        try {
-          const consent = await AdMob.requestConsentInfo();
-          if (consent.isConsentFormAvailable) {
-            await AdMob.showConsentForm();
-          }
-        } catch (err) {
-          console.error('ads: onay akışı alınamadı', err);
+      try {
+        const consent = await AdMob.requestConsentInfo();
+        if (consent.isConsentFormAvailable) {
+          await AdMob.showConsentForm();
         }
+      } catch (err) {
+        console.error('ads: onay akışı alınamadı', err);
       }
       try {
         await AdMob.initialize({ initializeForTesting: AD_TEST_MODE });
-        if (!isAdFree()) {
-          await prepareInterstitial();
-          await loadAppOpen();
-        }
+        await prepareInterstitial();
+        await loadAppOpen();
       } catch (err) {
         console.error('ads: AdMob başlatılamadı', err);
       }
       initResolved = true;
     })();
-
-    // When the user buys ad-free mid-session, drop the banner immediately.
-    onEntitlementChange((adFree) => {
-      if (adFree) void hideBanner();
-    });
   }
   return initPromise;
 }
@@ -119,7 +101,6 @@ export function onBannerHeightChange(callback: (heightPx: number) => void): () =
 }
 
 export async function showBanner(): Promise<void> {
-  if (isAdFree()) return;
   try {
     await AdMob.showBanner({
       adId: AD_UNITS.banner,
@@ -147,7 +128,6 @@ export async function teardownBanner(): Promise<void> {
 // ---- Interstitial -------------------------------------------------------
 
 export async function requestInterstitial(kind: 'bill-add' | 'navigation'): Promise<void> {
-  if (isAdFree()) return;
   if (!initResolved) return;
   if (interstitialShowing) return;
   if (!gate(kind)) return;
@@ -174,9 +154,6 @@ export async function requestInterstitial(kind: 'bill-add' | 'navigation'): Prom
     recordFullScreenAd();
     if (kind === 'navigation') {
       recordNavigationInterstitial();
-    } else {
-      // bill-add just closed → offer the Home "remove ads" strip once.
-      setPendingRemoveAdsPrompt(true);
     }
     settle();
   });
@@ -197,7 +174,6 @@ export async function requestInterstitial(kind: 'bill-add' | 'navigation'): Prom
 // ---- App Open ----------------------------------------------------------
 
 export async function maybeShowAppOpen(): Promise<void> {
-  if (isAdFree()) return;
   if (!initResolved) return;
   if (interstitialShowing) return;
   if (!gate('app-open')) return;

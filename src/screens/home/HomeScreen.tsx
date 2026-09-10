@@ -10,9 +10,8 @@ import { formatPeriod } from '../../lib/format';
 import { shareBillBreakdown } from '../../lib/shareBill';
 import { Card, CardContent } from '../../components/ui/card';
 import { EmptyState } from '../../components/EmptyState';
-import { RemoveAdsStrip } from '../../components/ads/RemoveAdsStrip';
 import { Capacitor } from '@capacitor/core';
-import { initAds, showBanner, hideBanner, onBannerHeightChange, getReservedBannerHeightPx, isAdFree, onEntitlementChange } from '../../lib/ads';
+import { initAds, showBanner, hideBanner, onBannerHeightChange, getReservedBannerHeightPx } from '../../lib/ads';
 import type { Bill, BillItem } from '../../types/domain';
 import './HomeScreen.css';
 
@@ -25,7 +24,6 @@ export function HomeScreen() {
   const [budgetTl, setBudgetTl] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [adFree, setAdFree] = useState(isAdFree());
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -105,11 +103,6 @@ export function HomeScreen() {
     load();
   }, [load]);
 
-  useEffect(() => {
-    setAdFree(isAdFree());
-    return onEntitlementChange(setAdFree);
-  }, []);
-
   // Banner only lives on Home — a fixed-size CSS var reservation would be
   // wrong on other screens, so it's set/cleared with this screen's lifetime,
   // sized from the SDK's own reported adaptive-banner height. initAds() is
@@ -125,12 +118,6 @@ export function HomeScreen() {
       document.documentElement.style.setProperty('--ad-banner-height', `${px}px`);
       document.body.classList.toggle('has-ad-banner', px > 0);
     };
-
-    if (adFree) {
-      setBannerSpace(0);
-      void hideBanner();
-      return;
-    }
 
     // Reserve the banner's space *before* it paints. The native banner view is
     // layered over the WebView and never resizes it, and the SDK only reports
@@ -151,7 +138,7 @@ export function HomeScreen() {
       setBannerSpace(0);
       void hideBanner();
     };
-  }, [adFree]);
+  }, []);
 
   const iconByKey = (key: string | null) => (key ? DEVICE_CATALOG.find((d) => d.key === key)?.iconKey ?? 'other' : 'other');
 
@@ -161,7 +148,6 @@ export function HomeScreen() {
 
   return (
     <div className="home-shell">
-      <RemoveAdsStrip />
       <div className="home-hero">
         <div className="home-hero-glow" aria-hidden="true" />
         <span className="home-eyebrow">

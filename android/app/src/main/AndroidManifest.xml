@@ -46,8 +46,4 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
-
-    <!-- Google Play Billing — required by @revenuecat/purchases-capacitor for the
-         one-time ad-free purchase (wp_ad_free). -->
-    <uses-permission android:name="com.android.vending.BILLING" />
 </manifest>

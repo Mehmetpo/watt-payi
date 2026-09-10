@@ -37,30 +37,26 @@ describe('adState', () => {
     __resetStateForTests();
     await loadPersistentState();
     expect(Preferences.set).not.toHaveBeenCalled();
-    expect(getGateState({ isAdFree: false }).firstInstallAt).toBe(777);
+    expect(getGateState().firstInstallAt).toBe(777);
   });
 
   it('increments the session counter only for navigation interstitials', () => {
-    expect(getGateState({ isAdFree: false }).sessionInterstitialCount).toBe(0);
+    expect(getGateState().sessionInterstitialCount).toBe(0);
     recordFullScreenAd();
-    expect(getGateState({ isAdFree: false }).sessionInterstitialCount).toBe(0);
+    expect(getGateState().sessionInterstitialCount).toBe(0);
     recordNavigationInterstitial();
-    expect(getGateState({ isAdFree: false }).sessionInterstitialCount).toBe(1);
+    expect(getGateState().sessionInterstitialCount).toBe(1);
   });
 
   it('records the last full-screen ad timestamp from the injected clock', () => {
     nowValue = 555;
     recordFullScreenAd();
-    expect(getGateState({ isAdFree: false }).lastFullScreenAdAt).toBe(555);
+    expect(getGateState().lastFullScreenAdAt).toBe(555);
   });
 
   it('flips cold start to false after the first warm start', () => {
-    expect(getGateState({ isAdFree: false }).isColdStart).toBe(true);
+    expect(getGateState().isColdStart).toBe(true);
     markWarmStart();
-    expect(getGateState({ isAdFree: false }).isColdStart).toBe(false);
-  });
-
-  it('passes isAdFree straight through', () => {
-    expect(getGateState({ isAdFree: true }).isAdFree).toBe(true);
+    expect(getGateState().isColdStart).toBe(false);
   });
 });

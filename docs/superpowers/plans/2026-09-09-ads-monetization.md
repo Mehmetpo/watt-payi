@@ -2,6 +2,12 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Superseded 2026-09-10:** the ₺500 "remove ads" purchase was dropped before
+> release. `entitlement.ts`, `RemoveAdsSheet`, `RemoveAdsStrip`, the
+> `@revenuecat/purchases-capacitor` dependency, and the Play Billing permission
+> were removed; `adPolicy` / `adState` / `adController` no longer take an
+> `isAdFree` flag. The interstitial / App Open / banner work below still stands.
+
 **Goal:** Replace the "every 3rd bill" interstitial with a guaranteed bill-add interstitial plus policy-safe periodic full-screen ads (App Open on resume + gated navigation interstitials), and add a one-time ₺500 "remove ads" in-app purchase backed by RevenueCat.
 
 **Architecture:** A new `src/lib/ads/` module replaces the flat `src/lib/ads.ts` + `src/lib/adInterstitialFrequency.ts`. It splits into a pure decision function (`adPolicy.ts`), session/persisted counters with an injectable clock (`adState.ts`), a config file that owns `AD_TEST_MODE` (`adConfig.ts`), a RevenueCat wrapper (`entitlement.ts`), an AdMob orchestrator (`adController.ts`), and a `index.ts` public surface. A headless `<AdOrchestrator />` component in `App.tsx` wires resume + route-change events. `HomeScreen`, `AddFlow`, and `ProfileScreen` get small edits; two new components (`RemoveAdsSheet`, `RemoveAdsStrip`) drive the purchase UI.

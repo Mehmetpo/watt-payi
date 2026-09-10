@@ -22,11 +22,3 @@ const PROD = {
 };
 
 export const AD_UNITS = AD_TEST_MODE ? TEST : PROD;
-
-// RevenueCat Android *public* SDK key (RevenueCat dashboard → Project settings →
-// API keys → Android). This is a client key, not a secret — safe to commit.
-// TODO(Mehmet): paste the real key.
-export const REVENUECAT_ANDROID_API_KEY = 'TODO_MEHMET_REVENUECAT_ANDROID_KEY';
-
-export const ENTITLEMENT_ID = 'ad_free';
-export const AD_FREE_PRODUCT_ID = 'wp_ad_free';
