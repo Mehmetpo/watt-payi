@@ -66,5 +66,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>Sana daha alakalı reklamlar göstermek için bu izni kullanıyoruz.</string>
 </dict>
 </plist>
