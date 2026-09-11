@@ -68,5 +68,16 @@
 	<true/>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>Sana daha alakalı reklamlar göstermek için bu izni kullanıyoruz.</string>
+	<key>GADIsAdManagerApp</key>
+	<true/>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-1121247025375805~1814701549</string>
+	<key>SKAdNetworkItems</key>
+	<array>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>cstr6suwn9.skadnetwork</string>
+		</dict>
+	</array>
 </dict>
 </plist>
