@@ -68,6 +68,12 @@
 	<true/>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>Sana daha alakalı reklamlar göstermek için bu izni kullanıyoruz.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Fatura fotoğrafı çekebilmek için kamera erişimine ihtiyacımız var.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Fatura fotoğrafı seçebilmek için galeri erişimine ihtiyacımız var.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Fatura fotoğrafını kaydedebilmek için galeri erişimine ihtiyacımız var.</string>
 	<key>GADIsAdManagerApp</key>
 	<true/>
 	<key>GADApplicationIdentifier</key>
