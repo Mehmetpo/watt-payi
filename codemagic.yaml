@@ -11,9 +11,8 @@ workflows:
         BUNDLE_ID: "com.mehmetcebe.wattpayi"
         XCODE_PROJECT: "ios/App/App.xcodeproj"
         XCODE_SCHEME: "App"
-        VITE_SUPABASE_URL: "https://vwdgadvnatgjkmhikuax.supabase.co"
-        VITE_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3ZGdhZHZuYXRnamttaGlrdWF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyMTUxMDIsImV4cCI6MjEwMjc5MTEwMn0.lmf0kQ1OBgqdeyhPMLtbmeVdepCUIkJoBhbGsdKEDVg"
-        VITE_TURNSTILE_SITE_KEY: "0x4AAAAAAEaWsjOlt6gAQfWI"
+      groups:
+        - watt_payi_env
       node: latest
       xcode: latest
     integrations:
