@@ -1,0 +1,69 @@
+<!doctype html>
+<!--
+  Turnstile bridge for the iOS app.
+
+  Cloudflare Turnstile only runs on http(s) origins. Capacitor's iOS WebView
+  serves the app from capacitor://localhost (WKWebView can't use https for a
+  local scheme), so the widget there never verifies. The iOS build embeds
+  THIS page — deployed to a real https host whose hostname is allowlisted on
+  the Turnstile widget — in an iframe, and gets the token via postMessage.
+
+  Query params: sitekey (required), theme (light|dark|auto), lang.
+  Messages to parent: { source: 'wattpayi-turnstile', type: 'ready'|'success'|'expired'|'error', token? }
+  Messages from parent: { source: 'wattpayi-turnstile', type: 'reset' }
+
+  Static file, no build step: deploy this folder as-is (Cloudflare Pages,
+  Vercel, Netlify...).
+-->
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Doğrulama</title>
+    <style>
+      html, body { margin: 0; padding: 0; background: transparent; overflow: hidden; }
+      body { display: flex; justify-content: center; align-items: flex-start; }
+    </style>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad" async defer></script>
+  </head>
+  <body>
+    <div id="widget"></div>
+    <script>
+      var SOURCE = 'wattpayi-turnstile';
+      var params = new URLSearchParams(location.search);
+      var widgetId = null;
+
+      function send(type, token) {
+        // Posted only to our own parent frame; the token is single-use and
+        // bound to this site key, so '*' leaks nothing a framer couldn't get
+        // by solving the widget itself. (A capacitor:// parent's origin can't
+        // be named as a postMessage targetOrigin reliably.)
+        if (window.parent !== window) {
+          window.parent.postMessage({ source: SOURCE, type: type, token: token || null }, '*');
+        }
+      }
+
+      window.onTurnstileLoad = function () {
+        var theme = params.get('theme');
+        widgetId = turnstile.render('#widget', {
+          sitekey: params.get('sitekey') || '',
+          theme: theme === 'light' || theme === 'dark' ? theme : 'auto',
+          language: params.get('lang') || 'tr',
+          callback: function (token) { send('success', token); },
+          'expired-callback': function () { send('expired'); },
+          'error-callback': function () { send('error'); },
+        });
+        send('ready');
+      };
+
+      window.addEventListener('message', function (e) {
+        if (e.source !== window.parent) return;
+        var data = e.data || {};
+        if (data.source === SOURCE && data.type === 'reset' && widgetId !== null) {
+          turnstile.reset(widgetId);
+        }
+      });
+    </script>
+  </body>
+</html>

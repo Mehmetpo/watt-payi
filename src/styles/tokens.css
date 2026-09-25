@@ -45,8 +45,12 @@
      --safe-bottom is the device's bottom inset (gesture pill / 3-button bar),
      which BottomNav also adds to its own padding. Screen shells reserve
      --content-bottom-pad so their last row clears the bar — the extra 2.5rem
-     also covers the centre FAB, which pokes ~20px above it. */
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+     also covers the centre FAB, which pokes ~20px above it.
+     On Android, Capacitor's SystemBars injects --safe-area-inset-bottom (0 when
+     it has already padded the WebView above the system bar, the real inset
+     when the WebView is edge-to-edge) — env() is unreliable on Android
+     WebViews < 140, so prefer the injected value; iOS falls back to env(). */
+  --safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
   --bottom-nav-h: 4.25rem;
   --content-bottom-pad: calc(var(--bottom-nav-h) + var(--safe-bottom) + 2.5rem);
 }

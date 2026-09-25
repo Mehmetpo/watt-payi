@@ -4,7 +4,7 @@ import { App as CapacitorApp } from '@capacitor/app';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   initAds,
-  teardownBanner,
+  setBannerWanted,
   requestInterstitial,
   maybeShowAppOpen,
   markWarmStart,
@@ -29,7 +29,7 @@ export function AdOrchestrator() {
     if (!userId) return;
     void initAds();
     return () => {
-      void teardownBanner();
+      setBannerWanted(false);
     };
   }, [userId]);
 
