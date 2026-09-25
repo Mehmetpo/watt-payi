@@ -10,8 +10,7 @@ import { formatPeriod } from '../../lib/format';
 import { shareBillBreakdown } from '../../lib/shareBill';
 import { Card, CardContent } from '../../components/ui/card';
 import { EmptyState } from '../../components/EmptyState';
-import { Capacitor } from '@capacitor/core';
-import { initAds, showBanner, hideBanner, onBannerHeightChange, getReservedBannerHeightPx } from '../../lib/ads';
+import { setBannerWanted } from '../../lib/ads';
 import type { Bill, BillItem } from '../../types/domain';
 import './HomeScreen.css';
 
@@ -103,41 +102,14 @@ export function HomeScreen() {
     load();
   }, [load]);
 
-  // Banner only lives on Home — a fixed-size CSS var reservation would be
-  // wrong on other screens, so it's set/cleared with this screen's lifetime,
-  // sized from the SDK's own reported adaptive-banner height. initAds() is
-  // deliberately triggered from here, not earlier at auth time: the native
+  // Banner only lives on Home. The ad controller waits for initAds() itself,
+  // which must not run before Capacitor has attached the WebView — the native
   // AdMob plugin resolves its banner's parent view once, on first
-  // initialize(), by reading the WebView's container — calling it before
-  // Capacitor has finished attaching that WebView caches a null parent and
-  // permanently breaks every later showBanner() call for the rest of the
-  // app session. Home is the first screen to actually mount post-login, by
-  // which point that attachment has long since happened.
+  // initialize(), and a null parent permanently breaks every later banner.
+  // Home is the first screen to mount post-login, well after that point.
   useEffect(() => {
-    const setBannerSpace = (px: number) => {
-      document.documentElement.style.setProperty('--ad-banner-height', `${px}px`);
-      document.body.classList.toggle('has-ad-banner', px > 0);
-    };
-
-    // Reserve the banner's space *before* it paints. The native banner view is
-    // layered over the WebView and never resizes it, and the SDK only reports
-    // its height after the ad loads — so reacting to onBannerHeightChange alone
-    // leaves the banner covering the nav for the whole fill latency plus the
-    // nav's slide-up transition, and again after every resume/rotate (the SDK
-    // re-anchors the banner above the gesture inset without re-reporting).
-    // Pre-reserving from the cached height closes that gap; the listener then
-    // trims it to the exact height, or back to 0 if the ad never fills.
-    if (Capacitor.isNativePlatform()) {
-      setBannerSpace(getReservedBannerHeightPx());
-    }
-
-    const removeListener = onBannerHeightChange(setBannerSpace);
-    initAds().then(showBanner);
-    return () => {
-      removeListener();
-      setBannerSpace(0);
-      void hideBanner();
-    };
+    setBannerWanted(true);
+    return () => setBannerWanted(false);
   }, []);
 
   const iconByKey = (key: string | null) => (key ? DEVICE_CATALOG.find((d) => d.key === key)?.iconKey ?? 'other' : 'other');

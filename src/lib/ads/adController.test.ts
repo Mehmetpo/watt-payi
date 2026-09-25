@@ -27,7 +27,11 @@ vi.mock('@capacitor-community/admob', () => ({
   },
   BannerAdPosition: { BOTTOM_CENTER: 'BOTTOM_CENTER' },
   BannerAdSize: { ADAPTIVE_BANNER: 'ADAPTIVE_BANNER' },
-  BannerAdPluginEvents: { SizeChanged: 'bannerAdSizeChanged' },
+  BannerAdPluginEvents: {
+    SizeChanged: 'bannerAdSizeChanged',
+    Loaded: 'bannerAdLoaded',
+    FailedToLoad: 'bannerAdFailedToLoad',
+  },
   InterstitialAdPluginEvents: {
     Dismissed: 'interstitialAdDismissed',
     FailedToShow: 'interstitialAdFailedToShow',
@@ -48,7 +52,7 @@ vi.mock('./adState', () => ({
   loadPersistentState: vi.fn().mockResolvedValue(undefined),
 }));
 
-import { initAds, requestInterstitial, hideBanner } from './adController';
+import { initAds, requestInterstitial } from './adController';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -67,10 +71,5 @@ describe('adController', () => {
     canShowAd.mockReturnValue(true);
     await requestInterstitial('bill-add');
     expect(showInterstitial).toHaveBeenCalledTimes(1);
-  });
-
-  it('hideBanner() calls the native hideBanner', async () => {
-    await hideBanner();
-    expect(hideBannerNative).toHaveBeenCalledTimes(1);
   });
 });
