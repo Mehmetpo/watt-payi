@@ -23,11 +23,11 @@ Run a single test file: `npx vitest run src/lib/calc.test.ts`
 
 There is no lint script configured — rely on `tsc -b` (via `npm run build`) for type safety.
 
-Capacitor native shells: `android/` exists (`npx cap sync android`, `npx cap open android`); iOS is
-gitignored (`.gitignore` excludes `ios/`) and not currently checked in.
+Capacitor native shells: `android/` and `ios/` are both checked in (`npx cap sync android|ios`,
+`npx cap open android|ios`); Codemagic builds the iOS release from `codemagic.yaml`.
 
-Known pre-existing failing test: `src/lib/calc.test.ts` has one proportional-allocation assertion
-that fails on current `main` — unrelated to most changes, don't assume you broke it.
+All tests pass on `main` (38/38 as of 2026-10-02); the earlier failing proportional-allocation
+assertion in `src/lib/calc.test.ts` is fixed.
 
 ## Environment
 
