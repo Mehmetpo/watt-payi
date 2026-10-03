@@ -43,12 +43,15 @@
   /* Bottom-nav clearance. --bottom-nav-h is the opaque nav-bar body height
      (a touch above what its padding + 44px touch targets actually render at);
      --safe-bottom is the device's bottom inset (gesture pill / 3-button bar),
-     which BottomNav also adds to its own padding. Screen shells reserve
-     --content-bottom-pad so their last row clears the bar — the extra 2.5rem
-     also covers the centre FAB, which pokes ~20px above it. */
+     which BottomNav also adds to its own padding. --ad-banner-height is the
+     app-wide AdMob banner (published by AdOrchestrator; 0px on web / before
+     it fills) — the nav sits on top of it, so it counts toward clearance.
+     Every screen shell reserves --content-bottom-pad so its last row clears
+     banner + nav — the extra 2.5rem also covers the centre FAB, which pokes
+     ~20px above the bar. */
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --bottom-nav-h: 4.25rem;
-  --content-bottom-pad: calc(var(--bottom-nav-h) + var(--safe-bottom) + 2.5rem);
+  --content-bottom-pad: calc(var(--bottom-nav-h) + var(--safe-bottom) + var(--ad-banner-height, 0px) + 2.5rem);
 }
 
 @media (prefers-color-scheme: dark) {

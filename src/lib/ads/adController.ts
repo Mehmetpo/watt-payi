@@ -42,9 +42,10 @@ async function loadAppOpen(): Promise<void> {
 
 /**
  * Idempotent, promise-cached. UMP consent → AdMob.initialize → preload the
- * first interstitial and app-open ad. Deliberately called from HomeScreen's
- * mount (see the comment there): initialize() must run only after Capacitor
- * has attached the WebView, or every later showBanner() breaks.
+ * first interstitial and app-open ad. Called by AdOrchestrator once the user is
+ * signed in; the banner is shown only after this resolves, since initialize()
+ * must run after Capacitor has attached the WebView or every later
+ * showBanner() breaks.
  */
 export function initAds(): Promise<void> {
   if (!initPromise) {

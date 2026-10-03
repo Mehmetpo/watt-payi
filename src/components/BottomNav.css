@@ -7,8 +7,8 @@
   z-index: 10;
   transition: bottom var(--dur-base) var(--ease-out);
 }
-/* While Home's AdMob banner is up (body.has-ad-banner, --ad-banner-height set
-   by HomeScreen) the nav lifts above it. The native banner is layered over the
+/* While the app-wide AdMob banner is up (body.has-ad-banner, --ad-banner-height
+   set by AdOrchestrator) the nav sits above it on every screen. The native banner is layered over the
    WebView, anchored *above* the system gesture inset, and the SDK reports only
    its own height — so clear the banner and the inset, and drop the nav's own
    inset padding, which now sits behind the banner. */
