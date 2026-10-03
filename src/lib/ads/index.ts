@@ -1,10 +1,6 @@
 export {
   initAds,
-  showBanner,
-  hideBanner,
-  teardownBanner,
-  onBannerHeightChange,
-  getReservedBannerHeightPx,
+  setBannerWanted,
   requestInterstitial,
   maybeShowAppOpen,
 } from './adController';

@@ -3,17 +3,20 @@
   position: fixed; bottom: 0; left: 0; right: 0;
   display: flex; justify-content: space-around; align-items: center;
   background: var(--surface); border-top: 1px solid var(--line);
-  padding: .4rem 0 calc(.4rem + env(safe-area-inset-bottom));
+  padding: .4rem 0 calc(.4rem + var(--safe-bottom));
   z-index: 10;
   transition: bottom var(--dur-base) var(--ease-out);
 }
 /* While the app-wide AdMob banner is up (body.has-ad-banner, --ad-banner-height
-   set by AdOrchestrator) the nav sits above it on every screen. The native banner is layered over the
-   WebView, anchored *above* the system gesture inset, and the SDK reports only
-   its own height — so clear the banner and the inset, and drop the nav's own
+   set by the ad controller) the nav sits above it on every screen. The native
+   banner is layered over the WebView, anchored *above* the system bar / home
+   indicator (iOS: the plugin pins it to the safe area; Android: MainActivity
+   sets its bottom margin to the same inset this var carries), and the SDK
+   reports only its own height — so clear the banner and the inset, and drop
+   the nav's own
    inset padding, which now sits behind the banner. */
 body.has-ad-banner .bottom-nav {
-  bottom: calc(var(--ad-banner-height, 0px) + env(safe-area-inset-bottom));
+  bottom: calc(var(--ad-banner-height, 0px) + var(--safe-bottom));
   padding-bottom: .4rem;
 }
 body.has-ad-banner .bottom-nav__pill { bottom: .3rem; }
@@ -21,7 +24,7 @@ body.has-ad-banner .bottom-nav__pill { bottom: .3rem; }
   .bottom-nav { transition: none; }
 }
 .bottom-nav__pill {
-  position: absolute; top: .3rem; bottom: calc(.3rem + env(safe-area-inset-bottom)); left: 0;
+  position: absolute; top: .3rem; bottom: calc(.3rem + var(--safe-bottom)); left: 0;
   background: var(--accent-soft); border-radius: var(--radius-md);
   transition: transform var(--dur-base) var(--ease-out);
   z-index: 0; pointer-events: none;

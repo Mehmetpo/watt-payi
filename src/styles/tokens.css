@@ -44,12 +44,16 @@
      (a touch above what its padding + 44px touch targets actually render at);
      --safe-bottom is the device's bottom inset (gesture pill / 3-button bar),
      which BottomNav also adds to its own padding. --ad-banner-height is the
-     app-wide AdMob banner (published by AdOrchestrator; 0px on web / before
+     app-wide AdMob banner (published by the ad controller; 0px on web / before
      it fills) — the nav sits on top of it, so it counts toward clearance.
      Every screen shell reserves --content-bottom-pad so its last row clears
      banner + nav — the extra 2.5rem also covers the centre FAB, which pokes
-     ~20px above the bar. */
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+     ~20px above the bar.
+     On Android, Capacitor's SystemBars injects --safe-area-inset-bottom (0 when
+     it has already padded the WebView above the system bar, the real inset
+     when the WebView is edge-to-edge) — env() is unreliable on Android
+     WebViews < 140, so prefer the injected value; iOS falls back to env(). */
+  --safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
   --bottom-nav-h: 4.25rem;
   --content-bottom-pad: calc(var(--bottom-nav-h) + var(--safe-bottom) + var(--ad-banner-height, 0px) + 2.5rem);
 }
