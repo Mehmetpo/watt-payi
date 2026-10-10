@@ -1,4 +1,4 @@
-import type { DeviceCorrection } from './calc';
+import { deviceKwh, OTHER_RESERVE, type DeviceCorrection } from './calc';
 
 export interface HistoricalBillSample {
   ratePerKwh: number;
@@ -6,7 +6,6 @@ export interface HistoricalBillSample {
   items: { key: string; watt: number; hoursPerWeek: number }[];
 }
 
-const WEEKS_PER_MONTH = 4.345;
 const LAMBDA = 3; // regularization strength — pulls a device's factor back toward 1 when data is sparse
 const SWEEPS = 40; // coordinate-descent passes over the whole history
 const RECENCY_DECAY = 0.88; // older bills influence the fit less than recent ones
@@ -14,11 +13,6 @@ const FACTOR_MIN = 0.4;
 const FACTOR_MAX = 2.5;
 const MIN_OCCURRENCES_FOR_FULL_CONFIDENCE = 4;
 
-const OTHER_RESERVE = 0.08; // share of every bill always left for untracked consumption (lighting, chargers, standby…)
-
-function rawKwh(watt: number, hoursPerWeek: number): number {
-  return (watt / 1000) * hoursPerWeek * WEEKS_PER_MONTH;
-}
 
 /**
  * Exact minimiser of  LAMBDA·(f − 1)² + Σ wc2ᵢ·max(0, f − tᵢ)²  over f. The objective is convex, so
@@ -55,7 +49,7 @@ export function learnDeviceCorrections(history: HistoricalBillSample[]): DeviceC
   const weights = history.map((_, i) => Math.pow(RECENCY_DECAY, i));
 
   const contributions = history.map((bill) =>
-    bill.items.map((item) => ({ key: item.key, c: rawKwh(item.watt, item.hoursPerWeek) * bill.ratePerKwh }))
+    bill.items.map((item) => ({ key: item.key, c: deviceKwh({ key: item.key, watt: item.watt, hoursPerWeek: item.hoursPerWeek }) * bill.ratePerKwh }))
   );
 
   const deviceKeys = Array.from(new Set(contributions.flatMap((row) => row.map((r) => r.key))));

@@ -6,13 +6,17 @@ import { ApplianceVisual } from '../../../components/ApplianceVisual';
 export interface DevicesStepProps {
   selected: Set<string>;
   onToggle: (deviceKey: string) => void;
+  /** Devices from the last saved bill; the choice card only shows when > 0. */
+  savedCount?: number;
+  onUseSaved?: () => void;
+  onStartFresh?: () => void;
 }
 
 function findDevice(key: string) {
   return DEVICE_CATALOG.find((d) => d.key === key)!;
 }
 
-export function DevicesStep({ selected, onToggle }: DevicesStepProps) {
+export function DevicesStep({ selected, onToggle, savedCount = 0, onUseSaved, onStartFresh }: DevicesStepProps) {
   const [expanded, setExpanded] = useState<Set<string>>(
     () => new Set(DEVICE_CATEGORIES.map((c) => c.label))
   );
@@ -57,6 +61,19 @@ export function DevicesStep({ selected, onToggle }: DevicesStepProps) {
 
   return (
     <div className="devices-step">
+      {savedCount > 0 && (
+        <div className="device-saved-choice">
+          <p>Geçen faturandaki {savedCount} cihaz kayıtlı. Onlarla devam edebilir ya da baştan seçebilirsin.</p>
+          <div className="device-saved-actions">
+            <button type="button" className="device-saved-btn primary" onClick={onUseSaved}>
+              Kayıtlı cihazlarla devam et
+            </button>
+            <button type="button" className="device-saved-btn" onClick={onStartFresh}>
+              Yeni cihazlar seç
+            </button>
+          </div>
+        </div>
+      )}
       <div className="device-section">
         <h3 className="device-section-label">Yaygın</h3>
         <div className="device-grid">{COMMON_DEVICE_KEYS.map(renderCard)}</div>

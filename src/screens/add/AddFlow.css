@@ -208,3 +208,15 @@
 @media (prefers-reduced-motion: reduce) {
   .add-success-icon { animation: none; }
 }
+
+.device-saved-choice {
+  margin-bottom: 1.1rem; padding: .9rem 1rem; border: 1.5px solid var(--accent); border-radius: var(--radius-lg);
+  background: var(--accent-soft);
+}
+.device-saved-choice p { margin: 0 0 .7rem; font-size: .85rem; color: var(--ink); line-height: 1.5; }
+.device-saved-actions { display: flex; flex-direction: column; gap: .5rem; }
+.device-saved-btn {
+  height: 2.75rem; border-radius: var(--radius-lg); border: 1.5px solid var(--line); background: var(--surface);
+  color: var(--ink); font: inherit; font-weight: 600; font-size: .9rem; cursor: pointer;
+}
+.device-saved-btn.primary { background: var(--accent-button, var(--accent)); border-color: transparent; color: #fff; }

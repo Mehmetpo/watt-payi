@@ -5,6 +5,9 @@ import { captureBillPhoto, extractBillFromPhoto } from '../../../lib/billExtract
 export interface BillStepValue {
   billTl: number;
   ratePerKwh: number;
+  /** Total consumption printed on the bill; makes the split use the all-in rate. */
+  kwh?: number;
+  periodDays?: number;
 }
 
 export interface BillStepProps {
@@ -20,6 +23,12 @@ const RATE_RANGE = { min: 0.5, max: 20 };
 
 function looksOffRange(value: number, range: { min: number; max: number }) {
   return value > 0 && (value < range.min || value > range.max);
+}
+
+function daysBetween(start: string | null, end: string | null): number | undefined {
+  if (!start || !end) return undefined;
+  const ms = Date.parse(end) - Date.parse(start);
+  return Number.isFinite(ms) && ms > 0 ? Math.round(ms / 86_400_000) : undefined;
 }
 
 export function BillStep({ value, onChange }: BillStepProps) {
@@ -43,6 +52,8 @@ export function BillStep({ value, onChange }: BillStepProps) {
       onChange({
         billTl: extracted.toplam_tutar ?? value.billTl,
         ratePerKwh: extracted.birim_fiyat ?? value.ratePerKwh,
+        kwh: extracted.kwh ?? value.kwh,
+        periodDays: daysBetween(extracted.donem_baslangic, extracted.donem_bitis) ?? value.periodDays,
       });
       if (extracted.toplam_tutar === null) {
         setReadError('Tutarı okuyamadık, elle girebilir misin?');
@@ -111,6 +122,24 @@ export function BillStep({ value, onChange }: BillStepProps) {
             Bu birim fiyat alışılmadık görünüyor, kontrol eder misin?
           </p>
         )}
+      </div>
+      <div className="add-field bill-in" style={{ '--i': 3 } as CSSProperties}>
+        <label htmlFor="kwh">Toplam tüketim (kWh)</label>
+        <div className={'add-amount' + (justFilled ? ' flash' : '')}>
+          <input
+            id="kwh"
+            type="number"
+            min={0}
+            value={value.kwh || ''}
+            onChange={(e) => onChange({ ...value, kwh: Number(e.target.value) || undefined })}
+            placeholder="Faturada yazan kWh"
+          />
+          <span className="unit">kWh</span>
+        </div>
+        <p className="add-field-warning">
+          Faturadaki toplam tüketimi girersen hesap, vergiler dahil gerçekte ödediğin fiyatla yapılır; boş bırakırsan
+          birim fiyattan tahmin edilir.
+        </p>
       </div>
     </div>
   );

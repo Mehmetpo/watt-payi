@@ -16,3 +16,4 @@ supabase/.temp/
 artifacts/
 # 4K screenshot source renders — only the exported play-ready/ JPGs are tracked
 store-assets/4k/*.png
+*.local.txt

@@ -9,6 +9,8 @@ const NUDGE_THRESHOLD_PCT = 5;
 export interface ResultStepProps {
   billTl: number;
   ratePerKwh: number;
+  kwh?: number;
+  periodDays?: number;
   devices: DeviceUsage[];
   corrections: DeviceCorrection[];
   learning: boolean;
@@ -19,6 +21,8 @@ export interface ResultStepProps {
 export function ResultStep({
   billTl,
   ratePerKwh,
+  kwh,
+  periodDays,
   devices,
   corrections,
   learning,
@@ -26,8 +30,8 @@ export function ResultStep({
   onAddDevice,
 }: ResultStepProps) {
   const result = useMemo(
-    () => calculateBreakdown(devices, { billTl, ratePerKwh }, corrections),
-    [devices, billTl, ratePerKwh, corrections]
+    () => calculateBreakdown(devices, { billTl, ratePerKwh, kwh, periodDays }, corrections),
+    [devices, billTl, ratePerKwh, kwh, periodDays, corrections]
   );
 
   const nameByKey = (key: string) => DEVICE_CATALOG.find((d) => d.key === key)?.name ?? key;
@@ -40,8 +44,8 @@ export function ResultStep({
       ? 'Hiç cihaz seçilmedi.'
       : result.otherPct > 1
         ? `Seçtiğin cihazlar faturanın %${Math.round(100 - result.otherPct)}'ini açıklıyor — geri kalan %${Math.round(result.otherPct)}'i "Diğer" olarak ayrıldı (seçilmeyen veya bilinmeyen tüketim).`
-        : result.calcRatio > 1.05
-          ? `Girdiğin süreler faturandan biraz daha yüksek bir tüketime işaret ediyor, dağılım faturana göre orantılandı.`
+        : result.calcRatio > 0.95
+          ? `Girdiğin süreler faturandaki tüketimden fazla çıkıyor; dağılım faturana göre orantılandı ve bilinmeyen tüketim için küçük bir pay ayrıldı.`
           : 'Seçtiğin cihazlar faturanın tamamını açıklıyor.';
 
   const missingCommon = COMMON_DEVICE_KEYS.filter((key) => !selectedKeys.has(key))

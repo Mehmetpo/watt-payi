@@ -123,6 +123,24 @@ export function AddFlow() {
     return () => clearTimeout(timer);
   }, [step, historyLoaded, billHistory]);
 
+  // The device set from the most recent bill, offered as a one-tap starting point.
+  const savedDevices = billHistory[0]?.items ?? [];
+  const [savedChoice, setSavedChoice] = useState<'pending' | 'saved' | 'fresh'>('pending');
+
+  function useSavedDevices() {
+    const sanitized = savedDevices.filter((d) => DEVICE_CATALOG.some((c) => c.key === d.key));
+    setSelectedDevices(new Set(sanitized.map((d) => d.key)));
+    setUsageByKey(new Map(sanitized.map((d) => [d.key, { key: d.key, watt: d.watt, hoursPerWeek: d.hoursPerWeek }])));
+    setSavedChoice('saved');
+    goToStep(2);
+  }
+
+  function startFreshDevices() {
+    setSelectedDevices(new Set());
+    setUsageByKey(new Map());
+    setSavedChoice('fresh');
+  }
+
   function updateUsage(key: string, patch: Partial<DeviceUsage>) {
     setUsageByKey((prev) => {
       const next = new Map(prev);
@@ -183,7 +201,7 @@ export function AddFlow() {
     }
 
     const devices = Array.from(usageByKey.values());
-    const result = calculateBreakdown(devices, { billTl: bill.billTl, ratePerKwh: bill.ratePerKwh }, corrections);
+    const result = calculateBreakdown(devices, { billTl: bill.billTl, ratePerKwh: bill.ratePerKwh, kwh: bill.kwh, periodDays: bill.periodDays }, corrections);
     const periodMonth = new Date();
     periodMonth.setDate(1);
 
@@ -193,7 +211,8 @@ export function AddFlow() {
         user_id: userId,
         period_month: periodMonth.toISOString().slice(0, 10),
         total_tl: bill.billTl,
-        rate_tl_per_kwh: bill.ratePerKwh,
+        // Store the all-in rate actually paid so history/learning stay consistent with the split.
+        rate_tl_per_kwh: result.effectiveRate > 0 ? result.effectiveRate : bill.ratePerKwh,
       })
       .select()
       .single();
@@ -313,7 +332,13 @@ export function AddFlow() {
       <div className="add-card">
         <div key={step} className={'add-step-anim ' + (direction === 'forward' ? 'from-right' : 'from-left')}>
           {step === 0 && <BillStep value={bill} onChange={setBill} />}
-          {step === 1 && <DevicesStep selected={selectedDevices} onToggle={toggleDevice} />}
+          {step === 1 && <DevicesStep
+              selected={selectedDevices}
+              onToggle={toggleDevice}
+              savedCount={savedChoice === 'pending' ? savedDevices.length : 0}
+              onUseSaved={useSavedDevices}
+              onStartFresh={startFreshDevices}
+            />}
           {step === 2 && (
             <UsageStep
               selectedKeys={selectedDevices}
@@ -326,6 +351,8 @@ export function AddFlow() {
             <ResultStep
               billTl={bill.billTl}
               ratePerKwh={bill.ratePerKwh}
+              kwh={bill.kwh}
+              periodDays={bill.periodDays}
               devices={Array.from(usageByKey.values())}
               corrections={corrections}
               learning={learning}
