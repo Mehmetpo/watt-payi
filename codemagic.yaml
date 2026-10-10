@@ -11,6 +11,7 @@ workflows:
         BUNDLE_ID: "com.mehmetcebe.wattpayi"
         XCODE_PROJECT: "ios/App/App.xcodeproj"
         XCODE_SCHEME: "App"
+        VITE_PRIVACY_POLICY_URL: "https://watt-payi.vercel.app/gizlilik.html"
       groups:
         - watt_payi_env
       node: latest
