@@ -10,6 +10,7 @@ import {
 import { Capacitor } from '@capacitor/core';
 import { AD_TEST_MODE, AD_UNITS } from './adConfig';
 import { createBannerController } from './bannerController';
+import { requestTrackingConsent } from './trackingConsent';
 import { canShowAd, type AdKind } from './adPolicy';
 import {
   getGateState,
@@ -53,6 +54,9 @@ export function initAds(): Promise<void> {
   if (!initPromise) {
     initPromise = (async () => {
       await loadPersistentState();
+      // ATT must be decided before UMP / AdMob start so the very first ad
+      // request already carries the user's choice (iOS only; no-op elsewhere).
+      await requestTrackingConsent();
       try {
         const consent = await AdMob.requestConsentInfo();
         if (consent.isConsentFormAvailable) {

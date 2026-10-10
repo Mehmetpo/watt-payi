@@ -9,9 +9,10 @@ import {
   maybeShowAppOpen,
   markWarmStart,
 } from '../../lib/ads';
+import { TrackingPrePrompt } from './TrackingPrePrompt';
 
 /**
- * Headless. Lives as a sibling of the route-keyed <div> in App.tsx so it
+ * Mostly headless (it renders only the ATT explainer). Lives as a sibling of the route-keyed <div> in App.tsx so it
  * persists across navigations. Owns the single, app-wide AdMob banner and
  * wires resume + route-change events to the ad controller.
  *
@@ -79,5 +80,5 @@ export function AdOrchestrator() {
     };
   }, [location.pathname, userId]);
 
-  return null;
+  return <TrackingPrePrompt />;
 }

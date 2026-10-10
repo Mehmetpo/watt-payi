@@ -1,0 +1,47 @@
+.att-backdrop {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.25rem; padding-bottom: calc(1.25rem + var(--safe-bottom));
+  background: color-mix(in srgb, var(--ink) 45%, transparent);
+  animation: att-fade var(--dur-base) var(--ease-out) both;
+}
+.att-card {
+  width: 100%; max-width: 26rem;
+  padding: 1.25rem; border-radius: var(--radius-lg);
+  background: var(--surface); color: var(--ink);
+  box-shadow: var(--shadow);
+  animation: att-rise var(--dur-slow) var(--ease-out) both;
+}
+.att-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 2.5rem; height: 2.5rem; border-radius: .75rem;
+  background: var(--accent-soft); color: var(--accent-strong);
+}
+.att-title { margin: .75rem 0 .25rem; font-size: 1.15rem; font-weight: 800; letter-spacing: -.01em; }
+.att-desc { margin: 0; font-size: .875rem; line-height: 1.4; color: var(--ink-muted); }
+.att-panel {
+  margin-top: 1rem; padding: .875rem; border-radius: .75rem;
+  background: var(--surface-sunken);
+}
+.att-label { margin: 0 0 .5rem; font-size: .75rem; font-weight: 700; color: var(--ink-muted); }
+.att-list { list-style: none; margin: 0 0 .875rem; padding: 0; display: grid; gap: .5rem; }
+.att-list:last-child { margin-bottom: 0; }
+.att-list li { display: flex; gap: .5rem; align-items: flex-start; font-size: .85rem; line-height: 1.35; }
+.att-list svg { flex-shrink: 0; margin-top: .1rem; }
+.att-yes { color: var(--good); }
+.att-no { color: var(--ink-faint); }
+.att-btn {
+  width: 100%; min-height: 2.75rem; margin-top: 1rem; border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--accent-button); color: #fff;
+  font-family: inherit; font-weight: 700; font-size: .95rem; cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.att-btn:active { transform: scale(.98); }
+.att-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@keyframes att-fade { from { opacity: 0; } }
+@keyframes att-rise { from { opacity: 0; transform: translateY(.5rem); } }
+@media (prefers-reduced-motion: reduce) {
+  .att-backdrop, .att-card, .att-btn { animation: none; transition: none; }
+}

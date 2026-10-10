@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('@capacitor/core', () => ({ Capacitor: { isNativePlatform: () => true } }));
+vi.mock('@capacitor/core', () => ({ Capacitor: { isNativePlatform: () => true, getPlatform: () => 'android' } }));
 
 const showInterstitial = vi.fn().mockResolvedValue(undefined);
 const prepareInterstitial = vi.fn().mockResolvedValue(undefined);

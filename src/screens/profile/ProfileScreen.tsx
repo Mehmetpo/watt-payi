@@ -11,6 +11,7 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Skeleton } from '../../components/ui/skeleton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+import { PrivacyLink } from '../../components/PrivacyLink';
 import { HoldToConfirmButton } from '../../components/HoldToConfirmButton';
 import './ProfileScreen.css';
 
@@ -314,6 +315,8 @@ export function ProfileScreen() {
       >
         Çıkış yap
       </Button>
+
+      <PrivacyLink />
 
       <div className="profile-danger-zone profile-in" style={{ '--i': 5 } as CSSProperties}>
         {!confirmingDelete ? (

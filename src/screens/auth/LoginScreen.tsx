@@ -3,6 +3,7 @@ import { Mail, Lock } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { beginRecoveryRequest } from '../../lib/recoveryNonce';
 import { Button } from '../../components/ui/button';
+import { PrivacyLink } from '../../components/PrivacyLink';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { BrandMark } from '../../components/BrandMark';
@@ -239,6 +240,7 @@ export function LoginScreen() {
           Zaten hesabın var mı? Giriş yap
         </Button>
       )}
+      <PrivacyLink />
     </div>
   );
 }

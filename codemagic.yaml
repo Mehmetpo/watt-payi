@@ -18,6 +18,12 @@ workflows:
     integrations:
       app_store_connect: watt
     scripts:
+      - name: Check privacy policy URL
+        script: |
+          case "$VITE_PRIVACY_POLICY_URL" in
+            https://*) ;;
+            *) echo "VITE_PRIVACY_POLICY_URL must be a public https URL (set it in the watt_payi_env group)"; exit 1 ;;
+          esac
       - name: Install npm dependencies
         script: npm ci
       - name: Build web app
