@@ -1,7 +1,7 @@
 export const INTERSTITIAL_MIN_INTERVAL_MS = 180_000;
 export const SESSION_INTERSTITIAL_CAP = 3;
 export const INITIAL_GRACE_MS = 90_000;
-export const APP_OPEN_MIN_INTERVAL_MS = 240_000;
+export const APP_OPEN_MIN_INTERVAL_MS = 180_000;
 
 export interface AdGateState {
   now: number;
