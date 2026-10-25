@@ -120,4 +120,16 @@ describe('bannerController', () => {
     await flush();
     expect(native.show).toHaveBeenCalledTimes(2);
   });
+
+  it('re-reserves space when an ad loads after an earlier failure (banner would cover the nav)', async () => {
+    const c = make();
+    c.setWanted(true);
+    await flush();
+    native.l.failed!();
+    expect(last(space)).toBe(0);
+    // AdMob retries / refreshes on its own and a later fill lands on screen.
+    native.l.loaded!();
+    native.l.size!(58);
+    expect(last(space)).toBe(58);
+  });
 });

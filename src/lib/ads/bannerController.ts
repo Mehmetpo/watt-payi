@@ -114,6 +114,9 @@ export function createBannerController(native: BannerNative, opts: BannerControl
 
   native.onLoaded(() => {
     phase = 'loaded';
+    // An ad on screen after an earlier failure (AdMob retries on its own):
+    // the nav must clear it again.
+    failed = false;
     // A load always leaves the view attached and visible on iOS, even if
     // hide() already ran while it was still loading.
     visible = true;
