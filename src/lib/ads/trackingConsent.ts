@@ -1,4 +1,5 @@
 import { AdMob } from '@capacitor-community/admob';
+import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 
 /**
@@ -20,10 +21,40 @@ export interface TrackingDeps {
   showExplainer: () => Promise<void>;
 }
 
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+/** iOS silently drops the system dialog unless the app is active. */
+async function waitUntilActive(): Promise<void> {
+  try {
+    for (let i = 0; i < 20; i++) {
+      if ((await CapacitorApp.getState()).isActive) return;
+      await sleep(250);
+    }
+  } catch {
+    // fall through: try anyway
+  }
+}
+
+const getAttStatus = async (): Promise<AttStatus> =>
+  (await AdMob.trackingAuthorizationStatus()).status;
+
+/**
+ * Let the explainer overlay finish dismissing before asking, then re-ask once
+ * if iOS swallowed the request (status still undetermined).
+ */
+async function requestSystemPromptReliably(): Promise<void> {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await waitUntilActive();
+    await sleep(attempt === 0 ? 600 : 1500);
+    await AdMob.requestTrackingAuthorization();
+    if ((await getAttStatus()) !== 'notDetermined') return;
+  }
+}
+
 const realDeps = (showExplainer: () => Promise<void>): TrackingDeps => ({
   isIos: () => Capacitor.getPlatform() === 'ios',
-  getStatus: async () => (await AdMob.trackingAuthorizationStatus()).status,
-  requestSystemPrompt: () => AdMob.requestTrackingAuthorization(),
+  getStatus: getAttStatus,
+  requestSystemPrompt: requestSystemPromptReliably,
   showExplainer,
 });
 

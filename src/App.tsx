@@ -12,6 +12,8 @@ import { ProfileScreen } from './screens/profile/ProfileScreen';
 import { BottomNav } from './components/BottomNav';
 import { OnboardingTour } from './components/onboarding/OnboardingTour';
 import { AdOrchestrator } from './components/ads/AdOrchestrator';
+import { TrackingPrePrompt } from './components/ads/TrackingPrePrompt';
+import { requestTrackingConsent } from './lib/ads/trackingConsent';
 
 function AuthedShell() {
   const { session, loading, recovery } = useAuth();
@@ -56,11 +58,18 @@ function AuthedShell() {
 }
 
 export default function App() {
+  // App Review expects the ATT dialog at launch, before sign-in, not only
+  // after it. No-op off iOS or once the user has decided.
+  useEffect(() => {
+    void requestTrackingConsent();
+  }, []);
+
   return (
     <AuthProvider>
       <OnboardingProvider>
         <AuthedShell />
       </OnboardingProvider>
+      <TrackingPrePrompt />
     </AuthProvider>
   );
 }
