@@ -8,9 +8,11 @@ import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { BrandMark } from '../../components/BrandMark';
 import { CaptchaWidget, type CaptchaHandle } from '../../components/CaptchaWidget';
+import { useI18n } from '../../i18n/I18nContext';
 import './LoginScreen.css';
 
 export function LoginScreen() {
+  const { t } = useI18n();
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -53,7 +55,7 @@ export function LoginScreen() {
     const trimmedEmail = email.trim();
 
     if (mode === 'signup' && password !== confirm) {
-      setError('Şifreler eşleşmiyor.');
+      setError(t('auth.errorMismatch'));
       return;
     }
 
@@ -69,7 +71,7 @@ export function LoginScreen() {
           // Supabase returns the same error for a wrong password and a
           // non-existent account, so the copy covers both and the nudge below
           // offers the signup path.
-          setError('Giriş yapılamadı. Şifreni kontrol et — ya da bu e-postayla bir hesabın yoksa yeni bir tane oluştur.');
+          setError(t('auth.errorLogin'));
           setLoginFailed(true);
         }
       } else {
@@ -80,16 +82,16 @@ export function LoginScreen() {
         });
 
         if (signUpError) {
-          setError('Kayıt oluşturulamadı, tekrar dene.');
+          setError(t('auth.errorSignup'));
         } else if (!signUpData.session) {
           // "Confirm email" is off in the Supabase Auth dashboard, so a successful
           // signUp returns a session and logs the user straight in. If no session
           // comes back, something went wrong rather than an email being pending.
-          setError('Kayıt tamamlanamadı, tekrar dene.');
+          setError(t('auth.errorSignupIncomplete'));
         }
       }
     } catch {
-      setError('Bir şeyler ters gitti, tekrar dene.');
+      setError(t('auth.errorGeneric'));
     } finally {
       setBusy(false);
       resetCaptcha();
@@ -99,7 +101,7 @@ export function LoginScreen() {
   async function handleForgotPassword() {
     const trimmedEmail = email.trim();
     if (!trimmedEmail) {
-      setError('Önce e-posta adresini gir.');
+      setError(t('auth.errorEnterEmail'));
       return;
     }
     setError(null);
@@ -113,7 +115,7 @@ export function LoginScreen() {
       if (resetError) throw resetError;
       setResetSent(true);
     } catch {
-      setError('Sıfırlama bağlantısı gönderilemedi, tekrar dene.');
+      setError(t('auth.errorResetSend'));
     } finally {
       setResetBusy(false);
       resetCaptcha();
@@ -127,10 +129,10 @@ export function LoginScreen() {
         <BrandMark size={26} />
       </div>
       <h1 className="display login-in" style={{ '--i': 1 } as CSSProperties}>Watt Payı</h1>
-      <p className="login-sub login-in" style={{ '--i': 2 } as CSSProperties}>Faturanı cihaz cihaz takip et.</p>
+      <p className="login-sub login-in" style={{ '--i': 2 } as CSSProperties}>{t('auth.tagline')}</p>
 
       <form onSubmit={handleSubmit} className="login-form login-in" style={{ '--i': 3 } as CSSProperties}>
-        <Label htmlFor="email">E-posta</Label>
+        <Label htmlFor="email">{t('auth.email')}</Label>
         <div className="login-input-wrap">
           <Mail size={17} strokeWidth={1.8} className="login-input-icon" />
           <Input
@@ -140,11 +142,11 @@ export function LoginScreen() {
             className="h-12 text-base"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="ornek@eposta.com"
+            placeholder={t('auth.emailPlaceholder')}
           />
         </div>
 
-        <Label htmlFor="password">Şifre</Label>
+        <Label htmlFor="password">{t('auth.password')}</Label>
         <div className="login-input-wrap">
           <Lock size={17} strokeWidth={1.8} className="login-input-icon" />
           <Input
@@ -155,13 +157,13 @@ export function LoginScreen() {
             className="h-12 text-base"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="En az 8 karakter"
+            placeholder={t('auth.passwordPlaceholder')}
           />
         </div>
 
         {mode === 'signup' && (
           <>
-            <Label htmlFor="confirmPassword">Şifre (tekrar)</Label>
+            <Label htmlFor="confirmPassword">{t('auth.confirm')}</Label>
             <div className="login-input-wrap">
               <Lock size={17} strokeWidth={1.8} className="login-input-icon" />
               <Input
@@ -172,7 +174,7 @@ export function LoginScreen() {
                 className="h-12 text-base"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
-                placeholder="Tekrar gir"
+                placeholder={t('auth.confirmPlaceholder')}
               />
             </div>
           </>
@@ -188,24 +190,24 @@ export function LoginScreen() {
 
         <Button type="submit" size="lg" className="h-12 text-base mt-2" disabled={busy || !captchaToken}>
           {busy
-            ? mode === 'login' ? 'Giriş yapılıyor...' : 'Hesap oluşturuluyor...'
-            : mode === 'login' ? 'Giriş yap' : 'Hesap oluştur'}
+            ? mode === 'login' ? t('auth.loggingIn') : t('auth.signingUp')
+            : mode === 'login' ? t('auth.login') : t('auth.signup')}
         </Button>
       </form>
 
       {error && <p className="form-error">{error}</p>}
       {loginFailed && mode === 'login' && (
         <p className="login-nudge">
-          Böyle bir hesap yok mu?{' '}
+          {t('auth.nudgeQuestion')}{' '}
           <button type="button" className="login-nudge-link" onClick={goToSignupKeepingCredentials}>
-            Buraya tıklayarak hesap aç
+            {t('auth.nudgeLink')}
           </button>
         </p>
       )}
 
       {mode === 'login' ? (
         resetSent ? (
-          <p className="login-reset-sent">Şifre sıfırlama bağlantısı e-postana gönderildi.</p>
+          <p className="login-reset-sent">{t('auth.resetSent')}</p>
         ) : (
           <Button
             type="button"
@@ -214,20 +216,20 @@ export function LoginScreen() {
             onClick={handleForgotPassword}
             disabled={resetBusy || !captchaToken}
           >
-            {resetBusy ? 'Gönderiliyor...' : 'Şifremi unuttum'}
+            {resetBusy ? t('auth.sending') : t('auth.forgot')}
           </Button>
         )
       ) : null}
 
       {mode === 'login' ? (
         <div className="login-signup-cta">
-          <span>Hesabın yok mu?</span>
+          <span>{t('auth.noAccount')}</span>
           <button
             type="button"
             className="login-signup-cta-link"
             onClick={() => switchMode('signup')}
           >
-            Buraya tıklayarak hesap aç
+            {t('auth.nudgeLink')}
           </button>
         </div>
       ) : (
@@ -237,7 +239,7 @@ export function LoginScreen() {
           className="login-forgot-link"
           onClick={() => switchMode('login')}
         >
-          Zaten hesabın var mı? Giriş yap
+          {t('auth.haveAccount')}
         </Button>
       )}
       <PrivacyLink />

@@ -1,12 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { deviceLocales, resolveLanguage, type Lang, type LanguagePreference } from './language';
-import { translate, type Dictionaries, type Params } from './translate';
+import { translate, type Params } from './translate';
 import { formatNumber, formatPercent, formatPeriod } from './format';
 import { getLanguagePreference, setLanguagePreference } from './storage';
-import { tr } from './dictionaries/tr';
-import { en } from './dictionaries/en';
-
-export const DICTIONARIES: Dictionaries = { tr, en };
+import { DICTIONARIES } from './dictionaries';
 
 interface I18nValue {
   lang: Lang;

@@ -6,7 +6,7 @@ import { BillBreakdownSkeleton } from '../../components/BillBreakdownSkeleton';
 import { compareDeviceSpending, type DeviceDeltaResult } from '../../lib/deviceDelta';
 import { useCountUp } from '../../hooks/useCountUp';
 import { DEVICE_CATALOG } from '../../data/deviceCatalog';
-import { formatPeriod } from '../../lib/format';
+import { useI18n } from '../../i18n/I18nContext';
 import { shareBillBreakdown } from '../../lib/shareBill';
 import { Card, CardContent } from '../../components/ui/card';
 import { EmptyState } from '../../components/EmptyState';
@@ -14,6 +14,7 @@ import type { Bill, BillItem } from '../../types/domain';
 import './HomeScreen.css';
 
 export function HomeScreen() {
+  const { t, lang, number, percent, period, deviceName } = useI18n();
   const [latestBill, setLatestBill] = useState<Bill | null>(null);
   const [items, setItems] = useState<BillItem[]>([]);
   const [previousTotal, setPreviousTotal] = useState<number | null>(null);
@@ -77,10 +78,10 @@ export function HomeScreen() {
             compareDeviceSpending(
               latestItems
                 .filter((row) => row.device_key)
-                .map((row) => ({ key: row.device_key!, name: row.device_name, tl: row.calibrated_tl })),
+                .map((row) => ({ key: row.device_key!, name: deviceName(row.device_key, row.device_name), tl: row.calibrated_tl })),
               previousItems
                 .filter((row) => row.device_key)
-                .map((row) => ({ key: row.device_key!, name: row.device_name, tl: row.calibrated_tl }))
+                .map((row) => ({ key: row.device_key!, name: deviceName(row.device_key, row.device_name), tl: row.calibrated_tl }))
             )
           );
         } else {
@@ -91,11 +92,11 @@ export function HomeScreen() {
       }
     } catch (err) {
       console.error('HomeScreen: fatura verileri yüklenemedi', err);
-      setError('Veriler yüklenemedi. Bağlantını kontrol edip tekrar dene.');
+      setError(t('home.loadError'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t, deviceName]);
 
   useEffect(() => {
     load();
@@ -112,7 +113,7 @@ export function HomeScreen() {
       <div className="home-hero">
         <div className="home-hero-glow" aria-hidden="true" />
         <span className="home-eyebrow">
-          {latestBill ? formatPeriod(latestBill.periodMonth) : 'Bu Ay'}
+          {latestBill ? period(latestBill.periodMonth) : t('home.thisMonth')}
         </span>
         {loading ? (
           <div className="home-hero-skeleton" aria-hidden="true" />
@@ -120,18 +121,18 @@ export function HomeScreen() {
           <>
             <div className="home-hero-row">
               <div className="home-hero-total mono">
-                {heroTotal.toLocaleString('tr-TR')}
+                {number(heroTotal)}
                 <span>TL</span>
               </div>
               {delta !== null && (
                 <span className={'home-delta' + (delta <= 0 ? ' down' : ' up')}>
-                  {delta <= 0 ? '↓' : '↑'} %{Math.abs(delta).toFixed(0)}
+                  {delta <= 0 ? '↓' : '↑'} {percent(Math.abs(delta).toFixed(0))}
                 </span>
               )}
             </div>
             {latestBill.rateTlPerKwh != null && (
               <span className="home-hero-sub mono">
-                {latestBill.rateTlPerKwh.toLocaleString('tr-TR', { maximumFractionDigits: 2 })} ₺/kWh birim fiyat
+                {t('home.unitPrice', { rate: number(latestBill.rateTlPerKwh, { maximumFractionDigits: 2 }) })}
               </span>
             )}
           </>
@@ -155,7 +156,7 @@ export function HomeScreen() {
               </div>
               <p>{error}</p>
               <button type="button" className="home-retry-btn" onClick={load}>
-                Tekrar dene
+                {t('home.retry')}
               </button>
             </CardContent>
           </Card>
@@ -164,9 +165,9 @@ export function HomeScreen() {
             <CardContent className="home-empty">
               <EmptyState
                 icon={<Zap size={26} strokeWidth={1.6} />}
-                message="Henüz bir fatura eklemedin."
+                message={t('home.emptyMessage')}
                 actionTo="/add"
-                actionLabel="+ İlk faturanı ekle"
+                actionLabel={t('home.emptyAction')}
               />
             </CardContent>
           </Card>
@@ -181,9 +182,9 @@ export function HomeScreen() {
               >
                 <CardContent className="home-budget">
                   <div className="home-budget-head">
-                    <span className="home-budget-label">Bütçe hedefi</span>
+                    <span className="home-budget-label">{t('home.budget')}</span>
                     <span className="home-budget-values mono">
-                      {Math.round(latestBill.totalTl).toLocaleString('tr-TR')} / {budgetTl.toLocaleString('tr-TR')} TL
+                      {number(Math.round(latestBill.totalTl))} / {number(budgetTl)} TL
                     </span>
                   </div>
                   <div className="home-budget-track">
@@ -195,7 +196,7 @@ export function HomeScreen() {
                   {latestBill.totalTl > budgetTl && (
                     <p className="home-budget-over-msg">
                       <TriangleAlert size={14} strokeWidth={1.8} />
-                      {Math.round(latestBill.totalTl - budgetTl)} TL bütçe hedefini aştın
+                      {t('home.overBudget', { amount: Math.round(latestBill.totalTl - budgetTl) })}
                     </p>
                   )}
                 </CardContent>
@@ -207,8 +208,15 @@ export function HomeScreen() {
                   <button
                     type="button"
                     className="home-share-btn"
-                    aria-label="Paylaş"
-                    onClick={() => shareBillBreakdown(formatPeriod(latestBill.periodMonth), latestBill.totalTl, items)}
+                    aria-label={t('share.aria')}
+                    onClick={() =>
+                      shareBillBreakdown(
+                        period(latestBill.periodMonth),
+                        latestBill.totalTl,
+                        items.map((it) => ({ ...it, deviceName: deviceName(it.deviceKey, it.deviceName) })),
+                        lang,
+                      )
+                    }
                   >
                     <Share2 size={15} strokeWidth={1.8} />
                   </button>
@@ -218,12 +226,12 @@ export function HomeScreen() {
                   <div className="home-device-delta">
                     {deviceDelta.increased && (
                       <span className="up">
-                        ↑ {deviceDelta.increased.name} önceki aydan {Math.round(deviceDelta.increased.deltaTl)} TL daha fazla geldi
+                        {t('home.deviceUp', { name: deviceDelta.increased.name, amount: Math.round(deviceDelta.increased.deltaTl) })}
                       </span>
                     )}
                     {deviceDelta.decreased && (
                       <span className="down">
-                        ↓ {deviceDelta.decreased.name} önceki aydan {Math.round(Math.abs(deviceDelta.decreased.deltaTl))} TL daha az geldi
+                        {t('home.deviceDown', { name: deviceDelta.decreased.name, amount: Math.round(Math.abs(deviceDelta.decreased.deltaTl)) })}
                       </span>
                     )}
                   </div>

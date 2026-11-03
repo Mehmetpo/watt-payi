@@ -6,10 +6,12 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { BrandMark } from '../../components/BrandMark';
+import { useI18n } from '../../i18n/I18nContext';
 import './LoginScreen.css';
 
 export function ResetPasswordScreen() {
   const { clearRecovery } = useAuth();
+  const { t } = useI18n();
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +21,7 @@ export function ResetPasswordScreen() {
     e.preventDefault();
     setError(null);
     if (password !== confirm) {
-      setError('Şifreler eşleşmiyor.');
+      setError(t('auth.errorMismatch'));
       return;
     }
     setBusy(true);
@@ -28,7 +30,7 @@ export function ResetPasswordScreen() {
       if (updateError) throw updateError;
       clearRecovery();
     } catch {
-      setError('Şifre güncellenemedi, tekrar dene.');
+      setError(t('reset.error'));
     } finally {
       setBusy(false);
     }
@@ -40,11 +42,11 @@ export function ResetPasswordScreen() {
       <div className="login-mark login-in" style={{ '--i': 0 } as CSSProperties}>
         <BrandMark size={26} />
       </div>
-      <h1 className="display login-in" style={{ '--i': 1 } as CSSProperties}>Yeni şifre</h1>
-      <p className="login-sub login-in" style={{ '--i': 2 } as CSSProperties}>Hesabın için yeni bir şifre belirle.</p>
+      <h1 className="display login-in" style={{ '--i': 1 } as CSSProperties}>{t('reset.title')}</h1>
+      <p className="login-sub login-in" style={{ '--i': 2 } as CSSProperties}>{t('reset.sub')}</p>
 
       <form onSubmit={handleSubmit} className="login-form login-in" style={{ '--i': 3 } as CSSProperties}>
-        <Label htmlFor="newPassword">Yeni şifre</Label>
+        <Label htmlFor="newPassword">{t('reset.newPassword')}</Label>
         <div className="login-input-wrap">
           <Lock size={17} strokeWidth={1.8} className="login-input-icon" />
           <Input
@@ -55,11 +57,11 @@ export function ResetPasswordScreen() {
             className="h-12 text-base"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="En az 8 karakter"
+            placeholder={t('auth.passwordPlaceholder')}
           />
         </div>
 
-        <Label htmlFor="confirmPassword">Şifre (tekrar)</Label>
+        <Label htmlFor="confirmPassword">{t('auth.confirm')}</Label>
         <div className="login-input-wrap">
           <Lock size={17} strokeWidth={1.8} className="login-input-icon" />
           <Input
@@ -70,12 +72,12 @@ export function ResetPasswordScreen() {
             className="h-12 text-base"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            placeholder="Tekrar gir"
+            placeholder={t('auth.confirmPlaceholder')}
           />
         </div>
 
         <Button type="submit" size="lg" className="h-12 text-base mt-2" disabled={busy}>
-          {busy ? 'Kaydediliyor...' : 'Şifreyi güncelle'}
+          {busy ? t('reset.saving') : t('reset.submit')}
         </Button>
       </form>
 
