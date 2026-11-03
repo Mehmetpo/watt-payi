@@ -5,13 +5,14 @@ import { supabase } from '../../lib/supabaseClient';
 import { BillBreakdown } from '../../components/BillBreakdown';
 import { BillBreakdownSkeleton } from '../../components/BillBreakdownSkeleton';
 import { DEVICE_CATALOG } from '../../data/deviceCatalog';
-import { formatPeriod } from '../../lib/format';
+import { useI18n } from '../../i18n/I18nContext';
 import { shareBillBreakdown } from '../../lib/shareBill';
 import { Card, CardContent } from '../../components/ui/card';
 import type { BillItem } from '../../types/domain';
 import './HistoryScreen.css';
 
 export function HistoryDetailScreen() {
+  const { t, lang, period } = useI18n();
   const { billId } = useParams<{ billId: string }>();
   const [periodMonth, setPeriodMonth] = useState<string | null>(null);
   const [totalTl, setTotalTl] = useState(0);
@@ -65,11 +66,11 @@ export function HistoryDetailScreen() {
       );
     } catch (err) {
       console.error('HistoryDetailScreen: fatura detayı yüklenemedi', err);
-      setError('Fatura yüklenemedi. Bağlantını kontrol edip tekrar dene.');
+      setError(t('historyDetail.loadError'));
     } finally {
       setLoading(false);
     }
-  }, [billId]);
+  }, [billId, t]);
 
   useEffect(() => {
     load();
@@ -81,14 +82,21 @@ export function HistoryDetailScreen() {
     <div className="history-shell">
       <div className="history-detail-topbar">
         <Link to="/history" className="history-back">
-          <ArrowLeft size={15} strokeWidth={1.8} /> Geçmiş
+          <ArrowLeft size={15} strokeWidth={1.8} /> {t('history.title')}
         </Link>
         {!loading && !error && !notFound && (
           <button
             type="button"
             className="history-share-btn"
-            aria-label="Paylaş"
-            onClick={() => shareBillBreakdown(periodMonth ? formatPeriod(periodMonth) : 'Bu ayki', totalTl, items)}
+            aria-label={t('share.aria')}
+            onClick={() =>
+              shareBillBreakdown(
+                periodMonth ? period(periodMonth) : t('historyDetail.thisMonth'),
+                totalTl,
+                items,
+                lang,
+              )
+            }
           >
             <Share2 size={16} strokeWidth={1.8} />
           </button>
@@ -105,7 +113,7 @@ export function HistoryDetailScreen() {
               </div>
               <p>{error}</p>
               <button type="button" className="history-retry-btn" onClick={load}>
-                Tekrar dene
+                {t('history.retry')}
               </button>
             </div>
           ) : notFound ? (
@@ -113,8 +121,8 @@ export function HistoryDetailScreen() {
               <div className="empty-icon-badge">
                 <FileX2 size={26} strokeWidth={1.6} />
               </div>
-              <p>Bu fatura bulunamadı.</p>
-              <Link to="/history">Geçmişe dön</Link>
+              <p>{t('historyDetail.notFound')}</p>
+              <Link to="/history">{t('historyDetail.backToHistory')}</Link>
             </div>
           ) : (
             <BillBreakdown totalTl={totalTl} items={items} iconKeyFor={iconByKey} />

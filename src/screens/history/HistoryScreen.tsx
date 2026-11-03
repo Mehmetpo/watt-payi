@@ -4,7 +4,7 @@ import { FileClock, WifiOff } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { detectRisingDevices, type BillWithItems } from '../../lib/trends';
 import { summarizeBills } from '../../lib/billStats';
-import { formatPeriod } from '../../lib/format';
+import { useI18n } from '../../i18n/I18nContext';
 import { Skeleton } from '../../components/ui/skeleton';
 import { EmptyState } from '../../components/EmptyState';
 import './HistoryScreen.css';
@@ -16,6 +16,7 @@ interface BillRow {
 }
 
 export function HistoryScreen() {
+  const { t, number, percent, period, deviceName } = useI18n();
   const [bills, setBills] = useState<BillRow[]>([]);
   const [rising, setRising] = useState<{ deviceName: string; months: number }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,7 +47,7 @@ export function HistoryScreen() {
           periodMonth: b.period_month,
           items: (itemRows ?? [])
             .filter((i) => i.bill_id === b.id)
-            .map((i) => ({ deviceKey: i.device_key, deviceName: i.device_name, calibratedTl: i.calibrated_tl })),
+            .map((i) => ({ deviceKey: i.device_key, deviceName: deviceName(i.device_key, i.device_name), calibratedTl: i.calibrated_tl })),
         }));
 
         setRising(detectRisingDevices(billsWithItems));
@@ -55,11 +56,11 @@ export function HistoryScreen() {
       }
     } catch (err) {
       console.error('HistoryScreen: geçmiş faturalar yüklenemedi', err);
-      setError('Geçmiş yüklenemedi. Bağlantını kontrol edip tekrar dene.');
+      setError(t('history.loadError'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t, deviceName]);
 
   useEffect(() => {
     load();
@@ -69,28 +70,28 @@ export function HistoryScreen() {
 
   return (
     <div className="history-shell">
-      <h1 className="display history-in" style={{ '--i': 0 } as CSSProperties}>Geçmiş</h1>
+      <h1 className="display history-in" style={{ '--i': 0 } as CSSProperties}>{t('history.title')}</h1>
 
       {!loading && !error && summary && (
         <div className="history-summary history-in" style={{ '--i': 1 } as CSSProperties}>
           <div className="history-summary-cell">
-            <span className="history-summary-label">Ortalama</span>
-            <span className="history-summary-value mono">{summary.averageTl.toLocaleString('tr-TR')} TL</span>
+            <span className="history-summary-label">{t('history.average')}</span>
+            <span className="history-summary-value mono">{number(summary.averageTl)} TL</span>
           </div>
           <div className="history-summary-cell">
-            <span className="history-summary-label">En yüksek</span>
-            <span className="history-summary-value mono">{summary.highestTl.toLocaleString('tr-TR')} TL</span>
+            <span className="history-summary-label">{t('history.highest')}</span>
+            <span className="history-summary-value mono">{number(summary.highestTl)} TL</span>
           </div>
           <div className="history-summary-cell">
-            <span className="history-summary-label">En düşük</span>
-            <span className="history-summary-value mono">{summary.lowestTl.toLocaleString('tr-TR')} TL</span>
+            <span className="history-summary-label">{t('history.lowest')}</span>
+            <span className="history-summary-value mono">{number(summary.lowestTl)} TL</span>
           </div>
         </div>
       )}
 
       {rising.length > 0 && (
         <div className="history-insight history-in" style={{ '--i': 2 } as CSSProperties}>
-          {rising.map((r) => `${r.deviceName} ${r.months} aydır artıyor`).join(' · ')}
+          {rising.map((r) => t('history.rising', { name: r.deviceName, months: r.months })).join(' · ')}
         </div>
       )}
 
@@ -107,16 +108,16 @@ export function HistoryScreen() {
           </div>
           <p>{error}</p>
           <button type="button" className="history-retry-btn" onClick={load}>
-            Tekrar dene
+            {t('history.retry')}
           </button>
         </div>
       ) : bills.length === 0 ? (
         <div className="history-empty history-state-in">
           <EmptyState
             icon={<FileClock size={26} strokeWidth={1.6} />}
-            message="Henüz geçmiş fatura yok."
+            message={t('history.emptyMessage')}
             actionTo="/add"
-            actionLabel="+ İlk faturanı ekle"
+            actionLabel={t('history.emptyAction')}
           />
         </div>
       ) : (
@@ -141,14 +142,14 @@ export function HistoryScreen() {
                     />
                   )}
                   <div className="history-row-content">
-                    <span className="month">{formatPeriod(bill.period_month)}</span>
+                    <span className="month">{period(bill.period_month)}</span>
                     <div className="history-row-right">
                       {delta !== null && (
                         <span className={'history-delta' + (delta > 0 ? ' up' : '')}>
-                          {delta <= 0 ? '↓' : '↑'} %{Math.abs(delta).toFixed(0)}
+                          {delta <= 0 ? '↓' : '↑'} {percent(Math.abs(delta).toFixed(0))}
                         </span>
                       )}
-                      <span className="amount mono">{Math.round(bill.total_tl).toLocaleString('tr-TR')} TL</span>
+                      <span className="amount mono">{number(Math.round(bill.total_tl))} TL</span>
                     </div>
                   </div>
                 </Link>
@@ -160,8 +161,8 @@ export function HistoryScreen() {
 
       {!loading && !error && bills.length >= 1 && bills.length < 3 && (
         <Link to="/add" className="history-nudge history-state-in">
-          <span>Trend grafiğini ve cihaz artış uyarılarını görmek için en az 3 fatura ekle.</span>
-          <span className="history-nudge-cta">+ Fatura ekle</span>
+          <span>{t('history.nudge')}</span>
+          <span className="history-nudge-cta">{t('history.nudgeCta')}</span>
         </Link>
       )}
     </div>
