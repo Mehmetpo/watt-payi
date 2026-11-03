@@ -24,6 +24,8 @@ interface TipRequest {
   hoursPerWeek: number;
   calibratedTl: number;
   pctShare: number;
+  /** Output language of the tip; anything but 'en' keeps the original Turkish behavior. */
+  lang?: string;
 }
 
 serve(async (req) => {
@@ -63,6 +65,7 @@ serve(async (req) => {
 
   const body: TipRequest = await req.json();
   const { deviceName, watt, hoursPerWeek, calibratedTl, pctShare } = body;
+  const english = body.lang === 'en';
   if (!deviceName || typeof watt !== 'number' || typeof hoursPerWeek !== 'number') {
     return new Response(JSON.stringify({ error: 'missing_fields' }), { status: 400, headers: CORS_HEADERS });
   }
@@ -88,8 +91,13 @@ serve(async (req) => {
         messages: [
           {
             role: 'user',
-            content:
-              `Bir Türk hane, bu ayki elektrik faturasının en büyük payını "${sanitizedDeviceName}" cihazından harcamış: ` +
+            content: english
+              ? `A household has spent the largest share of this month's electricity bill on "${sanitizedDeviceName}": ` +
+                `${watt}W, used ${hoursPerWeek.toFixed(1)} hours a week, ${pctShare.toFixed(0)}% of the bill (${calibratedTl.toFixed(0)} TL) belongs to this device. ` +
+                'Write a 1-2 sentence, friendly, concrete and practical saving tip for this device. ' +
+                'Write in English. Do not give exact/made-up TL or % figures (you do not know the real data), but you may mention a rough benefit with hedged wording such as "roughly". ' +
+                'Return only the tip text, with no extra explanation, quotation marks or heading.'
+              : `Bir Türk hane, bu ayki elektrik faturasının en büyük payını "${sanitizedDeviceName}" cihazından harcamış: ` +
               `${watt}W, haftada ${hoursPerWeek.toFixed(1)} saat kullanılmış, faturanın %${pctShare.toFixed(0)}'i (${calibratedTl.toFixed(0)} TL) bu cihaza ait. ` +
               'Kullanıcıya bu cihaz için 1-2 cümlelik, samimi, somut ve pratik uygulanabilir bir tasarruf önerisi yaz. ' +
               'Türkçe yaz. Kesin/uydurma TL veya % rakamı verme (gerçek veriyi bilmiyorsun), ama "yaklaşık" gibi kalifiye ifadelerle kabaca bir fayda belirtebilirsin. ' +
