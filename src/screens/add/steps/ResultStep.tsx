@@ -3,6 +3,7 @@ import { calculateBreakdown, type DeviceCorrection, type DeviceUsage } from '../
 import { BillBreakdown } from '../../../components/BillBreakdown';
 import { ApplianceVisual } from '../../../components/ApplianceVisual';
 import { DEVICE_CATALOG, COMMON_DEVICE_KEYS } from '../../../data/deviceCatalog';
+import { useI18n } from '../../../i18n/I18nContext';
 
 const NUDGE_THRESHOLD_PCT = 5;
 
@@ -29,24 +30,25 @@ export function ResultStep({
   selectedKeys,
   onAddDevice,
 }: ResultStepProps) {
+  const { t, deviceName } = useI18n();
   const result = useMemo(
     () => calculateBreakdown(devices, { billTl, ratePerKwh, kwh, periodDays }, corrections),
     [devices, billTl, ratePerKwh, kwh, periodDays, corrections]
   );
 
-  const nameByKey = (key: string) => DEVICE_CATALOG.find((d) => d.key === key)?.name ?? key;
+  const nameByKey = (key: string) => deviceName(key, DEVICE_CATALOG.find((d) => d.key === key)?.name ?? key);
   const iconByKey = (key: string | null) => (key ? DEVICE_CATALOG.find((d) => d.key === key)?.iconKey ?? 'other' : 'other');
 
   const adjustedCount = corrections.filter((c) => c.confidence > 0 && Math.abs(c.factor - 1) > 0.05).length;
 
   const insight =
     result.totalRawKwh === 0 && result.otherTl === 0
-      ? 'Hiç cihaz seçilmedi.'
+      ? t('result.noDevices')
       : result.otherPct > 1
-        ? `Seçtiğin cihazlar faturanın %${Math.round(100 - result.otherPct)}'ini açıklıyor — geri kalan %${Math.round(result.otherPct)}'i "Diğer" olarak ayrıldı (seçilmeyen veya bilinmeyen tüketim).`
+        ? t('result.insightOther', { explained: Math.round(100 - result.otherPct), other: Math.round(result.otherPct) })
         : result.calcRatio > 0.95
-          ? `Girdiğin süreler faturandaki tüketimden fazla çıkıyor; dağılım faturana göre orantılandı ve bilinmeyen tüketim için küçük bir pay ayrıldı.`
-          : 'Seçtiğin cihazlar faturanın tamamını açıklıyor.';
+          ? t('result.insightOver')
+          : t('result.insightFull');
 
   const missingCommon = COMMON_DEVICE_KEYS.filter((key) => !selectedKeys.has(key))
     .map((key) => DEVICE_CATALOG.find((d) => d.key === key))
@@ -81,7 +83,7 @@ export function ResultStep({
           <span />
           <span />
         </div>
-        <p>Geçmiş faturalarından öğreniyor...</p>
+        <p>{t('result.learning')}</p>
       </div>
     );
   }
@@ -96,7 +98,7 @@ export function ResultStep({
       </p>
       {adjustedCount > 0 && (
         <p className="add-insight add-insight-muted result-in" style={{ '--i': 1 } as CSSProperties}>
-          {adjustedCount} cihazın tüketimi geçmiş faturalarından öğrenilen verilerle ayarlandı.
+          {t('result.adjusted', { n: adjustedCount })}
         </p>
       )}
       <div className="result-in" style={{ '--i': breakdownDelay } as CSSProperties}>
@@ -105,8 +107,7 @@ export function ResultStep({
       {showNudge && (
         <div className="result-nudge result-in" style={{ '--i': nudgeDelay } as CSSProperties}>
           <p>
-            Faturanın %{Math.round(result.otherPct)}'i seçmediğin cihazlardan geliyor. Şunlardan birini eklemek ister
-            misin?
+            {t('result.nudge', { pct: Math.round(result.otherPct) })}
           </p>
           <div className="result-nudge-chips">
             {missingCommon.map((device) => (
@@ -117,7 +118,7 @@ export function ResultStep({
                 onClick={() => onAddDevice(device.key)}
               >
                 <ApplianceVisual iconKey={device.iconKey} size={15} imageSize={22} />
-                {device.name}
+                {deviceName(device.key, device.name)}
               </button>
             ))}
           </div>

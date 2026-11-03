@@ -1,0 +1,118 @@
+// "Add a bill" wizard: bill, devices, usage and result steps.
+export const tr = {
+  'add.step.bill': 'Fatura',
+  'add.step.devices': 'Cihazlar',
+  'add.step.usage': 'Kullanım',
+  'add.step.result': 'Sonuç',
+  'add.steps': 'Adımlar',
+  'add.stepOf': 'Adım {n} / {total}: {label}',
+  'add.stepAria': 'Adım {n}: {label}',
+  'add.back': 'Geri',
+  'add.cancel': 'İptal',
+  'add.next': 'Devam et',
+  'add.save': 'Kaydet',
+  'add.saving': 'Kaydediliyor...',
+  'add.savedTitle': 'Fatura kaydedildi',
+  'add.savedSub': 'Ana sayfana yönlendiriliyorsun...',
+  'add.sessionMissing': 'Oturum bulunamadı, tekrar giriş yap.',
+  'add.saveBillError': 'Fatura kaydedilemedi, tekrar dene.',
+  'add.saveItemsError': 'Cihaz kırılımı kaydedilemedi, tekrar dene.',
+
+  'bill.reading': 'Okunuyor...',
+  'bill.takePhoto': 'Fatura fotoğrafı çek',
+  'bill.readAmountError': 'Tutarı okuyamadık, elle girebilir misin?',
+  'bill.photoError': 'Fotoğraf işlenemedi, elle girebilir misin?',
+  'bill.amount': 'Aylık fatura tutarı',
+  'bill.amountWarning': 'Bu tutar alışılmadık görünüyor, kontrol eder misin?',
+  'bill.rate': 'Birim fiyat',
+  'bill.rateWarning': 'Bu birim fiyat alışılmadık görünüyor, kontrol eder misin?',
+  'bill.kwh': 'Toplam tüketim (kWh)',
+  'bill.kwhPlaceholder': 'Faturada yazan kWh',
+  'bill.kwhHint':
+    'Faturadaki toplam tüketimi girersen hesap, vergiler dahil gerçekte ödediğin fiyatla yapılır; boş bırakırsan birim fiyattan tahmin edilir.',
+
+  'devices.savedIntro': 'Geçen faturandaki {n} cihaz kayıtlı. Onlarla devam edebilir ya da baştan seçebilirsin.',
+  'devices.useSaved': 'Kayıtlı cihazlarla devam et',
+  'devices.startFresh': 'Yeni cihazlar seç',
+  'devices.common': 'Yaygın',
+
+  'usage.wattAria': '{name} watt değeri',
+  'usage.hoursAria': '{name} haftalık kullanım saati',
+  'usage.preset.none': 'Kullanmıyorum',
+  'usage.preset.low': 'Az',
+  'usage.preset.mid': 'Orta',
+  'usage.preset.high': 'Çok',
+  'usage.preset.always': 'Sürekli',
+  'usage.perWeek': 'sa/hafta',
+
+  'result.noDevices': 'Hiç cihaz seçilmedi.',
+  'result.insightOther':
+    'Seçtiğin cihazlar faturanın %{explained}\'ini açıklıyor — geri kalan %{other}\'i "Diğer" olarak ayrıldı (seçilmeyen veya bilinmeyen tüketim).',
+  'result.insightOver':
+    'Girdiğin süreler faturandaki tüketimden fazla çıkıyor; dağılım faturana göre orantılandı ve bilinmeyen tüketim için küçük bir pay ayrıldı.',
+  'result.insightFull': 'Seçtiğin cihazlar faturanın tamamını açıklıyor.',
+  'result.learning': 'Geçmiş faturalarından öğreniyor...',
+  'result.adjusted': '{n} cihazın tüketimi geçmiş faturalarından öğrenilen verilerle ayarlandı.',
+  'result.nudge': 'Faturanın %{pct}\'i seçmediğin cihazlardan geliyor. Şunlardan birini eklemek ister misin?',
+};
+
+type Key = keyof typeof tr;
+
+export const en: Record<Key, string> & Partial<Record<`${Key}.one`, string>> = {
+  'add.step.bill': 'Bill',
+  'add.step.devices': 'Appliances',
+  'add.step.usage': 'Usage',
+  'add.step.result': 'Result',
+  'add.steps': 'Steps',
+  'add.stepOf': 'Step {n} / {total}: {label}',
+  'add.stepAria': 'Step {n}: {label}',
+  'add.back': 'Back',
+  'add.cancel': 'Cancel',
+  'add.next': 'Continue',
+  'add.save': 'Save',
+  'add.saving': 'Saving...',
+  'add.savedTitle': 'Bill saved',
+  'add.savedSub': 'Taking you to your home screen...',
+  'add.sessionMissing': 'No session found, please sign in again.',
+  'add.saveBillError': 'Couldn’t save the bill, try again.',
+  'add.saveItemsError': 'Couldn’t save the appliance breakdown, try again.',
+
+  'bill.reading': 'Reading...',
+  'bill.takePhoto': 'Photograph your bill',
+  'bill.readAmountError': 'We couldn’t read the amount. Can you enter it by hand?',
+  'bill.photoError': 'Couldn’t process the photo. Can you enter it by hand?',
+  'bill.amount': 'Monthly bill amount',
+  'bill.amountWarning': 'This amount looks unusual, could you double-check it?',
+  'bill.rate': 'Unit price',
+  'bill.rateWarning': 'This unit price looks unusual, could you double-check it?',
+  'bill.kwh': 'Total consumption (kWh)',
+  'bill.kwhPlaceholder': 'kWh shown on the bill',
+  'bill.kwhHint':
+    'If you enter the total consumption from your bill, the split uses the price you actually paid, taxes included; if you leave it empty it is estimated from the unit price.',
+
+  'devices.savedIntro': '{n} appliances from your last bill are saved. You can continue with them or start over.',
+  'devices.savedIntro.one': '1 appliance from your last bill is saved. You can continue with it or start over.',
+  'devices.useSaved': 'Continue with saved appliances',
+  'devices.startFresh': 'Choose new appliances',
+  'devices.common': 'Common',
+
+  'usage.wattAria': '{name} wattage',
+  'usage.hoursAria': '{name} weekly hours of use',
+  'usage.preset.none': 'Don’t use',
+  'usage.preset.low': 'Low',
+  'usage.preset.mid': 'Medium',
+  'usage.preset.high': 'High',
+  'usage.preset.always': 'Always on',
+  'usage.perWeek': 'h/week',
+
+  'result.noDevices': 'No appliances selected.',
+  'result.insightOther':
+    'Your selected appliances explain {explained}% of the bill — the remaining {other}% is shown as "Other" (unselected or unknown usage).',
+  'result.insightOver':
+    'The hours you entered add up to more than the consumption on your bill; the split was scaled to your bill and a small share was set aside for unknown usage.',
+  'result.insightFull': 'Your selected appliances explain the whole bill.',
+  'result.learning': 'Learning from your past bills...',
+  'result.adjusted': 'The usage of {n} appliances was adjusted using what we learned from your past bills.',
+  'result.adjusted.one': 'The usage of 1 appliance was adjusted using what we learned from your past bills.',
+  'result.nudge': '{pct}% of your bill comes from appliances you didn’t select. Want to add one of these?',
+};

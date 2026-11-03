@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Camera, TriangleAlert } from 'lucide-react';
 import { captureBillPhoto, extractBillFromPhoto } from '../../../lib/billExtraction';
+import { useI18n } from '../../../i18n/I18nContext';
 
 export interface BillStepValue {
   billTl: number;
@@ -32,6 +33,7 @@ function daysBetween(start: string | null, end: string | null): number | undefin
 }
 
 export function BillStep({ value, onChange }: BillStepProps) {
+  const { t } = useI18n();
   const [reading, setReading] = useState(false);
   const [readError, setReadError] = useState<string | null>(null);
   const [justFilled, setJustFilled] = useState(false);
@@ -56,7 +58,7 @@ export function BillStep({ value, onChange }: BillStepProps) {
         periodDays: daysBetween(extracted.donem_baslangic, extracted.donem_bitis) ?? value.periodDays,
       });
       if (extracted.toplam_tutar === null) {
-        setReadError('Tutarı okuyamadık, elle girebilir misin?');
+        setReadError(t('bill.readAmountError'));
       } else {
         // Briefly highlight the fields the OCR just filled in, so the win is felt, not just read.
         setJustFilled(true);
@@ -64,7 +66,7 @@ export function BillStep({ value, onChange }: BillStepProps) {
         flashTimer.current = setTimeout(() => setJustFilled(false), 700);
       }
     } catch {
-      setReadError('Fotoğraf işlenemedi, elle girebilir misin?');
+      setReadError(t('bill.photoError'));
     } finally {
       setReading(false);
     }
@@ -80,11 +82,11 @@ export function BillStep({ value, onChange }: BillStepProps) {
         disabled={reading}
       >
         <Camera size={18} strokeWidth={1.7} />
-        {reading ? 'Okunuyor...' : 'Fatura fotoğrafı çek'}
+        {reading ? t('bill.reading') : t('bill.takePhoto')}
       </button>
       {readError && <p className="form-error">{readError}</p>}
       <div className="add-field bill-in" style={{ '--i': 1 } as CSSProperties}>
-        <label htmlFor="billTl">Aylık fatura tutarı</label>
+        <label htmlFor="billTl">{t('bill.amount')}</label>
         <div className={'add-amount' + (justFilled ? ' flash' : '')}>
           <input
             id="billTl"
@@ -99,12 +101,12 @@ export function BillStep({ value, onChange }: BillStepProps) {
         {looksOffRange(value.billTl, BILL_TL_RANGE) && (
           <p className="add-field-warning">
             <TriangleAlert size={13} strokeWidth={2} />
-            Bu tutar alışılmadık görünüyor, kontrol eder misin?
+            {t('bill.amountWarning')}
           </p>
         )}
       </div>
       <div className="add-field bill-in" style={{ '--i': 2 } as CSSProperties}>
-        <label htmlFor="rate">Birim fiyat</label>
+        <label htmlFor="rate">{t('bill.rate')}</label>
         <div className={'add-amount' + (justFilled ? ' flash' : '')}>
           <input
             id="rate"
@@ -119,12 +121,12 @@ export function BillStep({ value, onChange }: BillStepProps) {
         {looksOffRange(value.ratePerKwh, RATE_RANGE) && (
           <p className="add-field-warning">
             <TriangleAlert size={13} strokeWidth={2} />
-            Bu birim fiyat alışılmadık görünüyor, kontrol eder misin?
+            {t('bill.rateWarning')}
           </p>
         )}
       </div>
       <div className="add-field bill-in" style={{ '--i': 3 } as CSSProperties}>
-        <label htmlFor="kwh">Toplam tüketim (kWh)</label>
+        <label htmlFor="kwh">{t('bill.kwh')}</label>
         <div className={'add-amount' + (justFilled ? ' flash' : '')}>
           <input
             id="kwh"
@@ -132,13 +134,12 @@ export function BillStep({ value, onChange }: BillStepProps) {
             min={0}
             value={value.kwh || ''}
             onChange={(e) => onChange({ ...value, kwh: Number(e.target.value) || undefined })}
-            placeholder="Faturada yazan kWh"
+            placeholder={t('bill.kwhPlaceholder')}
           />
           <span className="unit">kWh</span>
         </div>
         <p className="add-field-warning">
-          Faturadaki toplam tüketimi girersen hesap, vergiler dahil gerçekte ödediğin fiyatla yapılır; boş bırakırsan
-          birim fiyattan tahmin edilir.
+          {t('bill.kwhHint')}
         </p>
       </div>
     </div>

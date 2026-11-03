@@ -4,6 +4,7 @@ import { en as auth } from './auth';
 import { en as home } from './home';
 import { en as history } from './history';
 import { en as profile } from './profile';
+import { en as add } from './add';
 
 export const en: Record<string, string> = {
   ...EN_DEVICES,
@@ -13,4 +14,5 @@ export const en: Record<string, string> = {
   ...home,
   ...history,
   ...profile,
+  ...add,
 };

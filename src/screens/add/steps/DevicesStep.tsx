@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import { DEVICE_CATALOG, COMMON_DEVICE_KEYS, DEVICE_CATEGORIES } from '../../../data/deviceCatalog';
 import { ApplianceVisual } from '../../../components/ApplianceVisual';
+import { useI18n } from '../../../i18n/I18nContext';
 
 export interface DevicesStepProps {
   selected: Set<string>;
@@ -17,15 +18,16 @@ function findDevice(key: string) {
 }
 
 export function DevicesStep({ selected, onToggle, savedCount = 0, onUseSaved, onStartFresh }: DevicesStepProps) {
+  const { t, deviceName } = useI18n();
   const [expanded, setExpanded] = useState<Set<string>>(
-    () => new Set(DEVICE_CATEGORIES.map((c) => c.label))
+    () => new Set(DEVICE_CATEGORIES.map((c) => c.id))
   );
 
-  function toggleCategory(label: string) {
+  function toggleCategory(id: string) {
     setExpanded((prev) => {
       const next = new Set(prev);
-      if (next.has(label)) next.delete(label);
-      else next.add(label);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   }
@@ -54,7 +56,7 @@ export function DevicesStep({ selected, onToggle, savedCount = 0, onUseSaved, on
           </span>
         )}
         <ApplianceVisual iconKey={device.iconKey} size={22} imageSize={34} />
-        <span>{device.name}</span>
+        <span>{deviceName(device.key, device.name)}</span>
       </div>
     );
   }
@@ -63,35 +65,35 @@ export function DevicesStep({ selected, onToggle, savedCount = 0, onUseSaved, on
     <div className="devices-step">
       {savedCount > 0 && (
         <div className="device-saved-choice">
-          <p>Geçen faturandaki {savedCount} cihaz kayıtlı. Onlarla devam edebilir ya da baştan seçebilirsin.</p>
+          <p>{t('devices.savedIntro', { n: savedCount })}</p>
           <div className="device-saved-actions">
             <button type="button" className="device-saved-btn primary" onClick={onUseSaved}>
-              Kayıtlı cihazlarla devam et
+              {t('devices.useSaved')}
             </button>
             <button type="button" className="device-saved-btn" onClick={onStartFresh}>
-              Yeni cihazlar seç
+              {t('devices.startFresh')}
             </button>
           </div>
         </div>
       )}
       <div className="device-section">
-        <h3 className="device-section-label">Yaygın</h3>
+        <h3 className="device-section-label">{t('devices.common')}</h3>
         <div className="device-grid">{COMMON_DEVICE_KEYS.map(renderCard)}</div>
       </div>
 
       {DEVICE_CATEGORIES.map((category) => {
-        const isOpen = expanded.has(category.label);
+        const isOpen = expanded.has(category.id);
         const selectedCount = category.keys.filter((k) => selected.has(k)).length;
         return (
-          <div className="device-section" key={category.label}>
+          <div className="device-section" key={category.id}>
             <button
               type="button"
               className="device-section-toggle"
               aria-expanded={isOpen}
-              onClick={() => toggleCategory(category.label)}
+              onClick={() => toggleCategory(category.id)}
             >
               <span className="device-section-label">
-                {category.label}
+                {t(`deviceCategory.${category.id}`)}
                 {selectedCount > 0 && <span className="device-section-count">{selectedCount}</span>}
               </span>
               <ChevronDown size={16} strokeWidth={2} className={'device-section-chevron' + (isOpen ? ' open' : '')} />

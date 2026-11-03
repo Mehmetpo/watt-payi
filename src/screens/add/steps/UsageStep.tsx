@@ -3,14 +3,15 @@ import { DEVICE_CATALOG } from '../../../data/deviceCatalog';
 import { ApplianceVisual } from '../../../components/ApplianceVisual';
 import { Slider } from '../../../components/ui/slider';
 import { cn } from '../../../lib/utils';
+import { useI18n } from '../../../i18n/I18nContext';
 import type { DeviceUsage } from '../../../lib/calc';
 
 const HOUR_PRESETS = [
-  { label: 'Kullanmıyorum', hours: 0 },
-  { label: 'Az', hours: 7 },
-  { label: 'Orta', hours: 21 },
-  { label: 'Çok', hours: 56 },
-  { label: 'Sürekli', hours: 168 },
+  { labelKey: 'usage.preset.none', hours: 0 },
+  { labelKey: 'usage.preset.low', hours: 7 },
+  { labelKey: 'usage.preset.mid', hours: 21 },
+  { labelKey: 'usage.preset.high', hours: 56 },
+  { labelKey: 'usage.preset.always', hours: 168 },
 ];
 
 export interface UsageStepProps {
@@ -21,6 +22,7 @@ export interface UsageStepProps {
 }
 
 export function UsageStep({ selectedKeys, usageByKey, overridesByKey, onChange }: UsageStepProps) {
+  const { t, deviceName } = useI18n();
   const devices = DEVICE_CATALOG.filter((d) => selectedKeys.has(d.key));
 
   return (
@@ -32,11 +34,11 @@ export function UsageStep({ selectedKeys, usageByKey, overridesByKey, onChange }
           <div className="usage-row usage-row-in" style={{ '--i': i } as CSSProperties} key={device.key}>
             <div className="usage-top">
               <div className="usage-icon"><ApplianceVisual iconKey={device.iconKey} size={17} imageSize={25} /></div>
-              <div className="usage-name">{device.name}</div>
+              <div className="usage-name">{deviceName(device.key, device.name)}</div>
               <div className="usage-watt">
                 <input
                   type="number"
-                  aria-label={`${device.name} watt değeri`}
+                  aria-label={t('usage.wattAria', { name: deviceName(device.key, device.name) })}
                   value={usage.watt}
                   onChange={(e) => onChange(device.key, { watt: Number(e.target.value) })}
                 />
@@ -47,26 +49,26 @@ export function UsageStep({ selectedKeys, usageByKey, overridesByKey, onChange }
               {HOUR_PRESETS.map((preset) => (
                 <button
                   type="button"
-                  key={preset.label}
+                  key={preset.labelKey}
                   className={cn('usage-preset-chip', usage.hoursPerWeek === preset.hours && 'selected')}
                   aria-pressed={usage.hoursPerWeek === preset.hours}
                   onClick={() => onChange(device.key, { hoursPerWeek: preset.hours })}
                 >
-                  {preset.label}
+                  {t(preset.labelKey)}
                 </button>
               ))}
             </div>
             <div className="usage-slider-row">
               <Slider
                 className="usage-slider"
-                aria-label={`${device.name} haftalık kullanım saati`}
+                aria-label={t('usage.hoursAria', { name: deviceName(device.key, device.name) })}
                 min={0}
                 max={168}
                 step={0.5}
                 value={[usage.hoursPerWeek]}
                 onValueChange={(v) => onChange(device.key, { hoursPerWeek: Array.isArray(v) ? v[0] : v })}
               />
-              <span className="usage-val mono">{usage.hoursPerWeek.toFixed(1)} sa/hafta</span>
+              <span className="usage-val mono">{usage.hoursPerWeek.toFixed(1)} {t('usage.perWeek')}</span>
             </div>
           </div>
         );

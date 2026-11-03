@@ -10,16 +10,19 @@ import { learnDeviceCorrections, type HistoricalBillSample } from '../../lib/lea
 import { requestInterstitial } from '../../lib/ads';
 import { DEVICE_CATALOG } from '../../data/deviceCatalog';
 import { supabase } from '../../lib/supabaseClient';
+import { useI18n } from '../../i18n/I18nContext';
 import { Button } from '../../components/ui/button';
 import './AddFlow.css';
 
 const OTHER_DEVICE_NAME = 'Diğer / Bilinmeyen Tüketim';
 const HISTORY_WINDOW = 12; // how many past bills feed the learned calibration
 
-const STEP_LABELS = ['Fatura', 'Cihazlar', 'Kullanım', 'Sonuç'];
+const STEP_KEYS = ['add.step.bill', 'add.step.devices', 'add.step.usage', 'add.step.result'];
 
 export function AddFlow() {
   const navigate = useNavigate();
+  const { t, lang, deviceName } = useI18n();
+  const stepLabels = STEP_KEYS.map((key) => t(key));
   const [step, setStep] = useState(0);
   const [furthest, setFurthest] = useState(0);
   const prevStepRef = useRef(0);
@@ -174,7 +177,8 @@ export function AddFlow() {
       method: 'POST',
       headers: { 'content-type': 'application/json', authorization: `Bearer ${accessToken}` },
       body: JSON.stringify({
-        deviceName: catalogEntry.name,
+        deviceName: deviceName(catalogEntry.key, catalogEntry.name),
+        lang,
         watt: usage.watt,
         hoursPerWeek: usage.hoursPerWeek,
         calibratedTl: top.calibratedTl,
@@ -195,7 +199,7 @@ export function AddFlow() {
     const { data: userData } = await supabase.auth.getUser();
     const userId = userData.user?.id;
     if (!userId) {
-      setSaveError('Oturum bulunamadı, tekrar giriş yap.');
+      setSaveError(t('add.sessionMissing'));
       setSaving(false);
       return;
     }
@@ -218,7 +222,7 @@ export function AddFlow() {
       .single();
 
     if (billError || !billRow) {
-      setSaveError('Fatura kaydedilemedi, tekrar dene.');
+      setSaveError(t('add.saveBillError'));
       setSaving(false);
       return;
     }
@@ -261,7 +265,7 @@ export function AddFlow() {
 
     if (itemsError) {
       setSaving(false);
-      setSaveError('Cihaz kırılımı kaydedilemedi, tekrar dene.');
+      setSaveError(t('add.saveItemsError'));
       return;
     }
 
@@ -288,8 +292,8 @@ export function AddFlow() {
         <div className="add-success-icon">
           <CheckCircle2 size={56} strokeWidth={1.6} />
         </div>
-        <h2 className="display">Fatura kaydedildi</h2>
-        <p className="add-success-sub">Ana sayfana yönlendiriliyorsun...</p>
+        <h2 className="display">{t('add.savedTitle')}</h2>
+        <p className="add-success-sub">{t('add.savedSub')}</p>
       </div>
     );
   }
@@ -297,16 +301,16 @@ export function AddFlow() {
   return (
     <div className="add-shell">
       <p aria-live="polite" className="sr-only">
-        {`Adım ${step + 1} / ${STEP_LABELS.length}: ${STEP_LABELS[step]}`}
+        {t('add.stepOf', { n: step + 1, total: stepLabels.length, label: stepLabels[step] })}
       </p>
       <div className="add-progress-head">
-        <span className="add-progress-label">{STEP_LABELS[step]}</span>
-        <span className="add-progress-count mono">{step + 1} / {STEP_LABELS.length}</span>
+        <span className="add-progress-label">{stepLabels[step]}</span>
+        <span className="add-progress-count mono">{step + 1} / {stepLabels.length}</span>
       </div>
       <div
         className="add-progress"
         role="tablist"
-        aria-label="Adımlar"
+        aria-label={t('add.steps')}
         onKeyDown={(e) => {
           if (e.key === 'ArrowRight') {
             const next = Math.min(step + 1, furthest);
@@ -316,13 +320,13 @@ export function AddFlow() {
           }
         }}
       >
-        {STEP_LABELS.map((label, i) => (
+        {stepLabels.map((label, i) => (
           <button
             key={i}
             type="button"
             role="tab"
             aria-selected={i === step}
-            aria-label={`Adım ${i + 1}: ${label}`}
+            aria-label={t('add.stepAria', { n: i + 1, label })}
             disabled={i > furthest}
             className={i < step ? 'done' : i === step ? 'active' : ''}
             onClick={() => i !== step && goToStep(i)}
@@ -368,14 +372,14 @@ export function AddFlow() {
       <div className="add-row-btns">
         {step > 0 ? (
           <Button type="button" variant="outline" size="lg" className="h-12 flex-none" onClick={() => goToStep(step - 1)}>
-            Geri
+            {t('add.back')}
           </Button>
         ) : (
           <Button type="button" variant="outline" size="lg" className="h-12 flex-none" onClick={() => navigate('/')}>
-            İptal
+            {t('add.cancel')}
           </Button>
         )}
-        {step < STEP_LABELS.length - 1 ? (
+        {step < stepLabels.length - 1 ? (
           <Button
             type="button"
             size="lg"
@@ -383,11 +387,11 @@ export function AddFlow() {
             disabled={(step === 0 && bill.billTl <= 0) || (step === 1 && selectedDevices.size === 0)}
             onClick={() => goToStep(step + 1)}
           >
-            Devam et
+            {t('add.next')}
           </Button>
         ) : (
           <Button type="button" size="lg" className="h-12 flex-1 text-base" disabled={saving} onClick={saveBill}>
-            {saving ? 'Kaydediliyor...' : 'Kaydet'}
+            {saving ? t('add.saving') : t('add.save')}
           </Button>
         )}
       </div>
