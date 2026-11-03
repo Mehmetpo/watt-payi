@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState, type CSSProperties } from 'react';
 import { RotateCcw, WifiOff, TriangleAlert, PlayCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { useOnboarding } from '../../contexts/OnboardingContext';
+import { useI18n } from '../../i18n/I18nContext';
+import type { LanguagePreference } from '../../i18n/language';
 import { scheduleMonthlyReminder } from '../../lib/notifications';
 import { DEVICE_CATALOG } from '../../data/deviceCatalog';
 import { ApplianceVisual } from '../../components/ApplianceVisual';
@@ -15,7 +17,10 @@ import { PrivacyLink } from '../../components/PrivacyLink';
 import { HoldToConfirmButton } from '../../components/HoldToConfirmButton';
 import './ProfileScreen.css';
 
+const LANGUAGE_OPTIONS: LanguagePreference[] = ['auto', 'tr', 'en'];
+
 export function ProfileScreen() {
+  const { t, lang, preference, setPreference, deviceName } = useI18n();
   const [reminderDay, setReminderDay] = useState(5);
   const [budgetTl, setBudgetTl] = useState<number | null>(null);
   const [email, setEmail] = useState('');
@@ -64,11 +69,11 @@ export function ProfileScreen() {
       setWatts(map);
     } catch (err) {
       console.error('ProfileScreen: profil verileri yüklenemedi', err);
-      setError('Profil yüklenemedi. Bağlantını kontrol edip tekrar dene.');
+      setError(t('profile.loadError'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     load();
@@ -85,11 +90,11 @@ export function ProfileScreen() {
         .from('profiles')
         .upsert({ id: userData.user.id, reminder_day: day });
       if (upsertError) throw upsertError;
-      await scheduleMonthlyReminder(day);
+      await scheduleMonthlyReminder(day, lang);
     } catch (err) {
       console.error('ProfileScreen: hatırlatma günü kaydedilemedi', err);
       setReminderDay(previous);
-      setSaveError('Değişiklik kaydedilemedi. Tekrar dene.');
+      setSaveError(t('profile.saveError'));
     }
   }
 
@@ -107,7 +112,7 @@ export function ProfileScreen() {
     } catch (err) {
       console.error('ProfileScreen: bütçe hedefi kaydedilemedi', err);
       setBudgetTl(previous);
-      setSaveError('Değişiklik kaydedilemedi. Tekrar dene.');
+      setSaveError(t('profile.saveError'));
     }
   }
 
@@ -133,8 +138,15 @@ export function ProfileScreen() {
         else next.set(deviceKey, previous);
         return next;
       });
-      setSaveError('Değişiklik kaydedilemedi. Tekrar dene.');
+      setSaveError(t('profile.saveError'));
     }
+  }
+
+  function changeLanguage(next: LanguagePreference) {
+    setPreference(next);
+    // Re-schedule an already-permitted reminder so its text follows the new language.
+    const nextLang = next === 'auto' ? lang : next;
+    void scheduleMonthlyReminder(reminderDay, nextLang, { requestPermission: false }).catch(() => {});
   }
 
   async function signOut() {
@@ -152,7 +164,7 @@ export function ProfileScreen() {
       await supabase.auth.signOut();
     } catch (err) {
       console.error('ProfileScreen: hesap silinemedi', err);
-      setDeleteError('Hesap silinemedi. Bağlantını kontrol edip tekrar dene.');
+      setDeleteError(t('profile.deleteError'));
       setDeleting(false);
     }
   }
@@ -169,7 +181,7 @@ export function ProfileScreen() {
 
   return (
     <div className="profile-shell">
-      <h1 className="display profile-in" style={{ '--i': 0 } as CSSProperties}>Profil</h1>
+      <h1 className="display profile-in" style={{ '--i': 0 } as CSSProperties}>{t('profile.title')}</h1>
 
       {loading ? (
         <Card className="profile-card profile-in" style={{ '--i': 1 } as CSSProperties}>
@@ -192,7 +204,7 @@ export function ProfileScreen() {
             </div>
             <p>{error}</p>
             <button type="button" className="profile-retry-btn" onClick={load}>
-              Tekrar dene
+              {t('profile.retry')}
             </button>
           </CardContent>
         </Card>
@@ -200,21 +212,21 @@ export function ProfileScreen() {
         <Card className="profile-card profile-in" style={{ '--i': 1 } as CSSProperties}>
           <CardContent>
             <div className="profile-field">
-              <Label>Hesap</Label>
+              <Label>{t('profile.account')}</Label>
               <span className="mono">{email}</span>
             </div>
             <div className="profile-field profile-field-stack">
-              <Label id="reminderDayLabel">Ayın kaçında hatırlat</Label>
+              <Label id="reminderDayLabel">{t('profile.reminderDay')}</Label>
               <DayOfMonthPicker value={reminderDay} onChange={saveReminderDay} labelId="reminderDayLabel" />
             </div>
             <div className="profile-field">
-              <Label htmlFor="budgetTl">Aylık bütçe hedefi</Label>
+              <Label htmlFor="budgetTl">{t('profile.budget')}</Label>
               <div className="profile-budget-input">
                 <Input
                   id="budgetTl"
                   type="number"
                   min={1}
-                  placeholder="Belirlenmedi"
+                  placeholder={t('profile.budgetPlaceholder')}
                   className="profile-num-input"
                   value={budgetTl ?? ''}
                   onChange={(e) => setBudgetTl(e.target.value === '' ? null : Number(e.target.value))}
@@ -228,11 +240,32 @@ export function ProfileScreen() {
       )}
 
       <Card className="profile-card profile-in" style={{ '--i': 2 } as CSSProperties}>
+        <CardContent>
+          <div className="profile-field profile-field-stack">
+            <Label id="languageLabel">{t('profile.language')}</Label>
+            <div className="profile-lang-group" role="radiogroup" aria-labelledby="languageLabel">
+              {LANGUAGE_OPTIONS.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  role="radio"
+                  aria-checked={preference === option}
+                  className="profile-lang-option"
+                  onClick={() => changeLanguage(option)}
+                >
+                  {option === 'auto' ? t('profile.languageAuto') : option === 'tr' ? 'Türkçe' : 'English'}
+                </button>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="profile-card profile-in" style={{ '--i': 3 } as CSSProperties}>
         <CardHeader>
-          <CardTitle>Varsayılan watt değerleri</CardTitle>
+          <CardTitle>{t('profile.wattTitle')}</CardTitle>
           <CardDescription>
-            Her cihazın ortalama güç tüketimi (watt). Hesaplamalarda bu değerler kullanılır —
-            kendi cihazın farklıysa üzerine dokunup düzenleyebilirsin.
+            {t('profile.wattDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -255,12 +288,12 @@ export function ProfileScreen() {
                     <div className="profile-device-icon">
                       <ApplianceVisual iconKey={device.iconKey} size={17} imageSize={25} />
                     </div>
-                    <span>{device.name}</span>
+                    <span>{deviceName(device.key, device.name)}</span>
                     {isOverridden && (
                       <button
                         type="button"
                         className="profile-watt-reset"
-                        aria-label="Varsayılana dön"
+                        aria-label={t('profile.resetWatt')}
                         onClick={() => saveWatt(device.key, device.defaultWatt)}
                       >
                         <RotateCcw size={14} strokeWidth={2} />
@@ -268,7 +301,7 @@ export function ProfileScreen() {
                     )}
                     <Input
                       type="number"
-                      aria-label={`${device.name} watt değeri`}
+                      aria-label={t('profile.wattAria', { name: deviceName(device.key, device.name) })}
                       className="profile-num-input profile-watt-input"
                       value={watts.get(device.key) ?? device.defaultWatt}
                       onChange={(e) => saveWatt(device.key, Number(e.target.value))}
@@ -282,7 +315,7 @@ export function ProfileScreen() {
               className="profile-devices-toggle"
               onClick={() => setShowAllDevices((v) => !v)}
             >
-              {showAllDevices ? 'Daha az göster' : `Tüm cihazları göster (${hiddenDeviceCount})`}
+              {showAllDevices ? t('profile.showLess') : t('profile.showAll', { count: hiddenDeviceCount })}
             </button>
           )}
         </CardContent>
@@ -299,44 +332,44 @@ export function ProfileScreen() {
         variant="ghost"
         size="lg"
         className="w-full h-12 text-base profile-in"
-        style={{ '--i': 3 } as CSSProperties}
+        style={{ '--i': 4 } as CSSProperties}
         onClick={onboarding.show}
       >
         <PlayCircle strokeWidth={1.8} />
-        Tanıtımı tekrar izle
+        {t('profile.replayTour')}
       </Button>
 
       <Button
         variant="outline"
         size="lg"
         className="w-full h-12 text-base profile-in"
-        style={{ '--i': 4 } as CSSProperties}
+        style={{ '--i': 5 } as CSSProperties}
         onClick={signOut}
       >
-        Çıkış yap
+        {t('profile.signOut')}
       </Button>
 
       <PrivacyLink />
 
-      <div className="profile-danger-zone profile-in" style={{ '--i': 5 } as CSSProperties}>
+      <div className="profile-danger-zone profile-in" style={{ '--i': 6 } as CSSProperties}>
         {!confirmingDelete ? (
           <Button variant="link" className="profile-delete-link" onClick={() => setConfirmingDelete(true)}>
-            Hesabımı kalıcı olarak sil
+            {t('profile.deleteLink')}
           </Button>
         ) : (
           <div className="profile-delete-confirm">
             <TriangleAlert size={16} strokeWidth={1.8} />
-            <p>Bu işlem geri alınamaz. Tüm faturaların ve cihaz verilerin kalıcı olarak silinir.</p>
+            <p>{t('profile.deleteWarning')}</p>
             <div className="profile-delete-confirm-actions">
               <Button variant="outline" size="sm" onClick={() => setConfirmingDelete(false)} disabled={deleting}>
-                Vazgeç
+                {t('profile.cancel')}
               </Button>
               <HoldToConfirmButton
                 className="profile-hold-delete"
                 onConfirm={deleteAccount}
                 disabled={deleting}
-                idleLabel={deleting ? 'Siliniyor...' : 'Basılı tutarak sil'}
-                holdingLabel="Bırakma, siliniyor..."
+                idleLabel={deleting ? t('profile.deleting') : t('profile.holdToDelete')}
+                holdingLabel={t('profile.holdingDelete')}
               />
             </div>
           </div>

@@ -50,6 +50,18 @@
 .profile-devices-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 @media (prefers-reduced-motion: reduce) { .profile-devices-toggle { transition: none; } }
 
+.profile-lang-group {
+  display: flex; gap: .25rem; padding: .25rem; background: var(--surface-sunken); border-radius: var(--radius-lg);
+}
+.profile-lang-option {
+  flex: 1; border: 0; background: transparent; color: var(--ink-muted); font-family: inherit;
+  font-size: .82rem; font-weight: 700; padding: .55rem .4rem; border-radius: var(--radius-md); cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.profile-lang-option[aria-checked='true'] { background: var(--surface); color: var(--accent); box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+.profile-lang-option:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+@media (prefers-reduced-motion: reduce) { .profile-lang-option { transition: none; } }
+
 .profile-error { text-align: center; color: var(--ink-muted); padding: 1rem; }
 .profile-error p { margin: 0 0 .25rem; }
 .profile-error-icon { background: var(--coral-soft); color: var(--coral); }
