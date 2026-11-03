@@ -78,7 +78,10 @@
 .device-section-chevron.open { transform: rotate(180deg); }
 @media (prefers-reduced-motion: reduce) { .device-section-chevron { transition: none; } }
 
-.device-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; }
+/* Columns are rem-based and may shrink to 0 so a larger system font scale drops to 2 columns
+   (and long names wrap) instead of pushing the grid past the screen edge. */
+.devices-step, .device-section { min-width: 0; }
+.device-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 6.25rem), 1fr)); gap: .6rem; }
 .device-card {
   position: relative;
   border: 1.5px solid var(--line); border-radius: var(--radius-lg); background: var(--surface-sunken);
@@ -90,7 +93,8 @@
 .device-card:hover { border-color: var(--accent); }
 .device-card:active { transform: scale(.96); }
 .device-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.device-card span { font-size: .7rem; font-weight: 600; color: var(--ink-muted); transition: color var(--dur-fast) var(--ease-out); }
+.device-card { min-width: 0; }
+.device-card span { font-size: .7rem; font-weight: 600; color: var(--ink-muted); max-width: 100%; overflow-wrap: anywhere; hyphens: auto; transition: color var(--dur-fast) var(--ease-out); }
 .device-card svg { color: var(--ink-muted); transition: color var(--dur-fast) var(--ease-out); }
 .device-card.on { background: var(--accent-soft); border-color: var(--accent); animation: device-card-pop 320ms var(--ease-out); }
 .device-card.on span, .device-card.on svg { color: var(--accent-strong); }
