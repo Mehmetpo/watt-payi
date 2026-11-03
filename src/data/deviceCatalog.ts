@@ -65,6 +65,7 @@ export const DEVICE_CATALOG: DeviceCatalogEntry[] = [
 export const COMMON_DEVICE_KEYS = ['fridge', 'lighting', 'tv', 'washer', 'vacuum', 'router', 'kettle', 'iron'];
 
 export interface DeviceCategory {
+  id: string;
   label: string;
   keys: string[];
 }
@@ -72,8 +73,9 @@ export interface DeviceCategory {
 // Everything outside COMMON_DEVICE_KEYS, grouped so the device picker can
 // disclose the long tail progressively instead of one long card wall.
 export const DEVICE_CATEGORIES: DeviceCategory[] = [
-  { label: 'Beyaz Eşya', keys: ['dishwasher', 'dryer', 'freezer', 'minifridge'] },
+  { id: 'whiteGoods', label: 'Beyaz Eşya', keys: ['dishwasher', 'dryer', 'freezer', 'minifridge'] },
   {
+    id: 'kitchen',
     label: 'Mutfak',
     keys: [
       'oven', 'toaster', 'microwave', 'blender', 'coffee', 'hood',
@@ -81,9 +83,9 @@ export const DEVICE_CATEGORIES: DeviceCategory[] = [
       'mixer', 'juicer',
     ],
   },
-  { label: 'Isıtma & Soğutma', keys: ['ac', 'heater', 'fan', 'spaceheater', 'dehumidifier', 'airpurifier', 'electricblanket', 'waterheatertank'] },
-  { label: 'Elektronik', keys: ['pc', 'gameconsole', 'projector', 'smartspeaker', 'printer', 'laptop', 'monitor', 'soundbar', 'mediabox'] },
-  { label: 'Temizlik', keys: ['robotvacuum', 'handvacuum'] },
-  { label: 'Kişisel Bakım', keys: ['hairdryer', 'hairstraightener', 'shaver'] },
-  { label: 'Diğer Ev Aletleri', keys: ['sewingmachine', 'aquarium', 'evcharger', 'lawnmower'] },
+  { id: 'climate', label: 'Isıtma & Soğutma', keys: ['ac', 'heater', 'fan', 'spaceheater', 'dehumidifier', 'airpurifier', 'electricblanket', 'waterheatertank'] },
+  { id: 'electronics', label: 'Elektronik', keys: ['pc', 'gameconsole', 'projector', 'smartspeaker', 'printer', 'laptop', 'monitor', 'soundbar', 'mediabox'] },
+  { id: 'cleaning', label: 'Temizlik', keys: ['robotvacuum', 'handvacuum'] },
+  { id: 'personalCare', label: 'Kişisel Bakım', keys: ['hairdryer', 'hairstraightener', 'shaver'] },
+  { id: 'otherAppliances', label: 'Diğer Ev Aletleri', keys: ['sewingmachine', 'aquarium', 'evcharger', 'lawnmower'] },
 ];

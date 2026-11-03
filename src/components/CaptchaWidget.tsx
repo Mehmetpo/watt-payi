@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile';
+import { useI18n } from '../i18n/I18nContext';
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string;
 const BRIDGE_URL = import.meta.env.VITE_TURNSTILE_BRIDGE_URL as string | undefined;
@@ -27,6 +28,7 @@ export const CaptchaWidget = forwardRef<CaptchaHandle, CaptchaWidgetProps>(funct
   { onSuccess, onInvalidate },
   ref,
 ) {
+  const { lang, t } = useI18n();
   const useBridge = Capacitor.getPlatform() === 'ios' && !!BRIDGE_URL;
   const turnstileRef = useRef<TurnstileInstance>(null);
   const frameRef = useRef<HTMLIFrameElement>(null);
@@ -62,12 +64,12 @@ export const CaptchaWidget = forwardRef<CaptchaHandle, CaptchaWidgetProps>(funct
   if (useBridge && BRIDGE_URL) {
     const src = new URL(BRIDGE_URL);
     src.searchParams.set('sitekey', SITE_KEY);
-    src.searchParams.set('lang', 'tr');
+    src.searchParams.set('lang', lang);
     return (
       <iframe
         ref={frameRef}
         src={src.toString()}
-        title="Güvenlik doğrulaması"
+        title={t('captcha.title')}
         className="captcha-bridge-frame"
         // Normal Turnstile widget: 300×65.
         width={300}
@@ -80,6 +82,7 @@ export const CaptchaWidget = forwardRef<CaptchaHandle, CaptchaWidgetProps>(funct
     <Turnstile
       ref={turnstileRef}
       siteKey={SITE_KEY}
+      options={{ language: lang }}
       onSuccess={onSuccess}
       onExpire={onInvalidate}
       onError={onInvalidate}

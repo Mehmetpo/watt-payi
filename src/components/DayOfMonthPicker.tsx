@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useI18n } from '../i18n/I18nContext';
 import './DayOfMonthPicker.css';
 
 export interface DayOfMonthPickerProps {
@@ -11,6 +12,7 @@ export interface DayOfMonthPickerProps {
 }
 
 export function DayOfMonthPicker({ value, onChange, max = 28, labelId }: DayOfMonthPickerProps) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const days = Array.from({ length: max }, (_, i) => i + 1);
   const gridId = useId();
@@ -40,12 +42,17 @@ export function DayOfMonthPicker({ value, onChange, max = 28, labelId }: DayOfMo
         onClick={() => setOpen((o) => !o)}
       >
         <span>
-          Her ayın <strong className="mono">{value}.</strong> günü
+          {t('dayPicker.pre')}
+          <strong className="mono">
+            {value}
+            {t('dayPicker.daySuffix')}
+          </strong>
+          {t('dayPicker.post')}
         </span>
         <ChevronDown size={15} strokeWidth={2} className={'day-picker-chevron' + (open ? ' open' : '')} />
       </button>
       {open && (
-        <div id={gridId} className="day-picker-grid" role="group" aria-label="Ayın günü seç">
+        <div id={gridId} className="day-picker-grid" role="group" aria-label={t('dayPicker.aria')}>
           {days.map((day) => (
             <button
               type="button"

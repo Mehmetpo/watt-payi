@@ -3,6 +3,7 @@ import { ApplianceVisual } from './ApplianceVisual';
 import { useCountUp } from '../hooks/useCountUp';
 import type { BillItem } from '../types/domain';
 import { donutSegmentGradient } from '../lib/donutGradient';
+import { useI18n } from '../i18n/I18nContext';
 import './BillBreakdown.css';
 
 const CAT_COLORS = [
@@ -28,6 +29,9 @@ export interface BillBreakdownProps {
 }
 
 export function BillBreakdown({ totalTl, items, iconKeyFor, showTotal = true }: BillBreakdownProps) {
+  const { number, percent, deviceName } = useI18n();
+  const nameOf = (item: { deviceKey: string | null; deviceName: string }) =>
+    deviceName(item.deviceKey, item.deviceName);
   const [active, setActive] = useState<number | null>(null);
   const sorted = [...items].sort((a, b) => b.calibratedTl - a.calibratedTl);
   const top = sorted[0];
@@ -67,14 +71,14 @@ export function BillBreakdown({ totalTl, items, iconKeyFor, showTotal = true }: 
           {top && (
             <div className="breakdown-donut-center" style={{ color: CAT_COLORS[0] }}>
               <ApplianceVisual iconKey={iconKeyFor(top.deviceKey)} size={20} imageSize={30} />
-              <span className="breakdown-donut-top-name">{top.deviceName}</span>
-              <span className="breakdown-donut-top-pct mono">%{top.pctShare.toFixed(0)}</span>
+              <span className="breakdown-donut-top-name">{nameOf(top)}</span>
+              <span className="breakdown-donut-top-pct mono">{percent(top.pctShare.toFixed(0))}</span>
             </div>
           )}
         </div>
         {showTotal && (
           <div className="breakdown-total mono">
-            {totalDisplay.toLocaleString('tr-TR')}
+            {number(totalDisplay)}
             <span>TL</span>
           </div>
         )}
@@ -96,10 +100,10 @@ export function BillBreakdown({ totalTl, items, iconKeyFor, showTotal = true }: 
             </div>
             <div className="breakdown-main">
               <div className="breakdown-top">
-                <span className="breakdown-name">{item.deviceName}</span>
+                <span className="breakdown-name">{nameOf(item)}</span>
                 <span className="breakdown-amount mono">
-                  {Math.round(item.calibratedTl).toLocaleString('tr-TR')} TL
-                  <small>%{item.pctShare.toFixed(0)}</small>
+                  {number(Math.round(item.calibratedTl))} TL
+                  <small>{percent(item.pctShare.toFixed(0))}</small>
                 </span>
               </div>
               <div className="breakdown-track">

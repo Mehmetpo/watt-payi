@@ -1,43 +1,20 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { User, Camera, Zap, PieChart, Sparkle } from 'lucide-react';
 import { useOnboarding } from '../../contexts/OnboardingContext';
+import { useI18n } from '../../i18n/I18nContext';
 import './OnboardingTour.css';
 
 interface Slide {
   id: string;
-  title: string;
-  description: string;
   tileColor: string;
 }
 
+// Copy lives in the dictionaries as onboarding.<id>.title / .desc.
 const SLIDES: Slide[] = [
-  {
-    id: 'welcome',
-    title: "watt-payi'ye hoş geldin",
-    description:
-      'Elektrik faturanı cihazlarına göre otomatik olarak bölüştürüp, evindeki gerçek tüketim dağılımını gösterir.',
-    tileColor: 'var(--accent)',
-  },
-  {
-    id: 'bill',
-    title: 'Faturanı fotoğrafla',
-    description:
-      'Elektrik faturanın fotoğrafını çek, tutarı ve dönemi biz senin için okuyalım — elle girmene gerek kalmasın.',
-    tileColor: 'var(--chart-4)',
-  },
-  {
-    id: 'devices',
-    title: 'Cihazlarını seç',
-    description:
-      'Evindeki buzdolabı, klima, çamaşır makinesi gibi cihazları işaretle, biz saatlik kullanımına göre payını hesaplayalım.',
-    tileColor: 'var(--chart-5)',
-  },
-  {
-    id: 'result',
-    title: 'Harcamanı gör',
-    description: 'Hangi cihaz ne kadar tüketiyor, grafikte gör — ve tasarruf için kişisel önerini al.',
-    tileColor: 'var(--good)',
-  },
+  { id: 'welcome', tileColor: 'var(--accent)' },
+  { id: 'bill', tileColor: 'var(--chart-4)' },
+  { id: 'devices', tileColor: 'var(--chart-5)' },
+  { id: 'result', tileColor: 'var(--good)' },
 ];
 
 // Small looping CSS-only scenes (no framer-motion, see project convention) that give
@@ -104,6 +81,7 @@ const SCENES: Record<string, () => JSX.Element> = {
 
 export function OnboardingTour() {
   const { dismiss } = useOnboarding();
+  const { t } = useI18n();
   const [activeIndex, setActiveIndex] = useState(0);
   const dialogRef = useRef<HTMLDivElement>(null);
   const skipButtonRef = useRef<HTMLButtonElement>(null);
@@ -177,7 +155,7 @@ export function OnboardingTour() {
         className="onboarding-dialog"
         role="dialog"
         aria-modal="true"
-        aria-label="Uygulama tanıtımı"
+        aria-label={t('onboarding.aria')}
         tabIndex={-1}
         onKeyDown={handleDialogKeyDown}
       >
@@ -201,8 +179,8 @@ export function OnboardingTour() {
         </div>
 
         <div className="onboarding-text" key={slide.id + '-text'}>
-          <h2>{slide.title}</h2>
-          <p>{slide.description}</p>
+          <h2>{t(`onboarding.${slide.id}.title`)}</h2>
+          <p>{t(`onboarding.${slide.id}.desc`)}</p>
         </div>
 
         <div className="onboarding-footer">
@@ -213,14 +191,14 @@ export function OnboardingTour() {
             disabled={isFirst}
             style={{ visibility: isFirst ? 'hidden' : 'visible' }}
           >
-            Geri
+            {t('common.back')}
           </button>
           <div className="onboarding-footer-right">
             <button ref={skipButtonRef} type="button" className="onboarding-btn-ghost" onClick={dismiss}>
-              Geç
+              {t('common.skip')}
             </button>
             <button type="button" className="onboarding-btn-primary" onClick={handleNext}>
-              {isLast ? 'Başla' : 'İleri'}
+              {isLast ? t('common.start') : t('common.next')}
             </button>
           </div>
         </div>

@@ -1,15 +1,16 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Home, History, Plus, CircleUserRound } from 'lucide-react';
+import { useI18n } from '../i18n/I18nContext';
 import './BottomNav.css';
 
 const TABS = [
-  { to: '/', label: 'Ana Sayfa', Icon: Home },
-  { to: '/history', label: 'Geçmiş', Icon: History },
+  { to: '/', labelKey: 'nav.home', Icon: Home },
+  { to: '/history', labelKey: 'nav.history', Icon: History },
 ];
 
 const TABS_RIGHT = [
-  { to: '/profile', label: 'Profil', Icon: CircleUserRound },
+  { to: '/profile', labelKey: 'nav.profile', Icon: CircleUserRound },
 ];
 
 const ALL_TABS = [...TABS, ...TABS_RIGHT];
@@ -20,6 +21,7 @@ interface PillRect {
 }
 
 export function BottomNav() {
+  const { t } = useI18n();
   const location = useLocation();
   const navRef = useRef<HTMLElement>(null);
   const itemRefs = useRef<Map<string, HTMLAnchorElement>>(new Map());
@@ -46,7 +48,7 @@ export function BottomNav() {
     return () => window.removeEventListener('resize', measure);
   }, [activeTo]);
 
-  function renderTab({ to, label, Icon }: (typeof ALL_TABS)[number]) {
+  function renderTab({ to, labelKey, Icon }: (typeof ALL_TABS)[number]) {
     return (
       <NavLink
         key={to}
@@ -59,7 +61,7 @@ export function BottomNav() {
         className={({ isActive }) => 'bottom-nav__item' + (isActive ? ' active' : '')}
       >
         <Icon className="bottom-nav__icon" size={22} strokeWidth={1.7} />
-        <span className="bottom-nav__label">{label}</span>
+        <span className="bottom-nav__label">{t(labelKey)}</span>
       </NavLink>
     );
   }
@@ -75,7 +77,7 @@ export function BottomNav() {
       )}
       {TABS.map(renderTab)}
 
-      <NavLink to="/add" aria-label="Fatura ekle" className="bottom-nav__fab">
+      <NavLink to="/add" aria-label={t('nav.addBill')} className="bottom-nav__fab">
         <Plus size={24} strokeWidth={2.2} />
       </NavLink>
 
