@@ -12,3 +12,10 @@ export const PRIVACY_POLICY_URL: string | null = /^https:\/\//i.test(configured)
   : import.meta.env.DEV
     ? '/gizlilik.html'
     : null;
+
+// The English policy is published next to the Turkish one (privacy.html beside
+// gizlilik.html), so the localized URL is derived from the configured one.
+export function privacyPolicyUrlFor(lang: string): string | null {
+  if (!PRIVACY_POLICY_URL) return null;
+  return lang === 'en' ? PRIVACY_POLICY_URL.replace(/gizlilik\.html$/i, 'privacy.html') : PRIVACY_POLICY_URL;
+}

@@ -1,0 +1,4 @@
+"NSUserTrackingUsageDescription" = "We use this permission to show you more relevant ads.";
+"NSCameraUsageDescription" = "We need camera access so you can photograph your bill.";
+"NSPhotoLibraryUsageDescription" = "We need photo library access so you can pick a photo of your bill.";
+"NSPhotoLibraryAddUsageDescription" = "We need photo library access so you can save your bill photo.";

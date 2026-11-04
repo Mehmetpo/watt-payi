@@ -1,0 +1,4 @@
+"NSUserTrackingUsageDescription" = "Sana daha alakalı reklamlar göstermek için bu izni kullanıyoruz.";
+"NSCameraUsageDescription" = "Fatura fotoğrafı çekebilmek için kamera erişimine ihtiyacımız var.";
+"NSPhotoLibraryUsageDescription" = "Fatura fotoğrafı seçebilmek için galeri erişimine ihtiyacımız var.";
+"NSPhotoLibraryAddUsageDescription" = "Fatura fotoğrafını kaydedebilmek için galeri erişimine ihtiyacımız var.";
