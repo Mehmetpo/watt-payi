@@ -65,8 +65,7 @@ Please note: the breakdown is an estimate based on the figures you enter, not a 
 Watt Payı is now available in English! The app follows your device language, and you can switch between English and Turkish any time in Profile.
 ```
 
-**Support URL / Privacy Policy URL / Marketing URL:** unchanged. An English privacy policy
-page is still needed (see follow-ups in the hand-over report).
+**Support URL / Privacy Policy URL:** use the English page, https://watt-payi.vercel.app/privacy.html.
 
 ---
 
