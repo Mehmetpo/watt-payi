@@ -54,8 +54,10 @@
      when the WebView is edge-to-edge) — env() is unreliable on Android
      WebViews < 140, so prefer the injected value; iOS falls back to env(). */
   --safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+  --safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --nav-float-gap: .5rem;
   --bottom-nav-h: 4.25rem;
-  --content-bottom-pad: calc(var(--bottom-nav-h) + var(--safe-bottom) + var(--ad-banner-height, 0px) + 2.5rem);
+  --content-bottom-pad: calc(var(--bottom-nav-h) + var(--safe-bottom) + var(--ad-banner-height, 0px) + var(--nav-float-gap) + 2.5rem);
 }
 
 @media (prefers-color-scheme: dark) {

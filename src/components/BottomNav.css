@@ -1,30 +1,27 @@
 .bottom-nav {
-  /* Flush to the bottom, its own padding clearing the gesture inset. */
-  position: fixed; bottom: 0; left: 0; right: 0;
+  /* Floating pill: lifted off the bottom edge (and off the AdMob banner) so the
+     two never read as one glued-together strip. */
+  position: fixed; left: .75rem; right: .75rem;
+  bottom: calc(var(--safe-bottom) + var(--nav-float-gap));
   display: flex; justify-content: space-around; align-items: center;
-  background: var(--surface); border-top: 1px solid var(--line);
-  padding: .4rem 0 calc(.4rem + var(--safe-bottom));
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 1.5rem; box-shadow: 0 6px 22px rgba(0,0,0,.22);
+  padding: .4rem 0;
   z-index: 10;
   transition: bottom var(--dur-base) var(--ease-out);
 }
 /* While the app-wide AdMob banner is up (body.has-ad-banner, --ad-banner-height
-   set by the ad controller) the nav sits above it on every screen. The native
-   banner is layered over the WebView, anchored *above* the system bar / home
-   indicator (iOS: the plugin pins it to the safe area; Android: MainActivity
-   sets its bottom margin to the same inset this var carries), and the SDK
-   reports only its own height — so clear the banner and the inset, and drop
-   the nav's own
-   inset padding, which now sits behind the banner. */
+   set by the ad controller) the nav floats above it. The native banner is
+   anchored above the system bar / home indicator, and the SDK reports only its
+   own height, so clear the banner and the inset plus the float gap. */
 body.has-ad-banner .bottom-nav {
-  bottom: calc(var(--ad-banner-height, 0px) + var(--safe-bottom));
-  padding-bottom: .4rem;
+  bottom: calc(var(--ad-banner-height, 0px) + var(--safe-bottom) + var(--nav-float-gap));
 }
-body.has-ad-banner .bottom-nav__pill { bottom: .3rem; }
 @media (prefers-reduced-motion: reduce) {
   .bottom-nav { transition: none; }
 }
 .bottom-nav__pill {
-  position: absolute; top: .3rem; bottom: calc(.3rem + var(--safe-bottom)); left: 0;
+  position: absolute; top: .3rem; bottom: .3rem; left: 0;
   background: var(--accent-soft); border-radius: var(--radius-md);
   transition: transform var(--dur-base) var(--ease-out);
   z-index: 0; pointer-events: none;

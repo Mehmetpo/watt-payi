@@ -1,4 +1,4 @@
-.login-shell { position: relative; max-width: 360px; margin: 0 auto; padding: 4.5rem 1.5rem 3rem; display: flex; flex-direction: column; gap: .5rem; overflow: hidden; }
+.login-shell { position: relative; max-width: 360px; margin: 0 auto; padding: calc(4.5rem + var(--safe-top)) 1.5rem 3rem; display: flex; flex-direction: column; gap: .5rem; overflow: hidden; }
 .login-glow {
   position: absolute; top: -120px; left: 50%; width: 340px; height: 340px; margin-left: -170px;
   background: var(--hero-gradient); filter: blur(60px); opacity: .28; border-radius: 50%; z-index: -1;
