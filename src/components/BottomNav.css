@@ -1,27 +1,35 @@
 .bottom-nav {
-  /* Floating pill: lifted off the bottom edge (and off the AdMob banner) so the
-     two never read as one glued-together strip. */
-  position: fixed; left: .75rem; right: .75rem;
-  bottom: calc(var(--safe-bottom) + var(--nav-float-gap));
+  /* Docked full-width bar: it fills the screen edge to edge (no rounded corners,
+     no gap) so no app content shows around it. With no banner it runs down to the
+     very bottom and pads itself by the home-indicator inset. */
+  --nav-pad-b: calc(.4rem + var(--safe-bottom));
+  position: fixed; left: 0; right: 0; bottom: 0;
   display: flex; justify-content: space-around; align-items: center;
-  background: var(--surface); border: 1px solid var(--line);
-  border-radius: 1.5rem; box-shadow: 0 6px 22px rgba(0,0,0,.22);
-  padding: .4rem 0;
+  background: var(--surface); border-top: 1px solid var(--line);
+  border-radius: 0; box-shadow: 0 -4px 18px rgba(0,0,0,.16);
+  padding: .4rem .75rem var(--nav-pad-b);
   z-index: 10;
   transition: bottom var(--dur-base) var(--ease-out);
 }
 /* While the app-wide AdMob banner is up (body.has-ad-banner, --ad-banner-height
-   set by the ad controller) the nav floats above it. The native banner is
-   anchored above the system bar / home indicator, and the SDK reports only its
-   own height, so clear the banner and the inset plus the float gap. */
+   set by the ad controller) the nav rides on top of it. The native banner is
+   anchored above the system bar / home indicator and the SDK reports only its
+   own height, so clear banner + inset; the nav then needs no inset padding. */
 body.has-ad-banner .bottom-nav {
-  bottom: calc(var(--ad-banner-height, 0px) + var(--safe-bottom) + var(--nav-float-gap));
+  --nav-pad-b: .4rem;
+  bottom: calc(var(--ad-banner-height, 0px) + var(--safe-bottom));
+}
+/* The strip under the banner (home-indicator inset) is empty WebView; paint it
+   the banner's white so the ad reads as filling the screen bottom. */
+body.has-ad-banner::after {
+  content: ''; position: fixed; left: 0; right: 0; bottom: 0;
+  height: var(--safe-bottom); background: #fff; z-index: 9; pointer-events: none;
 }
 @media (prefers-reduced-motion: reduce) {
   .bottom-nav { transition: none; }
 }
 .bottom-nav__pill {
-  position: absolute; top: .3rem; bottom: .3rem; left: 0;
+  position: absolute; top: .3rem; bottom: calc(var(--nav-pad-b) - .1rem); left: 0;
   background: var(--accent-soft); border-radius: var(--radius-md);
   transition: transform var(--dur-base) var(--ease-out);
   z-index: 0; pointer-events: none;
