@@ -2,9 +2,13 @@ export const INTERSTITIAL_MIN_INTERVAL_MS = 180_000;
 export const SESSION_INTERSTITIAL_CAP = 3;
 export const INITIAL_GRACE_MS = 90_000;
 export const APP_OPEN_MIN_INTERVAL_MS = 180_000;
+// Every app launch starts with a quiet period: no navigation / app-open
+// full-screen ad until the user has actually used the app for a while.
+export const SESSION_GRACE_MS = 120_000;
 
 export interface AdGateState {
   now: number;
+  sessionStartAt: number;
   lastFullScreenAdAt: number | null;
   sessionInterstitialCount: number;
   firstInstallAt: number;
@@ -20,6 +24,7 @@ export function canShowAd(kind: AdKind, s: AdGateState): boolean {
 
   // Grace window applies to navigation + app-open only.
   if (s.now - s.firstInstallAt < INITIAL_GRACE_MS) return false;
+  if (s.now - s.sessionStartAt < SESSION_GRACE_MS) return false;
 
   if (kind === 'navigation') {
     if (s.sessionInterstitialCount >= SESSION_INTERSTITIAL_CAP) return false;

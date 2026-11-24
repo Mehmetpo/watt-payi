@@ -4,11 +4,13 @@ import {
   INTERSTITIAL_MIN_INTERVAL_MS,
   SESSION_INTERSTITIAL_CAP,
   INITIAL_GRACE_MS,
+  SESSION_GRACE_MS,
   type AdGateState,
 } from './adPolicy';
 
 const base: AdGateState = {
   now: 10_000_000,
+  sessionStartAt: 10_000_000 - SESSION_GRACE_MS - 1, // session grace already over
   lastFullScreenAdAt: null,
   sessionInterstitialCount: 0,
   firstInstallAt: 10_000_000 - INITIAL_GRACE_MS - 1, // grace already over
@@ -30,6 +32,13 @@ describe('canShowAd', () => {
     const s = { ...base, firstInstallAt: base.now - (INITIAL_GRACE_MS - 1) };
     expect(canShowAd('navigation', s)).toBe(false);
     expect(canShowAd('app-open', s)).toBe(false);
+  });
+
+  it('blocks navigation + app-open inside the per-launch session grace window', () => {
+    const s = { ...base, sessionStartAt: base.now - (SESSION_GRACE_MS - 1) };
+    expect(canShowAd('navigation', s)).toBe(false);
+    expect(canShowAd('app-open', s)).toBe(false);
+    expect(canShowAd('bill-add', s)).toBe(true);
   });
 
   it('blocks navigation once the session cap is hit', () => {

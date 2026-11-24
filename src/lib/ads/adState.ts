@@ -33,6 +33,7 @@ export function getGateState(): AdGateState {
   const now = clock();
   return {
     now,
+    sessionStartAt: processStartAt,
     lastFullScreenAdAt,
     sessionInterstitialCount,
     firstInstallAt: firstInstallAt ?? now - INITIAL_GRACE_MS,
